@@ -612,7 +612,22 @@ textarea.k-input{resize:vertical;min-height:70px}
       <button class="rail-btn" id="rb-shop" data-s="shop" onclick="goTo('shop')" title="Belohnungen"><span class="rail-ico"><svg viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6L5 8z"></path><path d="M9 8V6a3 3 0 0 1 6 0v2"></path><path d="M9 12v2M15 12v2"></path></svg></span><span class="rail-lbl">Belohnungen</span></button>
     </div>
     <div class="rail-bot">
-      <button class="rail-btn" id="rb-github" data-s="github" onclick="confirm2('URL öffnen?','Möchten Sie https\://github.com/schokos/Kivo/issues wirklich öffnen?', () => window.open('https://github.com/schokos/Kivo/issues', '_blank'))" title="GitHub"><span class="rail-ico"><img src="assets/GitHub Logos/svg/GitHub_Invertocat_White_Clearspace.svg" alt="GitHub" width="24" height="24"></span><span class="rail-lbl">GitHub</span></button>
+      <button class="rail-btn" id="rb-github" data-s="github"
+      onclick="(async()=>{ 
+        const ok = await confirm2(
+          'URL öffnen?',
+          'Möchten Sie https://github.com/schokos/Kivo/issues wirklich öffnen?'
+        );
+        if(ok){
+          window.open('https://github.com/schokos/Kivo/issues', '_blank');
+        }
+      })()"
+      title="GitHub">
+        <span class="rail-ico">
+          <img src="assets/GitHub Logos/svg/GitHub_Invertocat_White_Clearspace.svg" alt="GitHub" width="24" height="24">
+        </span>
+        <span class="rail-lbl">GitHub</span>
+      </button>
       <button class="rail-btn" id="rb-aibot" data-s="aibot" onclick="goTo('aibot')" title="KI-Assistent"><span class="rail-ico"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H8l-4 4V5z"></path><circle cx="9" cy="10.5" r="1.1" fill="currentColor" stroke="none"></circle><circle cx="15" cy="10.5" r="1.1" fill="currentColor" stroke="none"></circle></svg>
       </span><span class="rail-lbl">KI-Assistent</span></button>
       <button class="rail-btn" id="rb-profile" data-s="profile" onclick="goTo('profile')" title="Profil"><span class="rail-ico" id="profile-rail-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"></path></svg></span><span class="rail-lbl">Profil</span></button>
@@ -1983,13 +1998,18 @@ async function syncPoolToServer(lang,name) {
   try { await sb.from('pools').upsert({id:currentUser.id+'_'+esc(mkKey(lang,name)),user_id:currentUser.id,lang,name,data:POOLS[lang][name],updated_at:new Date().toISOString()}); } catch(e){toast('Cloud-Sync fehlgeschlagen: '+e.message);}
 }
 
-function deletePool(key) {
-  confirm2('Pool löschen?','Alle Fortschritte für diesen Pool werden entfernt.',()=>{
+async function deletePool(key) {
+  const ok = await confirm2(
+    'Pool löschen?',
+    'Alle Fortschritte für diesen Pool werden entfernt.'
+  );
+
+  if(ok){
     const {l,p}=spKey(key);
     delete POOLS[l][p]; if(!Object.keys(POOLS[l]).length)delete POOLS[l];
     saveCustom(); if(activeKey===key){const lk=Object.keys(POOLS)[0];activeKey=mkKey(lk,Object.keys(POOLS[lk])[0]);}
     buildVocab(); renderOverview(); toast('Pool gelöscht');
-  });
+  }
 }
 
 function sharePool(key) {
@@ -3014,8 +3034,9 @@ function aiBotSend(preset) {
    STREAM / FETCH
    ========================================================= */
 
-async function fetchAiReply(loadingDiv) {
+   async function fetchAiReply(loadingDiv) {
   console.log('[AI] 🚀 fetchAiReply gestartet');
+
   const msgs = document.getElementById('aibot-msgs');
   const inp = document.getElementById('aibot-inp');
   const session = aiGetActiveSession();
@@ -3028,11 +3049,18 @@ async function fetchAiReply(loadingDiv) {
 
   function extractVocabInfo(rawText) {
     if (!rawText) return null;
+
     try {
       let cleanedText = rawText.trim();
-      while (cleanedText && !cleanedText.startsWith('{') && !cleanedText.startsWith('[')) {
+
+      while (
+        cleanedText &&
+        !cleanedText.startsWith('{') &&
+        !cleanedText.startsWith('[')
+      ) {
         cleanedText = cleanedText.slice(1).trim();
       }
+
       if (!cleanedText) return null;
 
       let name = null;
@@ -3046,6 +3074,7 @@ async function fetchAiReply(loadingDiv) {
       if (totalMatch) totalPairs = parseInt(totalMatch[1], 10);
 
       const pairsMatch = cleanedText.match(/"pairs"\s*:\s*\[([\s\S]*)/);
+
       if (pairsMatch) {
         const pairsContent = pairsMatch[1];
         pairCount = (pairsContent.match(/\{[^}]*"/g) || []).length;
@@ -3067,14 +3096,16 @@ async function fetchAiReply(loadingDiv) {
 
   const persistStreamState = () => {
     const active = aiGetActiveSession();
+
     if (!active || !aiCurrentStream) return;
+
     const idx = aiCurrentStream.assistantIndex;
 
     if (active.messages[idx]) {
       active.messages[idx].content = aiCurrentStream.raw;
       active.messages[idx].streaming = true;
     }
-    
+
     if (aiBotHistory[idx]) {
       aiBotHistory[idx].content = aiCurrentStream.raw;
     }
@@ -3096,7 +3127,9 @@ async function fetchAiReply(loadingDiv) {
     const startTag = '<vocab_list>';
     const endTag = '</vocab_list>';
 
-    if (fullText.includes(startTag)) inVocabBlock = true;
+    if (fullText.includes(startTag)) {
+      inVocabBlock = true;
+    }
 
     if (inVocabBlock && loadingDiv._streamState) {
       const cleaned = loadingDiv._streamState.fullText
@@ -3111,6 +3144,7 @@ async function fetchAiReply(loadingDiv) {
       loadingDiv._streamState.renderedLength = cleaned.length;
 
       loadingDiv.innerHTML = renderMarkdown(cleaned);
+
       renderLatex(loadingDiv);
       highlightCode(loadingDiv);
     }
@@ -3123,13 +3157,18 @@ async function fetchAiReply(loadingDiv) {
         let jsonStart = startIndex + startTag.length;
         let jsonContent = fullText.slice(jsonStart);
 
-        if (jsonContent.startsWith('>')) jsonContent = jsonContent.slice(1);
+        if (jsonContent.startsWith('>')) {
+          jsonContent = jsonContent.slice(1);
+        }
 
         if (endIndex === -1) {
           vocabRawBuffer = jsonContent;
         } else {
           vocabRawBuffer = fullText.slice(jsonStart, endIndex);
-          if (vocabRawBuffer.startsWith('>')) vocabRawBuffer = vocabRawBuffer.slice(1);
+
+          if (vocabRawBuffer.startsWith('>')) {
+            vocabRawBuffer = vocabRawBuffer.slice(1);
+          }
         }
       }
     }
@@ -3141,6 +3180,7 @@ async function fetchAiReply(loadingDiv) {
     if (displayText.trim()) {
       const alreadyRendered = loadingDiv._streamState?.fullText || '';
       const newChunk = displayText.slice(alreadyRendered.length);
+
       if (newChunk) {
         streamText(loadingDiv, newChunk);
       }
@@ -3149,11 +3189,13 @@ async function fetchAiReply(loadingDiv) {
     if (inVocabBlock && !vocabLoaderDiv) {
       vocabLoaderDiv = document.createElement('div');
       vocabLoaderDiv.className = 'ai-msg bot ai-vocab-loader';
+
       vocabLoaderDiv.innerHTML = makeLoadingHTML(
         'KI generiert Vokabelliste...',
         undefined,
         'loading'
       );
+
       msgs.appendChild(vocabLoaderDiv);
       msgs.scrollTop = msgs.scrollHeight;
     }
@@ -3162,15 +3204,26 @@ async function fetchAiReply(loadingDiv) {
       try {
         const labelEl = document.getElementById('loading-label');
         const barEl = document.getElementById('loading-bar');
+
         const vocabInfo = extractVocabInfo(vocabRawBuffer);
 
         if (vocabInfo && vocabInfo.pairCount > 0) {
           const name = vocabInfo.name || 'Unbenannt';
-          const wordLabel = vocabInfo.totalPairs === 1 ? 'Wort' : 'Wörter';
+
+          const wordLabel =
+            vocabInfo.totalPairs === 1
+              ? 'Wort'
+              : 'Wörter';
 
           const text = `Vokabelliste: "${name}" (${vocabInfo.pairCount} ${wordLabel})`;
+
           const progress = vocabInfo.totalPairs
-            ? Math.min(100, Math.round((vocabInfo.pairCount / vocabInfo.totalPairs) * 100))
+            ? Math.min(
+                100,
+                Math.round(
+                  (vocabInfo.pairCount / vocabInfo.totalPairs) * 100
+                )
+              )
             : undefined;
 
           if (!barEl) {
@@ -3180,7 +3233,10 @@ async function fetchAiReply(loadingDiv) {
               'loading'
             );
           } else {
-            if (labelEl) labelEl.textContent = text;
+            if (labelEl) {
+              labelEl.textContent = text;
+            }
+
             barEl.style.width = progress + '%';
           }
         }
@@ -3189,17 +3245,26 @@ async function fetchAiReply(loadingDiv) {
       }
     }
 
-    if (inVocabBlock && fullText.includes(endTag) && !hasRenderedVocab) {
+    if (
+      inVocabBlock &&
+      fullText.includes(endTag) &&
+      !hasRenderedVocab
+    ) {
       hasRenderedVocab = true;
 
       try {
         const vocabData = JSON.parse(vocabRawBuffer);
-        const importEnc = encodeURIComponent(JSON.stringify(vocabData));
+
+        const importEnc = encodeURIComponent(
+          JSON.stringify(vocabData)
+        );
 
         const div = document.createElement('div');
         div.className = 'ai-msg bot ai-vocab-result';
 
-        const label = `Vokabelliste: "${vocabData.name || 'Unbenannt'}" (${vocabData.pairs?.length || 0} Wörter)`;
+        const label =
+          `Vokabelliste: "${vocabData.name || 'Unbenannt'}" ` +
+          `(${vocabData.pairs?.length || 0} Wörter)`;
 
         div.innerHTML = makeLoadingHTML(
           label,
@@ -3207,21 +3272,27 @@ async function fetchAiReply(loadingDiv) {
           'done',
           `
             <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
-              <button class="btn btn-lime btn-sm" onclick="importAiList('${importEnc}')">
+              <button class="btn btn-lime btn-sm"
+                      onclick="importAiList('${importEnc}')">
                 📥 Direkt importieren
               </button>
             </div>
           `
         );
 
-        if (vocabLoaderDiv) vocabLoaderDiv.replaceWith(div);
-        else msgs.appendChild(div);
-
+        if (vocabLoaderDiv) {
+          vocabLoaderDiv.replaceWith(div);
+        } else {
+          msgs.appendChild(div);
+        }
       } catch (e) {
         console.error('[AI] JSON error:', e);
+
         if (vocabLoaderDiv) {
           const errorDiv = document.createElement('div');
+
           errorDiv.className = 'ai-msg bot ai-vocab-result';
+
           errorDiv.innerHTML = makeLoadingHTML(
             'Fehler beim Verarbeiten der Vokabelliste',
             0,
@@ -3229,6 +3300,7 @@ async function fetchAiReply(loadingDiv) {
             '',
             e.message
           );
+
           vocabLoaderDiv.replaceWith(errorDiv);
         }
       }
@@ -3247,12 +3319,14 @@ async function fetchAiReply(loadingDiv) {
 
       requestAnimationFrame(() => {
         const currentChunk = buffer;
+
         buffer = '';
         rafPending = false;
 
         if (!aiCurrentStream) return;
 
         aiCurrentStream.raw += currentChunk;
+
         persistStreamState();
         render(currentChunk);
 
@@ -3261,9 +3335,11 @@ async function fetchAiReply(loadingDiv) {
 
           if (vocabInfo) {
             const name = vocabInfo.name || 'Unbenannt';
+
             const progressText = vocabInfo.totalPairs
               ? `[LIVE UPDATE] Vokabelliste: "${name}" (${vocabInfo.pairCount}/${vocabInfo.totalPairs} Wörter - ${Math.round((vocabInfo.pairCount / vocabInfo.totalPairs) * 100)}%)`
               : `[LIVE UPDATE] Vokabelliste: "${name}" (${vocabInfo.pairCount} Wörter)`;
+
             console.log(progressText);
           } else {
             console.log('[LIVE UPDATE] Warte auf gültigen JSON-Inhalt...');
@@ -3275,64 +3351,91 @@ async function fetchAiReply(loadingDiv) {
 
   try {
     console.log('[AI] 📡 sending request...');
-    const resp = await fetch(SUPABASE_URL + '/functions/v1/kivo-ai', {
-      method: 'POST',
-      headers: await edgeHeaders(),
-      body: JSON.stringify({
-        mode: 'chat',
-        system: AI_SYS,
-        messages: aiBotHistory,
-      }),
-    });
 
-    if (!resp.ok || !resp.body) throw new Error('No stream response');
+    const resp = await fetch(
+      SUPABASE_URL + '/functions/v1/kivo-ai',
+      {
+        method: 'POST',
+        headers: await edgeHeaders(),
+        body: JSON.stringify({
+          mode: 'chat',
+          system: AI_SYS,
+          messages: aiBotHistory
+        })
+      }
+    );
+
+    if (!resp.ok || !resp.body) {
+      throw new Error('No stream response');
+    }
 
     const reader = resp.body.getReader();
     const decoder = new TextDecoder();
 
     while (true) {
       const { done, value } = await reader.read();
+
       if (done) break;
+
       const chunk = decoder.decode(value, { stream: true });
+
       processStream(chunk);
     }
 
     const tail = decoder.decode();
-    if (tail) processStream(tail);
 
-    // finalisieren
+    if (tail) {
+      processStream(tail);
+    }
+
+    // Stream finalisieren
     const active = aiGetActiveSession();
+
     if (active && aiCurrentStream) {
       const idx = aiCurrentStream.assistantIndex;
+
       if (active.messages[idx]) {
         active.messages[idx].content = aiCurrentStream.raw;
         active.messages[idx].streaming = false;
       }
+
       if (aiBotHistory[idx]) {
         aiBotHistory[idx].content = aiCurrentStream.raw;
       }
+
       active.streaming = {
         active: false,
         assistantIndex: null,
         raw: ''
       };
+
       aiSaveChatSessions();
     }
   } catch (e) {
     console.error('[AI] 💥 ERROR:', e);
-    loadingDiv.innerHTML = makeLoadingHTML('Fehler', 0, 'error', '', e.message);
+
+    loadingDiv.innerHTML = makeLoadingHTML(
+      'Fehler',
+      0,
+      'error',
+      '',
+      e.message
+    );
   } finally {
     aiCurrentStream = null;
+
     if (inp) {
       inp.disabled = false;
       inp.style.opacity = '1';
       inp.style.pointerEvents = 'auto';
       inp.focus();
     }
+
     setAiInputLocked(false);
+
     aiSaveChatSessions();
-    renderAiSessionMessages(active);
-    renderAiBot();
+
+    renderAiSessionMessages(aiGetActiveSession());
   }
 }
 
@@ -3493,16 +3596,26 @@ function getPassState(){
   return raw;
 }
 function savePassState(s){ lsSet('kivo_pass',s); }
-function buyProPass(){
+async function buyProPass(){
   const s=getPassState();
   if(s.proOwned){toast('Pro Pass ist bereits aktiv');return;}
   if(userCurrency<PASS_PRO_PRICE){toast('Nicht genug Münzen ('+PASS_PRO_PRICE+' nötig)');return;}
-  confirm2('Pro Pass kaufen?','Pro Pass für '+PASS_PRO_PRICE+' Münzen freischalten? Du erhältst dann auf jedem Level eine Belohnung.',()=>{
-    userCurrency-=PASS_PRO_PRICE; lsSet('kivo_currency',userCurrency);
-    s.proOwned=true; savePassState(s);
-    toast('Pro Pass aktiviert!');
-    renderPass(); updateCurrencyDisplay();
-  });
+    const ok = await confirm2(
+      'Pro Pass kaufen?',
+      'Pro Pass für '+PASS_PRO_PRICE+' Münzen freischalten? Du erhältst dann auf jedem Level eine Belohnung.'
+    );
+
+    if(ok){
+      userCurrency -= PASS_PRO_PRICE;
+      lsSet('kivo_currency', userCurrency);
+
+      s.proOwned = true;
+      savePassState(s);
+
+      toast('Pro Pass aktiviert!');
+      renderPass();
+      updateCurrencyDisplay();
+    }
 }
 function claimPass(track, lvl){
   const s=getPassState();
@@ -3972,17 +4085,28 @@ function renderShop() {
     </div>`;
 }
 
-function buyItem(id) {
+async function buyItem(id) {
   if(!currentUser){toast('Bitte zuerst anmelden');return;}
   const it=SHOP_ITEMS.find(i=>i.id===id); if(!it)return;
   if(userItems.includes(id)){toast('Bereits im Besitz');return;}
   if(userCurrency<it.price){toast('Nicht genug Münzen! ('+it.price+' benötigt)');return;}
-  confirm2('Item kaufen?',it.name+' für '+it.price+' Münzen kaufen?',()=>{
-    userCurrency-=it.price; lsSet('kivo_currency',userCurrency);
-    userItems.push(id); localStorage.setItem('kivo_items',JSON.stringify(userItems));
+  const ok = await confirm2(
+    'Item kaufen?',
+    it.name+' für '+it.price+' Münzen kaufen?'
+  );
+
+  if(ok){
+    userCurrency -= it.price;
+    lsSet('kivo_currency', userCurrency);
+
+    userItems.push(id);
+    localStorage.setItem('kivo_items', JSON.stringify(userItems));
+
     toast(it.name+' gekauft! Verfügbar im Avatar-Builder.');
-    renderShop(); updateCurrencyDisplay();
-  });
+
+    renderShop();
+    updateCurrencyDisplay();
+  }
 }
 
 // ── FRIEND PANEL ──────────────────────────────────────────────
