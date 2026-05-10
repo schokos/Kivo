@@ -832,7 +832,7 @@ textarea.k-input{resize:vertical;min-height:70px}
             <div class="app-page-title">KI-Assistent</div>
             <div class="app-page-sub">Stelle Fragen oder lass dir Lerntipps geben.</div>
           </div>
-          <!-- <button class="btn btn-lime btn-sm" onclick="openChatModal()">Chats</button> -->
+          <button class="btn btn-lime btn-sm" onclick="openChatModal()">Chats</button>
         </div>
         <div class="aibot-wrap" id="aibot-wrap"></div>
       </div>
@@ -1094,7 +1094,6 @@ let sessions = [];
 let currentUser = null;
 let fpFriendIds = [];
 let fpTab = 'board';
-let aiBotHistory = [];
 let gapVocab = [];
 let confirmCb = null;
 let cIdx = 0, cDeck = [], cFlipped = false;
@@ -1270,13 +1269,39 @@ function toast(msg) {
   const el=document.createElement('div'); el.className='k-toast'; el.textContent=msg;
   wrap.appendChild(el); setTimeout(()=>el.remove(),2800);
 }
-function confirm2(title,msg,cb) {
-  document.getElementById('confirm-title').textContent=title;
-  document.getElementById('confirm-msg').textContent=msg;
-  confirmCb=cb;
-  document.getElementById('confirm-ok').onclick=()=>{document.getElementById('confirm-overlay').classList.remove('open');cb&&cb();};
-  document.getElementById('confirm-overlay').classList.add('open');
+function confirm2(title, msg) {
+  return new Promise((resolve) => {
+    const overlay = document.getElementById('confirm-overlay');
+    const okBtn = document.getElementById('confirm-ok');
+    const cancelBtn = document.getElementById('confirm-cancel');
+
+    document.getElementById('confirm-title').textContent = title;
+    document.getElementById('confirm-msg').textContent = msg;
+
+    overlay.classList.add('open');
+
+    const close = (result) => {
+      overlay.classList.remove('open');
+
+      okBtn.onclick = null;
+      if (cancelBtn) cancelBtn.onclick = null;
+
+      resolve(result);
+    };
+
+    okBtn.onclick = () => close(true);
+
+    if (cancelBtn) {
+      cancelBtn.onclick = () => close(false);
+    }
+
+    // optional: Klick auf Hintergrund = cancel
+    overlay.onclick = (e) => {
+      if (e.target === overlay) close(false);
+    };
+  });
 }
+
 function openModal(id) { document.getElementById(id)?.classList.add('open'); }
 function closeModal(id) { document.getElementById(id)?.classList.remove('open'); }
 
@@ -2250,6 +2275,8 @@ function checkGapLive(inp) {
 
 
 // ── AI CHATBOT ───────────────────────────────────────────────
+let aiBotHistory = [];
+
 const AI_SYS = `Du bist der Kivo-Assistent — ein freundlicher Sprachlern-Helfer.
 Du hilfst beim Vokabellernen und beantwortest Fragen. Dein Benutzer ist ${currentUser?.username}.
 
@@ -2335,114 +2362,441 @@ function highlightCode(el) {
   });
 }
 
-function streamText(el, text, speed = 10000) {
-  if (!el) return Promise.resolve();
+/* =========================================================
+   AI CHAT SESSIONS + LOCALSTORAGE + RESUME + CHAT MODAL
+   ========================================================= */
 
-  return new Promise((resolve) => {
+const AI_CHAT_STORAGE_KEY = 'kivo_ai_chat_sessions_v1';
+const AI_CHAT_ACTIVE_KEY = 'kivo_ai_active_session_v1';
 
-    if (!el._streamState) {
-      el._streamState = {
-        fullText: '',
-        renderedLength: 0,
-        animating: false,
-        speed
-      };
-    }
+let aiChatSessions = {};
+let aiChatOrder = [];
+let aiActiveChatId = null;
 
-    const state = el._streamState;
+// Laufender Stream im aktiven Chat
+// { sessionId, assistantIndex, raw, requestId, loadingDiv }
+let aiCurrentStream = null;
 
-    state.fullText += text;
-
-    if (state.animating) return resolve(); // wichtig!
-
-    state.animating = true;
-
-    const step = () => {
-      const targetLength = state.fullText.length;
-
-      state.renderedLength += Math.max(
-        1,
-        Math.ceil((targetLength - state.renderedLength) / speed)
-      );
-
-      state.renderedLength = Math.min(state.renderedLength, targetLength);
-
-      const visibleText = state.fullText.slice(0, state.renderedLength);
-
-      el.innerHTML = renderMarkdown(visibleText);
-
-      renderLatex(el);
-      highlightCode(el);
-
-      const msgs = document.getElementById('aibot-msgs');
-      if (msgs) msgs.scrollTop = msgs.scrollHeight;
-
-      if (state.renderedLength < state.fullText.length) {
-        requestAnimationFrame(step);
-      } else {
-        state.animating = false;
-        resolve(); // 🔥 WICHTIG: Promise beenden
-      }
-    };
-
-    requestAnimationFrame(step);
-  });
+function aiUid(prefix = 'chat') {
+  return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
 }
 
-async function streamWelcomeMessage() {
-  const el = document.getElementById('welcome-msg');
-  if (!el) return;
-  // Stream-State zurücksetzen
-  el._streamState = null;
-  const text = `
-# 👋 Willkommen ${currentUser.username}
+function aiNow() {
+  return Date.now();
+}
+
+function aiWelcomeText() {
+  return `
+# 👋 Willkommen ${currentUser?.username || ''}
 Ich bin der **Kivo-Assistent**.
+
 Ich kann:
 - 📚 Vokabellisten erstellen
 - 🧠 Beim Lernen helfen
 - ✍️ Texte erklären
 - ➗ Mathe mit LaTeX darstellen
+
 Zum Beispiel:
+
 $$
 a^2+b^2=c^2
 $$
-`;
+`.trim();
+}
 
+function aiGetSession(id = aiActiveChatId) {
+  return id && aiChatSessions[id] ? aiChatSessions[id] : null;
+}
+
+function aiGetActiveSession() {
+  return aiGetSession(aiActiveChatId);
+}
+
+function aiEnsureSession() {
+  let session = aiGetActiveSession();
+  if (!session) {
+    session = aiCreateChatSession('Neuer Chat', true);
+  }
+  return session;
+}
+
+function aiSaveChatSessions() {
+  try {
+    const payload = {
+      activeId: aiActiveChatId,
+      order: aiChatOrder,
+      sessions: aiChatSessions
+    };
+    localStorage.setItem(AI_CHAT_STORAGE_KEY, JSON.stringify(payload));
+    localStorage.setItem(AI_CHAT_ACTIVE_KEY, aiActiveChatId || '');
+  } catch (e) {
+    console.warn('[AI] Speicherfehler:', e);
+  }
+}
+
+function aiLoadChatSessions() {
+  try {
+    const raw = localStorage.getItem(AI_CHAT_STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      aiChatSessions = parsed.sessions && typeof parsed.sessions === 'object' ? parsed.sessions : {};
+      aiChatOrder = Array.isArray(parsed.order)
+        ? parsed.order.filter(id => aiChatSessions[id])
+        : Object.keys(aiChatSessions);
+
+      const storedActive = parsed.activeId || localStorage.getItem(AI_CHAT_ACTIVE_KEY);
+      aiActiveChatId = storedActive && aiChatSessions[storedActive]
+        ? storedActive
+        : (aiChatOrder[0] || null);
+    }
+
+    if (!aiActiveChatId) {
+      const s = aiCreateChatSession('Neuer Chat', true);
+      aiActiveChatId = s.id;
+    }
+
+    return aiGetActiveSession();
+  } catch (e) {
+    console.warn('[AI] Sessions konnten nicht geladen werden:', e);
+    aiChatSessions = {};
+    aiChatOrder = [];
+    const s = aiCreateChatSession('Neuer Chat', true);
+    aiActiveChatId = s.id;
+    return s;
+  }
+}
+
+function aiCreateChatSession(title = 'Neuer Chat', makeActive = true) {
+  const id = aiUid('chat');
+  const session = {
+    id,
+    title,
+    createdAt: aiNow(),
+    updatedAt: aiNow(),
+    messages: [],
+    streaming: {
+      active: false,
+      assistantIndex: null,
+      raw: ''
+    }
+  };
+
+  aiChatSessions[id] = session;
+  aiChatOrder.unshift(id);
+
+  if (makeActive) {
+    aiActiveChatId = id;
+  }
+
+  aiSaveChatSessions();
+  return session;
+}
+
+function aiTouchSession(id = aiActiveChatId) {
+  const s = aiGetSession(id);
+  if (!s) return;
+  s.updatedAt = aiNow();
+  aiSaveChatSessions();
+}
+
+function aiRenameChatSession(id, newTitle) {
+  const s = aiGetSession(id);
+  if (!s) return;
+  const t = (newTitle || '').trim();
+  if (!t) return;
+  s.title = t.slice(0, 60);
+  s.updatedAt = aiNow();
+  aiSaveChatSessions();
+  openChatModal();
+  renderAiBot();
+}
+
+function aiDeleteChatSession(id) {
+  const s = aiGetSession(id);
+  console.log('[AI] Deleting session', id, s);
+  if (!s) return;
+
+  if (aiCurrentStream?.sessionId === id) {
+    aiCurrentStream = null;
+  }
+
+  delete aiChatSessions[id];
+  aiChatOrder = aiChatOrder.filter(x => x !== id);
+
+  if (aiActiveChatId === id) {
+    aiActiveChatId = aiChatOrder[0] || null;
+
+    if (!aiActiveChatId) {
+      const fresh = aiCreateChatSession('Neuer Chat', true);
+      aiActiveChatId = fresh.id;
+    }
+  }
+
+  aiSaveChatSessions();
+  renderAiBot();
+
+  if (document.getElementById('chat-overlay')?.classList.contains('open')) {
+    openChatModal();
+  }
+}
+
+function aiSwitchChatSession(id) {
+  if (!aiChatSessions[id]) return;
+
+  aiActiveChatId = id;
+  aiSaveChatSessions();
+  closeChatModal();
+  renderAiBot();
+}
+
+function aiSessionPreview(session) {
+  const last = [...(session.messages || [])].reverse().find(m => m?.content);
+  if (!last) return 'Leerer Chat';
+
+  const text = String(last.content)
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  return text.length > 72 ? text.slice(0, 72) + '…' : text;
+}
+
+function aiFormatSessionTime(ts) {
+  try {
+    return new Date(ts).toLocaleString('de-DE', {
+      day: '2-digit',
+      month: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  } catch {
+    return '';
+  }
+}
+
+function aiEnsureChatModal() {
+  if (document.getElementById('chat-overlay') && document.getElementById('chat-panel')) return;
+
+  const overlay = document.createElement('div');
+  overlay.id = 'chat-overlay';
+  overlay.className = 'fp-overlay';
+  overlay.onclick = closeChatModal;
+
+  const panel = document.createElement('div');
+  panel.id = 'chat-panel';
+  panel.className = 'fp-panel';
+  panel.innerHTML = `
+    <div class="fp-head">
+      <div style="font-size:13px;font-weight:800;">Chats</div>
+      <button class="btn btn-sm" onclick="closeChatModal()">✕</button>
+    </div>
+    <div class="fp-body" id="chat-modal-body"></div>
+  `;
+
+  document.body.appendChild(overlay);
+  document.body.appendChild(panel);
+}
+
+function openChatModal() {
+  aiEnsureChatModal();
+
+  const overlay = document.getElementById('chat-overlay');
+  const panel = document.getElementById('chat-panel');
+  const body = document.getElementById('chat-modal-body');
+
+  if (!overlay || !panel || !body) return;
+
+  body.innerHTML = `
+    <div style="display:flex;gap:8px;margin-bottom:12px;">
+      <button class="btn btn-lime btn-sm" onclick="aiCreateAndOpenNewChat()">＋ Neuer Chat</button>
+      <button class="btn btn-sm" onclick="aiLoadChatSessions();openChatModal()">↻ Aktualisieren</button>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      ${
+        aiChatOrder.length
+          ? aiChatOrder.map(id => {
+              const s = aiChatSessions[id];
+              const active = id === aiActiveChatId;
+              const preview = aiSessionPreview(s);
+              const time = aiFormatSessionTime(s.updatedAt || s.createdAt);
+
+              return `
+                <div class="friend-row ${active ? 'me' : ''}"
+                    style="align-items:flex-start;cursor:pointer"
+                    onclick='aiSwitchChatSession("${id}")'>
+                  <div class="f-info" style="min-width:0;">
+                    <div class="f-name" style="display:flex;align-items:center;gap:8px;justify-content:space-between;">
+                      <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                        ${escapeHtml(s.title || 'Unbenannt')}
+                      </span>
+                    </div>
+                    <div class="f-pts" style="margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                      ${escapeHtml(preview)}
+                    </div>
+                    <div class="f-pts" style="margin-top:4px;opacity:.75;">
+                      ${escapeHtml(time)}
+                    </div>
+                  </div>
+
+                  <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
+                    <button class="btn btn-sm"
+                            onclick='event.stopPropagation();openRenameChatModal("${id}")'>
+                      Umbenennen
+                    </button>
+                    <button class="btn btn-sm btn-danger"
+                            onclick='event.stopPropagation();aiConfirmDeleteChat("${id}")'>
+                      Löschen
+                    </button>
+                  </div>
+                </div>
+              `;
+            }).join('')
+          : `<div style="color:var(--muted);font-size:12px;padding:10px 0;">Noch keine Chats vorhanden.</div>`
+      }
+    </div>
+  `;
+
+  overlay.classList.add('open');
+  panel.classList.add('open');
+}
+
+function closeChatModal() {
+  const overlay = document.getElementById('chat-overlay');
+  const panel = document.getElementById('chat-panel');
+  if (overlay) overlay.classList.remove('open');
+  if (panel) panel.classList.remove('open');
+}
+
+function aiCreateAndOpenNewChat() {
+  aiCreateChatSession('Neuer Chat', true);
+  aiSaveChatSessions();
+  closeChatModal();
+  renderAiBot();
+}
+
+function openRenameChatModal(id) {
+  const s = aiGetSession(id);
+  if (!s) return;
+
+  document.getElementById('npm-title').textContent = 'Chat umbenennen';
+
+  document.getElementById('new-pool-content').innerHTML = `
+    <div class="k-group">
+      <label class="k-label">Chat-Name</label>
+      <input class="k-input" id="chat-rename-input" value="${(s.title || '').replace(/"/g,'&quot;')}">
+    </div>
+
+    <button class="btn btn-lime" style="width:100%" onclick="saveRenamedChat('${id}')">
+      Speichern
+    </button>
+  `;
+
+  openModal('new-pool-modal');
+}
+
+function saveRenamedChat(id) {
+  const input = document.getElementById('chat-rename-input');
+  if (!input) return;
+
+  const val = input.value.trim();
+  if (!val) return;
+
+  aiRenameChatSession(id, val);
+  closeModal('new-pool-modal');
+}
+
+async function aiConfirmDeleteChat(id) {
+  const s = aiGetSession(id);
+  if (!s) return;
+
+  const ok = await Promise.resolve(
+    confirm2(`Chat "${s.title || 'Unbenannt'}" wirklich löschen?`)
+  );
+
+  if (!ok) return;
+  aiDeleteChatSession(id);
+}
+
+/* =========================================================
+   UI LOCK
+   ========================================================= */
+
+function setAiInputLocked(locked) {
   const inp = document.getElementById('aibot-inp');
-  if (inp) {
-    inp.value = '';
-    setAiInputLocked(true);
-  }
-
-  await streamText(el, text);
+  const btn = document.getElementById('aibot-send-btn');
 
   if (inp) {
-    setAiInputLocked(false);
+    inp.disabled = locked;
+    inp.style.opacity = locked ? '0.6' : '1';
+    inp.style.pointerEvents = locked ? 'none' : 'auto';
   }
+
+  if (btn) {
+    btn.disabled = locked;
+    btn.innerHTML = locked
+      ? `<div class="kivo-spinner"></div>`
+      : `➤`;
+  }
+}
+
+/* =========================================================
+   RENDER
+   ========================================================= */
+
+function aiRecoverStaleStreaming(session) {
+  if (!session?.streaming?.active) return;
+
+  const idx = session.streaming.assistantIndex;
+  const msg = session.messages?.[idx];
+
+  if (msg && msg.role === 'assistant') {
+    msg.content = msg.content || session.streaming.raw || '';
+    msg.streaming = false;
+  }
+
+  session.streaming = {
+    active: false,
+    assistantIndex: null,
+    raw: ''
+  };
+
+  aiSaveChatSessions();
 }
 
 function renderAiBot() {
   const wrap = document.getElementById('aibot-wrap');
   if (!wrap) return;
 
-  // Login-Prüfung
-  if(!currentUser){
-    wrap.innerHTML=`<div class="k-card" style="text-align:center;padding:42px"><div style="color:var(--lime);margin-bottom:12px">${ic('lock',42)}</div><div style="font-size:14px;font-weight:800;margin-bottom:8px">Anmeldung erforderlich</div><button class="btn btn-lime" onclick="openModal('auth-modal')">Anmelden</button></div>`;
+  if (!currentUser) {
+    wrap.innerHTML = `
+      <div class="k-card" style="text-align:center;padding:42px">
+        <div style="color:var(--lime);margin-bottom:12px">${ic('lock',42)}</div>
+        <div style="font-size:14px;font-weight:800;margin-bottom:8px">Anmeldung erforderlich</div>
+        <button class="btn btn-lime" onclick="openModal('auth-modal')">Anmelden</button>
+      </div>`;
     return;
   }
 
-  // Standard-Inhalt, falls eingeloggt
+  aiLoadChatSessions();
+  const session = aiGetActiveSession();
+  if (!session) return;
+
+  aiRecoverStaleStreaming(session);
+
   wrap.innerHTML = `
     <div class="aibot-msgs" id="aibot-msgs">
       <div class="ai-msg bot" id="welcome-msg"></div>
     </div>
+
     <div class="ai-suggest-wrap" id="ai-suggests">
       ${AI_TIPS.map(s => `
-        <div class="ai-suggest" onclick="aiBotSend('${s.replace(/'/g, "\\'")}')">
-          ${s}
+        <div class="ai-suggest" data-tip="${escapeHtml(s)}" onclick="aiBotSend(this.dataset.tip)">
+          ${escapeHtml(s)}
         </div>
       `).join('')}
     </div>
+
     <div class="ai-input-row">
       <input
         class="k-input"
@@ -2451,132 +2805,230 @@ function renderAiBot() {
         style="flex:1"
         onkeydown="if(event.key==='Enter' && !this.disabled) aiBotSend()"
       >
-      <button class="btn btn-lime btn-sm" id="aibot-send-btn" onclick="aiBotSend()">
-        ➤
-      </button>
+      <button class="btn btn-lime btn-sm" id="aibot-send-btn" onclick="aiBotSend()">➤</button>
     </div>
   `;
-  streamWelcomeMessage();
+
+  const msgs = document.getElementById('aibot-msgs');
+  const sug = document.getElementById('ai-suggests');
+
+  if (!session) return;
+
+  // Load message history from session into aiBotHistory
+  aiBotHistory = (session.messages || []).map(m => ({ role: m.role, content: m.content }));
+
+  // bestehende Chats sofort aufbauen
+  if (Array.isArray(session.messages) && session.messages.length > 0) {
+    if (sug) sug.style.display = 'none';
+    renderAiSessionMessages(session);
+    return;
+  }
+
+  // leerer Chat: Welcome direkt in den Session-Flow schreiben
+  if (sug) sug.style.display = 'flex';
+  streamWelcomeMessage({ noStream: false });
 }
 
-function setAiInputLocked(locked) {
-  const inp = document.getElementById('aibot-inp');
-  const btn = document.getElementById('aibot-send-btn');
+function renderAiSessionMessages(session) {
+  const msgs = document.getElementById('aibot-msgs');
+  const sug = document.getElementById('ai-suggests');
+  if (!msgs || !session) return;
 
-  if (!inp || !btn) return;
+  msgs.innerHTML = '';
 
-  inp.disabled = locked;
-  inp.style.opacity = locked ? '0.6' : '1';
-  inp.style.pointerEvents = locked ? 'none' : 'auto';
+  for (let i = 0; i < session.messages.length; i++) {
+    const m = session.messages[i];
+    const div = document.createElement('div');
+    div.className = `ai-msg ${m.role === 'user' ? 'user' : 'bot'}`;
 
-  btn.disabled = locked;
+    if (m.role === 'user') {
+      div.textContent = m.content || '';
+    } else {
+      div.innerHTML = renderMarkdown(m.content || '');
+      renderLatex(div);
+      highlightCode(div);
 
-  btn.innerHTML = locked
-    ? `<div class="kivo-spinner"></div>`
-    : `➤`;
-}
-
-function makeLoadingHTML(
-  label,
-  progress,
-  mode = 'loading',
-  buttonHTML = '',
-  errorMsg = '',
-) {
-  const isError = mode === 'error';
-  const isDone = mode === 'done';
-  const isLoading = mode === 'loading';
-
-  const safeProgress = Math.max(0, Math.min(100, Number(progress) || 0));
-
-  const statusText = isError
-    ? escapeHtml(label + ': ' + errorMsg || 'Ein Fehler ist aufgetreten')
-    : escapeHtml(label || (isDone ? 'Fertig' : 'Bitte warten...'));
-
-  const icon = isLoading
-    ? `<div class="kivo-spinner"></div>`
-    : `
-      <div style="width:16px;height:16px;display:flex;align-items:center;justify-content:center;font-size:14px;">
-        ${isError ? '⚠' : '✓'}
-      </div>
-    `;
-
-  buttonHTML =  buttonHTML
-    ? `<div style="margin-top:10px;">${buttonHTML}</div>`
-    : '';
-
-  return `
-    <div style="padding:12px 16px;background:rgba(0,0,0,.05);border-radius:12px;margin:4px 0;">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:${progress !== undefined ? '8px' : '0'};">
-        ${icon}
-        <span id="loading-label" style="font-size:13px;color:${isError ? 'var(--danger)' : 'var(--muted)'}">
-          ${statusText}
-        </span>
-      </div>
-
-      ${
-        progress !== undefined && isLoading
-          ? `
-          <div style="height:4px;width:100%;background:rgba(0,0,0,.1);border-radius:999px;overflow:hidden;">
-            <div id="loading-bar"
-              style="height:100%;width:${safeProgress}%;border-radius:999px;background:var(--lime);transition:width .25s ease;">
-            </div>
-          </div>
-        `
-          : ''
+      if (m.streaming) {
+        const badge = document.createElement('div');
+        badge.className = 'streaming-badge';
+        badge.style.cssText =
+          'margin-top:8px;font-size:11px;opacity:.7;display:flex;align-items:center;gap:8px;';
+        badge.innerHTML = `<div class="kivo-spinner"></div><span>Wird wiederhergestellt…</span>`;
+        div.appendChild(badge);
       }
-      ${buttonHTML}
-    </div>
-  `;
+    }
+
+    msgs.appendChild(div);
+  }
+
+  if (sug) sug.style.display = session.messages.length ? 'none' : 'flex';
+  msgs.scrollTop = msgs.scrollHeight;
 }
 
-function aiBotSend(preset) {
+/* =========================================================
+   WELCOME
+   ========================================================= */
+
+async function streamWelcomeMessage({ noStream = false } = {}) {
+  const session = aiEnsureSession();
+  const el = document.getElementById('welcome-msg');
   const inp = document.getElementById('aibot-inp');
-  const msg = preset || (inp?.value || '').trim();
-  if (!msg) return;
+
+  if (!session) return;
+
+  // Wenn bereits Inhalt existiert, niemals nochmal streamen
+  if (session.messages.length > 0) {
+    renderAiSessionMessages(session);
+    return;
+  }
+
+  const text = aiWelcomeText();
+
+  if (noStream) {
+    session.messages.push({ role: 'assistant', content: text, kind: 'welcome', streaming: false });
+    session.updatedAt = aiNow();
+    aiSaveChatSessions();
+
+    if (el) {
+      el.innerHTML = renderMarkdown(text);
+      renderLatex(el);
+      highlightCode(el);
+    }
+    return;
+  }
 
   if (inp) {
     inp.value = '';
-    setAiInputLocked(true);
+    inp.disabled = true;
+    inp.style.opacity = '0.6';
+    inp.style.pointerEvents = 'none';
   }
+
+  // Welcome als Stream persistent machen
+  const assistantIndex = session.messages.length;
+  session.messages.push({
+    role: 'assistant',
+    content: '',
+    kind: 'welcome',
+    streaming: true
+  });
+  session.streaming = {
+    active: true,
+    assistantIndex,
+    raw: ''
+  };
+  aiCurrentStream = {
+    sessionId: session.id,
+    assistantIndex,
+    raw: '',
+    requestId: aiUid('stream'),
+    loadingDiv: el
+  };
+  aiSaveChatSessions();
+
+  await streamText(el, text);
+
+  session.messages[assistantIndex].content = text;
+  session.messages[assistantIndex].streaming = false;
+  session.streaming = {
+    active: false,
+    assistantIndex: null,
+    raw: ''
+  };
+  aiCurrentStream = null;
+  aiSaveChatSessions();
+
+  if (inp) {
+    inp.disabled = false;
+    inp.style.opacity = '1';
+    inp.style.pointerEvents = 'auto';
+  }
+}
+
+/* =========================================================
+   SEND
+   ========================================================= */
+
+function aiBotSend(preset) {
+  const session = aiEnsureSession();
+  const inp = document.getElementById('aibot-inp');
+  const msg = (preset || (inp?.value || '')).trim();
+  if (!msg) return;
+
+  if (inp) inp.value = '';
+  setAiInputLocked(true);
 
   const msgs = document.getElementById('aibot-msgs');
   if (!msgs) return;
 
-  aiBotHistory.push({ role: 'user', content: msg });
+  if (document.getElementById('ai-suggests')) {
+    document.getElementById('ai-suggests').style.display = 'none';
+  }
+
+  // User message - add to both aiBotHistory and session.messages
+  const userMsg = { role: 'user', content: msg };
+  aiBotHistory.push(userMsg);
+  session.messages.push(userMsg);
+  aiTouchSession(session.id);
 
   const userDiv = document.createElement('div');
   userDiv.className = 'ai-msg user';
   userDiv.textContent = msg;
   msgs.appendChild(userDiv);
 
+  // Assistant placeholder
   const loadingDiv = document.createElement('div');
   loadingDiv.className = 'ai-msg bot';
   loadingDiv.innerHTML = makeLoadingHTML('KI generiert Antwort...', undefined, 'loading');
   msgs.appendChild(loadingDiv);
-
   msgs.scrollTop = msgs.scrollHeight;
-  const sug = document.getElementById('ai-suggests');
-  if (sug) sug.style.display = 'none';
 
+  const assistantIndex = aiBotHistory.length;
+  const assistantMsg = {
+    role: 'assistant',
+    content: '',
+    streaming: true
+  };
+  aiBotHistory.push(assistantMsg);
+  session.messages.push(assistantMsg);
+
+  session.streaming = {
+    active: true,
+    assistantIndex,
+    raw: ''
+  };
+
+  aiCurrentStream = {
+    sessionId: session.id,
+    assistantIndex,
+    raw: '',
+    requestId: aiUid('stream'),
+    loadingDiv
+  };
+
+  aiSaveChatSessions();
   fetchAiReply(loadingDiv);
 }
+
+/* =========================================================
+   STREAM / FETCH
+   ========================================================= */
 
 async function fetchAiReply(loadingDiv) {
   console.log('[AI] 🚀 fetchAiReply gestartet');
   const msgs = document.getElementById('aibot-msgs');
   const inp = document.getElementById('aibot-inp');
+  const session = aiGetActiveSession();
 
-  if (!msgs) {
-    console.warn('[AI] ❌ msgs container fehlt');
+  if (!msgs || !session) {
+    console.warn('[AI] ❌ msgs/session fehlt');
+    setAiInputLocked(false);
     return;
   }
 
-  // 👇 Hilfsfunktion zum Extrahieren von Vokabel-Info aus UNVOLLSTÄNDIGEM JSON
   function extractVocabInfo(rawText) {
     if (!rawText) return null;
     try {
-      // 🔥 NEU: Entferne Störzeichen (z. B. ">", "{", Leerzeichen) am Anfang
       let cleanedText = rawText.trim();
       while (cleanedText && !cleanedText.startsWith('{') && !cleanedText.startsWith('[')) {
         cleanedText = cleanedText.slice(1).trim();
@@ -2587,56 +3039,73 @@ async function fetchAiReply(loadingDiv) {
       let pairCount = 0;
       let totalPairs = 0;
 
-      // Name extrahieren
       const nameMatch = cleanedText.match(/"name"\s*:\s*"([^"]*)"/);
       if (nameMatch) name = nameMatch[1];
 
-      // Total Pairs extrahieren
       const totalMatch = cleanedText.match(/"length"\s*:\s*(\d+)/);
-      if (totalMatch) totalPairs = parseInt(totalMatch[1]);
+      if (totalMatch) totalPairs = parseInt(totalMatch[1], 10);
 
-      // 🔥 NEU: Zähle ALLE {}-Objekte im "pairs"-Array (auch unvollständige)
       const pairsMatch = cleanedText.match(/"pairs"\s*:\s*\[([\s\S]*)/);
       if (pairsMatch) {
         const pairsContent = pairsMatch[1];
-        // Zähle alle {, die den Start eines neuen Paars markieren
         pairCount = (pairsContent.match(/\{[^}]*"/g) || []).length;
       }
 
       return { name, pairCount, totalPairs };
-    } catch (e) {
+    } catch {
       return null;
     }
   }
 
   let fullText = '';
-  let vocabRawBuffer = '';   // Buffer für den JSON-Inhalt zwischen <vocab_list> und </vocab_list>
+  let vocabRawBuffer = '';
   let inVocabBlock = false;
-  let vocabDiv = null;
   let vocabLoaderDiv = null;
   let hasRenderedVocab = false;
   let rafPending = false;
   let buffer = '';
+
+  const persistStreamState = () => {
+    const active = aiGetActiveSession();
+    if (!active || !aiCurrentStream) return;
+    const idx = aiCurrentStream.assistantIndex;
+
+    if (active.messages[idx]) {
+      active.messages[idx].content = aiCurrentStream.raw;
+      active.messages[idx].streaming = true;
+    }
+    
+    if (aiBotHistory[idx]) {
+      aiBotHistory[idx].content = aiCurrentStream.raw;
+    }
+
+    active.streaming = {
+      active: true,
+      assistantIndex: idx,
+      raw: aiCurrentStream.raw
+    };
+
+    aiSaveChatSessions();
+  };
 
   const render = (text) => {
     if (!text) return;
 
     fullText += text;
 
-    // 🔥 1. Vocab Block Start/Ende erkennen
     const startTag = '<vocab_list>';
     const endTag = '</vocab_list>';
 
     if (fullText.includes(startTag)) inVocabBlock = true;
-    if (inVocabBlock && loadingDiv._streamState) {
 
+    if (inVocabBlock && loadingDiv._streamState) {
       const cleaned = loadingDiv._streamState.fullText
-        .replace(/<vocab_list[\s\S]*$/i, '') // kompletter Tag + Rest
-        .replace(/<vocab[\s\S]*$/i, '')      // fallback
-        .replace(/<voc[\s\S]*$/i, '')        // fallback
-        .replace(/<vo[\s\S]*$/i, '')         // fallback
-        .replace(/<v[\s\S]*$/i, '')          // fallback
-        .replace(/<[\s\S]*$/i, '');          // letzter safety net
+        .replace(/<vocab_list[\s\S]*$/i, '')
+        .replace(/<vocab[\s\S]*$/i, '')
+        .replace(/<voc[\s\S]*$/i, '')
+        .replace(/<vo[\s\S]*$/i, '')
+        .replace(/<v[\s\S]*$/i, '')
+        .replace(/<[\s\S]*$/i, '');
 
       loadingDiv._streamState.fullText = cleaned;
       loadingDiv._streamState.renderedLength = cleaned.length;
@@ -2651,45 +3120,32 @@ async function fetchAiReply(loadingDiv) {
       const endIndex = fullText.indexOf(endTag, startIndex);
 
       if (startIndex !== -1) {
-        // Extrahiere den Inhalt NACH dem Start-Tag
         let jsonStart = startIndex + startTag.length;
         let jsonContent = fullText.slice(jsonStart);
 
-        // 🔥 NEU: Entferne ">" am Anfang, falls vorhanden
-        if (jsonContent.startsWith('>')) {
-          jsonContent = jsonContent.slice(1);
-        }
+        if (jsonContent.startsWith('>')) jsonContent = jsonContent.slice(1);
 
         if (endIndex === -1) {
-          // Noch kein Ende: Sammle den JSON-Inhalt
           vocabRawBuffer = jsonContent;
         } else {
-          // Ende gefunden: Nimm nur den JSON-Inhalt zwischen den Tags
           vocabRawBuffer = fullText.slice(jsonStart, endIndex);
-
-          // 🔥 NEU: Entferne ">" am Anfang, falls vorhanden
-          if (vocabRawBuffer.startsWith('>')) {
-            vocabRawBuffer = vocabRawBuffer.slice(1);
-          }
+          if (vocabRawBuffer.startsWith('>')) vocabRawBuffer = vocabRawBuffer.slice(1);
         }
       }
     }
 
-    // Normale Antwort (Text VOR dem Vocab-Block)
     const displayText = inVocabBlock
       ? fullText.slice(0, fullText.indexOf(startTag))
       : fullText;
 
     if (displayText.trim()) {
-      const alreadyRendered =
-        loadingDiv._streamState?.fullText || '';
+      const alreadyRendered = loadingDiv._streamState?.fullText || '';
       const newChunk = displayText.slice(alreadyRendered.length);
       if (newChunk) {
         streamText(loadingDiv, newChunk);
       }
     }
 
-    // 🔥 2. Loader erstellen
     if (inVocabBlock && !vocabLoaderDiv) {
       vocabLoaderDiv = document.createElement('div');
       vocabLoaderDiv.className = 'ai-msg bot ai-vocab-loader';
@@ -2702,41 +3158,37 @@ async function fetchAiReply(loadingDiv) {
       msgs.scrollTop = msgs.scrollHeight;
     }
 
-    // 🔥 3. LIVE UPDATE (jetzt stabil!)
     if (inVocabBlock && vocabLoaderDiv) {
       try {
         const labelEl = document.getElementById('loading-label');
         const barEl = document.getElementById('loading-bar');
-
         const vocabInfo = extractVocabInfo(vocabRawBuffer);
+
         if (vocabInfo && vocabInfo.pairCount > 0) {
-          
           const name = vocabInfo.name || 'Unbenannt';
-          const wordLabel = vocabInfo.totalPairs === 1 ? "Wort" : "Wörter";
+          const wordLabel = vocabInfo.totalPairs === 1 ? 'Wort' : 'Wörter';
 
-          const text = `Vokabelliste: "${name}" (${vocabInfo.pairCount} ${wordLabel})`
-
+          const text = `Vokabelliste: "${name}" (${vocabInfo.pairCount} ${wordLabel})`;
           const progress = vocabInfo.totalPairs
             ? Math.min(100, Math.round((vocabInfo.pairCount / vocabInfo.totalPairs) * 100))
             : undefined;
 
-          if (!barEl) vocabLoaderDiv.innerHTML = makeLoadingHTML(
-            `Vokabelliste: "${vocabInfo.name || 'Unbenannt'}" (${vocabInfo.pairCount} Wörter)`,
-            progress,
-            'loading'
-          );
-           else {
-          labelEl.textContent = text;
-          barEl.style.width = progress + "%";
-           }
+          if (!barEl) {
+            vocabLoaderDiv.innerHTML = makeLoadingHTML(
+              text,
+              progress,
+              'loading'
+            );
+          } else {
+            if (labelEl) labelEl.textContent = text;
+            barEl.style.width = progress + '%';
+          }
         }
       } catch (e) {
-        // Ignoriere Fehler bei partialem JSON
         console.log('[AI] Partial JSON (ignored):', e.message);
       }
     }
 
-    // 🔥 4. FINAL STATE
     if (inVocabBlock && fullText.includes(endTag) && !hasRenderedVocab) {
       hasRenderedVocab = true;
 
@@ -2754,12 +3206,12 @@ async function fetchAiReply(loadingDiv) {
           100,
           'done',
           `
-          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
-            <button class="btn btn-lime btn-sm"
-              onclick="importAiList('${importEnc}')">
-              📥 Direkt importieren
-            </button>
-          </div>`
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
+              <button class="btn btn-lime btn-sm" onclick="importAiList('${importEnc}')">
+                📥 Direkt importieren
+              </button>
+            </div>
+          `
         );
 
         if (vocabLoaderDiv) vocabLoaderDiv.replaceWith(div);
@@ -2785,51 +3237,36 @@ async function fetchAiReply(loadingDiv) {
     msgs.scrollTop = msgs.scrollHeight;
   };
 
-  const extractText = (json) => {
-    if (!json) return '';
-    const choice = json?.choices?.[0];
-    return choice?.delta?.content ?? choice?.message?.content ?? '';
-  };
-
   const processStream = (chunk) => {
     if (!chunk) return;
 
-    // Chunk nur puffern
     buffer += chunk;
 
-    // Maximal 1 Render pro Frame
     if (!rafPending) {
       rafPending = true;
 
       requestAnimationFrame(() => {
-
         const currentChunk = buffer;
-
         buffer = '';
         rafPending = false;
 
-        // EINMAL rendern
+        if (!aiCurrentStream) return;
+
+        aiCurrentStream.raw += currentChunk;
+        persistStreamState();
         render(currentChunk);
 
-        // LIVE-UPDATE-Logs
         if (inVocabBlock) {
-
           const vocabInfo = extractVocabInfo(vocabRawBuffer);
 
           if (vocabInfo) {
-
             const name = vocabInfo.name || 'Unbenannt';
-
             const progressText = vocabInfo.totalPairs
               ? `[LIVE UPDATE] Vokabelliste: "${name}" (${vocabInfo.pairCount}/${vocabInfo.totalPairs} Wörter - ${Math.round((vocabInfo.pairCount / vocabInfo.totalPairs) * 100)}%)`
               : `[LIVE UPDATE] Vokabelliste: "${name}" (${vocabInfo.pairCount} Wörter)`;
-
             console.log(progressText);
-
           } else {
-
             console.log('[LIVE UPDATE] Warte auf gültigen JSON-Inhalt...');
-
           }
         }
       });
@@ -2859,56 +3296,127 @@ async function fetchAiReply(loadingDiv) {
       const chunk = decoder.decode(value, { stream: true });
       processStream(chunk);
     }
+
     const tail = decoder.decode();
     if (tail) processStream(tail);
+
+    // finalisieren
+    const active = aiGetActiveSession();
+    if (active && aiCurrentStream) {
+      const idx = aiCurrentStream.assistantIndex;
+      if (active.messages[idx]) {
+        active.messages[idx].content = aiCurrentStream.raw;
+        active.messages[idx].streaming = false;
+      }
+      if (aiBotHistory[idx]) {
+        aiBotHistory[idx].content = aiCurrentStream.raw;
+      }
+      active.streaming = {
+        active: false,
+        assistantIndex: null,
+        raw: ''
+      };
+      aiSaveChatSessions();
+    }
   } catch (e) {
     console.error('[AI] 💥 ERROR:', e);
     loadingDiv.innerHTML = makeLoadingHTML('Fehler', 0, 'error', '', e.message);
   } finally {
+    aiCurrentStream = null;
+    if (inp) {
+      inp.disabled = false;
+      inp.style.opacity = '1';
+      inp.style.pointerEvents = 'auto';
+      inp.focus();
+    }
     setAiInputLocked(false);
+    aiSaveChatSessions();
+    renderAiSessionMessages(active);
+    renderAiBot();
   }
 }
 
-async function importAiList(encOrRaw) {
-  try {
-    let raw = encOrRaw;
-    try {
-      raw = decodeURIComponent(encOrRaw);
-    } catch (_) {
-      // schon raw
-    }
-    const p = typeof raw === 'string' ? JSON.parse(raw) : raw;
-    const lang = p.lang || 'KI-Import';
-    const name = p.name || 'KI-Liste';
-    const pairs = p.pairs || [];
-    if (!pairs.length) {
-      toast('Keine Vokabeln');
-      return;
-    }
-    const poolData = {
-      subcats: {
-        [name]: pairs.map(x => [x.en, x.de])
-      }
-    };
-    if (!POOLS[lang]) POOLS[lang] = {};
-    POOLS[lang][name] = poolData;
-    saveCustom();
-    if (currentUser) {
-      await syncPoolToServer(lang, name);
-    }
-    loadState();
-    toast(`✓ "${name}" mit ${pairs.length} Wörtern importiert!`);
-    confirm2(
-      'Pool wechseln?',
-      `Zu "${name}" wechseln und lernen?`,
-      () => {
-        setActivePool(mkKey(lang, name));
-        goTo('cards');
-      }
-    );
-  } catch (e) {
-    toast('Fehler: ' + e.message);
+/* =========================================================
+   HELPER FUNCTIONS FOR AI CHAT
+   ========================================================= */
+
+function makeLoadingHTML(label = 'Lädt...', progress = undefined, status = 'loading', buttons = '', errorMsg = '') {
+  let barHtml = '';
+  if (progress !== undefined) {
+    barHtml = `<div class="loading-bar-container" style="width:100%;height:6px;background:var(--panel-2);border-radius:3px;margin:8px 0;overflow:hidden"><div id="loading-bar" class="loading-bar" style="height:100%;background:var(--lime);width:${Math.max(0, Math.min(100, progress))}%;transition:width 0.3s ease"></div></div>`;
   }
+
+  let statusIcon = '⏳';
+  let statusColor = 'var(--muted)';
+
+  if (status === 'done') {
+    statusIcon = '✓';
+    statusColor = 'var(--lime)';
+  } else if (status === 'error') {
+    statusIcon = '✕';
+    statusColor = 'var(--danger)';
+  } else if (status === 'loading') {
+    statusIcon = '<span class="kivo-spinner"></span>';
+    statusColor = 'var(--lime)';
+  }
+
+  const errorHtml = errorMsg ? `<div style="margin-top:8px;padding:8px;background:var(--danger);color:white;border-radius:4px;font-size:11px">${escapeHtml(errorMsg)}</div>` : '';
+
+  return `
+    <div style="display:flex;flex-direction:column;align-items:flex-start;width:100%">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <span style="color:${statusColor};display:flex;align-items:center">${statusIcon}</span>
+        <span id="loading-label" style="font-size:13px;font-weight:600">${escapeHtml(label)}</span>
+      </div>
+      ${barHtml}
+      ${buttons ? `<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">${buttons}</div>` : ''}
+      ${errorHtml}
+    </div>
+  `;
+}
+
+async function streamText(el, text) {
+  if (!el) return;
+
+  // Initialize stream state if not already done
+  if (!el._streamState) {
+    el._streamState = {
+      fullText: '',
+      renderedLength: 0
+    };
+  }
+
+  const chunkSize = 8;
+  const delay = 15;
+
+  for (let i = 0; i < text.length; i += chunkSize) {
+    const chunk = text.slice(i, Math.min(i + chunkSize, text.length));
+    el._streamState.fullText += chunk;
+
+    const displayed = el._streamState.fullText.slice(0, el._streamState.renderedLength + chunk.length);
+    el._streamState.renderedLength = displayed.length;
+
+    el.innerHTML = renderMarkdown(displayed);
+    renderLatex(el);
+    highlightCode(el);
+
+    if (el.parentElement) {
+      el.parentElement.scrollTop = el.parentElement.scrollHeight;
+    }
+
+    await new Promise(resolve => setTimeout(resolve, delay));
+  }
+}
+
+/* =========================================================
+   INIT
+   ========================================================= */
+
+function initAiChatPersistence() {
+  aiLoadChatSessions();
+  window.addEventListener('beforeunload', () => {
+    aiSaveChatSessions();
+  });
 }
 
 
@@ -4054,6 +4562,8 @@ loadState();
 initAuth();
 checkShareUrl();
 updateNavIcons();
+initAiChatPersistence();
+
 </script>
 
 
