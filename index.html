@@ -2773,6 +2773,12 @@ function aiRecoverStaleStreaming(session) {
   if (msg && msg.role === 'assistant') {
     msg.content = msg.content || session.streaming.raw || '';
     msg.streaming = false;
+
+    // Prüfe, ob die Nachricht eine Vokabelliste enthält
+    const vocabBlock = stripVocabBlock(msg.content);
+    if (vocabBlock.hasVocab && vocabBlock.complete) {
+      msg.vocabData = vocabBlock.vocabRaw; // Speichere die JSON-Daten für die Wiederherstellung
+    }
   }
 
   session.streaming = {
@@ -2864,9 +2870,41 @@ function renderAiSessionMessages(session) {
     if (m.role === 'user') {
       div.textContent = m.content || '';
     } else {
-      div.innerHTML = renderMarkdown(m.content || '');
-      renderLatex(div);
-      highlightCode(div);
+      // Prüfe, ob die Nachricht eine Vokabelliste enthält
+      const vocabBlock = stripVocabBlock(m.content);
+      if (vocabBlock.hasVocab && vocabBlock.complete) {
+        try {
+          const vocabData = JSON.parse(vocabBlock.vocabRaw);
+          const importEnc = encodeURIComponent(JSON.stringify(vocabData));
+
+          div.innerHTML = `
+            <div style="display:flex;flex-direction:column;align-items:flex-start;width:100%">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+                <span style="color:var(--lime);display:flex;align-items:center">✓</span>
+                <span style="font-size:13px;font-weight:600">
+                  Vokabelliste: "${escapeHtml(vocabData.name || 'Unbenannt')}" (${vocabData.pairs?.length || 0} Wörter)
+                </span>
+              </div>
+              <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
+                <button class="btn btn-lime btn-sm"
+                        onclick="importAiList('${importEnc}')">
+                  📥 Direkt importieren
+                </button>
+              </div>
+            </div>
+          `;
+        } catch (e) {
+          console.error('[AI] Fehler beim Parsen der Vokabelliste:', e);
+          div.innerHTML = renderMarkdown(m.content);
+          renderLatex(div);
+          highlightCode(div);
+        }
+      } else {
+        // Normale Nachricht (ohne Vokabelliste)
+        div.innerHTML = renderMarkdown(m.content);
+        renderLatex(div);
+        highlightCode(div);
+      }
 
       if (m.streaming) {
         const badge = document.createElement('div');
@@ -2884,7 +2922,6 @@ function renderAiSessionMessages(session) {
   if (sug) sug.style.display = session.messages.length ? 'none' : 'flex';
   msgs.scrollTop = msgs.scrollHeight;
 }
-
 /* =========================================================
    WELCOME
    ========================================================= */
@@ -3034,7 +3071,7 @@ function aiBotSend(preset) {
    STREAM / FETCH
    ========================================================= */
 
-   async function fetchAiReply(loadingDiv) {
+async function fetchAiReply(loadingDiv) {
   console.log('[AI] 🚀 fetchAiReply gestartet');
 
   const msgs = document.getElementById('aibot-msgs');
@@ -3521,6 +3558,7 @@ function initAiChatPersistence() {
     aiSaveChatSessions();
   });
 }
+
 
 
 // ── PROFILE ───────────────────────────────────────────────────
