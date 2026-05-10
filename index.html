@@ -274,6 +274,8 @@ textarea.k-input{resize:vertical;min-height:70px}
 .match-card.ms{border-color:var(--lime);background:var(--lime-d);color:var(--lime)}
 .match-card.mm{border-color:color-mix(in srgb,#6AC28A 20%,transparent);background:color-mix(in srgb,#6AC28A 4%,transparent);color:var(--muted2);pointer-events:none;opacity:.5}
 .match-card.mw{border-color:var(--danger);animation:shake .3s}
+.match-container {display: grid;grid-template-columns: 1fr 1fr;gap: 10px;width: 100%;}
+.match-column {display: flex;flex-direction: column;gap: 10px;}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
 
 /* ── OVERVIEW ────────────────────────── */
@@ -1573,15 +1575,34 @@ function levenshtein(a,b) {
 
 // ── MATCHING ──────────────────────────────────────────────────
 function startMatch() {
-  mFound=0; mSel=null;
-  const el=document.getElementById('matching-area');
-  const picks=shuf(vocab).slice(0,8);
-  document.getElementById('mc-tot').textContent=picks.length;
-  document.getElementById('mc-cnt').textContent=0;
-  const left=picks.map(v=>({...v,_side:'de'}));
-  const right=shuf(picks).map(v=>({...v,_side:'en'}));
-  mPairs=[...shuf(left),...shuf(right)];
-  el.innerHTML=`<div class="match-grid">${mPairs.map((v,i)=>`<button class="match-card" id="mc-${i}" onclick="pickMatch(${i})">${v._side==='de'?v.de:v.en}</button>`).join('')}</div>`;
+  mFound = 0; 
+  mSel = null;
+  const el = document.getElementById('matching-area');
+  const picks = shuf(vocab).slice(0, 8);
+  
+  document.getElementById('mc-tot').textContent = picks.length;
+  document.getElementById('mc-cnt').textContent = 0;
+
+  const leftSide = shuf(picks.map(v => ({ ...v, _side: 'de' })));
+  const rightSide = shuf(picks.map(v => ({ ...v, _side: 'en' })));
+
+  mPairs = [...leftSide, ...rightSide];
+
+  const leftColumnHtml = leftSide.map((v, i) => 
+    `<button class="match-card" id="mc-${i}" onclick="pickMatch(${i})">${v.de}</button>`
+  ).join('');
+
+  const rightColumnHtml = rightSide.map((v, i) => {
+    const globalIndex = i + leftSide.length;
+    return `<button class="match-card" id="mc-${globalIndex}" onclick="pick( ${globalIndex})">${v.en}</button>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div class="match-container">
+      <div class="match-column">${leftColumnHtml}</div>
+      <div class="match-column">${rightColumnHtml}</div>
+    </div>
+  `;
 }
 function pickMatch(i) {
   const v=mPairs[i]; const el=document.getElementById('mc-'+i);
