@@ -1594,7 +1594,7 @@ function startMatch() {
 
   const rightColumnHtml = rightSide.map((v, i) => {
     const globalIndex = i + leftSide.length;
-    return `<button class="match-card" id="mc-${globalIndex}" onclick="pick( ${globalIndex})">${v.en}</button>`;
+    return `<button class="match-card" id="mc-${globalIndex}" onclick="pickMatch(${globalIndex})">${v.en}</button>`;
   }).join('');
 
   el.innerHTML = `
