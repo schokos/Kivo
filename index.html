@@ -1152,6 +1152,15 @@ function levelUpReward(){ return 10; }
 // ── STORAGE ──────────────────────────────────────────────────
 const lsGet = (k,d) => { try { return JSON.parse(localStorage.getItem(k)??d); } catch(e) { return JSON.parse(d); } };
 const lsSet = (k,v) => { try { localStorage.setItem(k,JSON.stringify(v)); } catch(e){} };
+function getScopedString(key, fallback='') {
+  try {
+    const raw = localStorage.getItem(key);
+    if (raw === null) return fallback;
+    try { return JSON.parse(raw); } catch { return raw; }
+  } catch(e) {
+    return fallback;
+  }
+}
 
 // ── PROFILE SYNC (currency / items / pass_data) ───────────────
 let _profileSyncTimer = null;
@@ -1161,7 +1170,7 @@ async function _doProfileSync(){
   _profileSyncPending = false;
   try {
     const passRaw = lsGet('kivo_pass','{}');
-    const itemsArr = (()=>{ try { return JSON.parse(localStorage.getItem('kivo_items')||'[]'); } catch(e){ return []; } })();
+    const itemsArr = lsGet('kivo_items','[]');
     await sb.from('profiles').update({
       currency: parseInt(userCurrency)||0,
       items: itemsArr,
@@ -1177,6 +1186,233 @@ function syncProfile(){
   _profileSyncTimer = setTimeout(_doProfileSync, 600);
 }
 window.addEventListener('beforeunload', ()=>{ if(_profileSyncPending) _doProfileSync(); });
+const LOCAL_SYNC_DEBOUNCE_MS = 1200;
+function safeJsonParse(raw, fallback) {
+  try {
+    if (raw === null || raw === undefined) return fallback;
+    return JSON.parse(raw);
+  } catch (e) {
+    return fallback;
+  }
+}
+const _localSyncDirty = { profile:false, pools:false, progress:false, chats:false };
+let _localSyncTimer = null;
+let _localSyncInFlight = null;
+
+function _markLocalDirty(kind){
+  if(!currentUser) return;
+  _localSyncDirty[kind] = true;
+  if(_localSyncTimer) clearTimeout(_localSyncTimer);
+  _localSyncTimer = setTimeout(()=>{ void flushLocalSync(); }, LOCAL_SYNC_DEBOUNCE_MS);
+}
+
+function _clearLocalDirty(kind){ _localSyncDirty[kind] = false; }
+function _hasLocalDirty(){ return Object.values(_localSyncDirty).some(Boolean); }
+
+function _mergeUnique(a,b){
+  return Array.from(new Set([...(Array.isArray(a)?a:[]), ...(Array.isArray(b)?b:[])]));
+}
+
+function mergeMaxMap(localMap = {}, serverMap = {}) {
+  const merged = { ...(serverMap || {}) };
+  for (const [k, v] of Object.entries(localMap || {})) {
+    const localVal = Number(v || 0);
+    const serverVal = Number(merged[k] || 0);
+    merged[k] = Math.max(serverVal, localVal);
+  }
+  return merged;
+}
+
+function mergeUniqueList(primary = [], secondary = []) {
+  return _mergeUnique(primary, secondary);
+}
+
+function mergePassState(serverPass = {}, localPass = {}) {
+  const serverClaimed = serverPass?.claimed || {};
+  const localClaimed = localPass?.claimed || {};
+  return {
+    ...serverPass,
+    ...localPass,
+    claimed: {
+      free: _mergeUnique(localClaimed.free, serverClaimed.free),
+      pro: _mergeUnique(localClaimed.pro, serverClaimed.pro),
+    },
+    proOwned: !!(serverPass?.proOwned || localPass?.proOwned),
+  };
+}
+
+function _mergeChatPayload(serverPayload={}, localPayload={}) {
+  const serverSessions = serverPayload.sessions && typeof serverPayload.sessions === 'object' ? serverPayload.sessions : {};
+  const localSessions = localPayload.sessions && typeof localPayload.sessions === 'object' ? localPayload.sessions : {};
+  const mergedSessions = {};
+  const ids = new Set([...Object.keys(serverSessions), ...Object.keys(localSessions)]);
+  for (const id of ids) {
+    const s = serverSessions[id];
+    const l = localSessions[id];
+    if (!s) mergedSessions[id] = l;
+    else if (!l) mergedSessions[id] = s;
+    else {
+      const st = Number(s.updatedAt || s.createdAt || 0);
+      const lt = Number(l.updatedAt || l.createdAt || 0);
+      mergedSessions[id] = lt >= st ? l : s;
+    }
+  }
+  const mergedOrder = [];
+  const addOrder = order => { for (const id of (Array.isArray(order)?order:[])) if (mergedSessions[id] && !mergedOrder.includes(id)) mergedOrder.push(id); };
+  addOrder(localPayload.order);
+  addOrder(serverPayload.order);
+  for (const id of Object.keys(mergedSessions)) if (!mergedOrder.includes(id)) mergedOrder.push(id);
+  const activeId = localPayload.activeId && mergedSessions[localPayload.activeId]
+    ? localPayload.activeId
+    : (serverPayload.activeId && mergedSessions[serverPayload.activeId] ? serverPayload.activeId : (mergedOrder[0] || null));
+  return { activeId, order: mergedOrder, sessions: mergedSessions };
+}
+
+async function _syncProfileToServer(){
+  if(!currentUser) return false;
+  try{
+    const xpData = lsGet('kivo_xp','{}') || {};
+    const currency = parseInt(lsGet('kivo_currency','0')) || 0;
+    const items = lsGet('kivo_items','[]') || [];
+    const passData = lsGet('kivo_pass','{}') || {};
+    const avatarUrl = getScopedString('kivo_avatar_url', '') || currentUser.avatar_url || '';
+    const avatarData = currentUser.avatar_data || null;
+    const username = currentUser.username || '';
+    const payload = {
+      username,
+      avatar_url: avatarUrl || null,
+      avatar_data: avatarData,
+      xp_data: xpData,
+      xp_total: Object.values(xpData).reduce((a,b)=>a+Number(b||0),0),
+      streak: calcStreak(),
+      currency,
+      items: Array.isArray(items)?items:[],
+      pass_data: passData,
+      updated_at: new Date().toISOString(),
+    };
+    const { error } = await sb.from('profiles').update(payload).eq('id', currentUser.id);
+    if(error) throw error;
+    currentUser.avatar_data = avatarData || currentUser.avatar_data || null;
+    currentUser.avatar_url = avatarUrl || currentUser.avatar_url || null;
+    return true;
+  }catch(e){
+    console.warn('[SYNC] profile failed', e);
+    return false;
+  }
+}
+
+async function _syncPoolsToServer(){
+  if(!currentUser) return false;
+  try{
+    const custom = lsGet('kivo_custom','{}') || {};
+    const wanted = new Set();
+    for(const [lang,pools] of Object.entries(custom)){
+      for(const [name,data] of Object.entries(pools||{})){
+        if(BUILTIN[lang]?.[name]) continue;
+        const id = currentUser.id+'_'+esc(mkKey(lang,name));
+        wanted.add(id);
+        const { error } = await sb.from('pools').upsert({id,user_id:currentUser.id,lang,name,data,updated_at:new Date().toISOString()});
+        if(error) throw error;
+      }
+    }
+    const { data:rows, error } = await sb.from('pools').select('id').eq('user_id',currentUser.id);
+    if(error) throw error;
+    for(const row of rows||[]){
+      if(!wanted.has(row.id)){
+        const { error:delErr } = await sb.from('pools').delete().eq('id',row.id);
+        if(delErr) throw delErr;
+      }
+    }
+    return true;
+  }catch(e){
+    console.warn('[SYNC] pools failed', e);
+    return false;
+  }
+}
+
+async function _syncProgressToServer(){
+  if(!currentUser) return false;
+  try{
+    const prefix = 'kivo_kn_';
+    const wanted = new Set();
+    const rowsToSave = [];
+    for(let i=0;i<localStorage.length;i++){
+      const key = localStorage.key(i);
+      if(!key || !key.startsWith(prefix)) continue;
+      const raw = localStorage.getItem(key);
+      if(raw===null) continue;
+      const val = safeJsonParse(raw, null);
+      if(val===null) continue;
+      const poolKey = key.slice(prefix.length);
+      wanted.add(poolKey);
+      rowsToSave.push({user_id:currentUser.id,pool_key:poolKey,known_ids:Array.isArray(val)?val:[],updated_at:new Date().toISOString()});
+    }
+    for(const row of rowsToSave){
+      const { error } = await sb.from('progress').upsert(row);
+      if(error) throw error;
+    }
+    const { data:rows, error } = await sb.from('progress').select('pool_key').eq('user_id',currentUser.id);
+    if(error) throw error;
+    for(const row of rows||[]){
+      if(!wanted.has(row.pool_key)){
+        const { error:delErr } = await sb.from('progress').delete().eq('user_id',currentUser.id).eq('pool_key',row.pool_key);
+        if(delErr) throw delErr;
+      }
+    }
+    return true;
+  }catch(e){
+    console.warn('[SYNC] progress failed', e);
+    return false;
+  }
+}
+
+async function _syncChatsToServer(){
+  if(!currentUser) return false;
+  try{
+    const localPayload = lsGet(AI_CHAT_STORAGE_KEY,'{}') || {};
+    const { data:prof, error } = await sb.from('profiles').select('chat_data').eq('id',currentUser.id).maybeSingle();
+    if(error) throw error;
+    const serverPayload = prof?.chat_data && typeof prof.chat_data==='object' ? prof.chat_data : {};
+    const merged = _mergeChatPayload(serverPayload, localPayload);
+    const { error:updErr } = await sb.from('profiles').update({chat_data:merged, updated_at:new Date().toISOString()}).eq('id',currentUser.id);
+    if(updErr) throw updErr;
+    lsSet(AI_CHAT_STORAGE_KEY, merged);
+    lsSet(AI_CHAT_ACTIVE_KEY, merged.activeId || '');
+    return true;
+  }catch(e){
+    console.warn('[SYNC] chats failed', e);
+    return false;
+  }
+}
+
+async function flushLocalSync({force=false}={}){
+  if(!currentUser) return;
+  if(_localSyncInFlight) return _localSyncInFlight;
+  if(!force && !_hasLocalDirty()) return;
+  if(_localSyncTimer){ clearTimeout(_localSyncTimer); _localSyncTimer=null; }
+  const run = (async()=>{
+    if(force || _localSyncDirty.profile){ if(await _syncProfileToServer()) _clearLocalDirty('profile'); }
+    if(force || _localSyncDirty.pools){ if(await _syncPoolsToServer()) _clearLocalDirty('pools'); }
+    if(force || _localSyncDirty.progress){ if(await _syncProgressToServer()) _clearLocalDirty('progress'); }
+    if(force || _localSyncDirty.chats){ if(await _syncChatsToServer()) _clearLocalDirty('chats'); }
+  })();
+  _localSyncInFlight = run;
+  try{ await run; } finally {
+    _localSyncInFlight = null;
+    if(!force && _hasLocalDirty()){
+      if(_localSyncTimer) clearTimeout(_localSyncTimer);
+      _localSyncTimer = setTimeout(()=>{ void flushLocalSync(); }, LOCAL_SYNC_DEBOUNCE_MS);
+    }
+  }
+}
+
+function syncProfile(){ _markLocalDirty('profile'); }
+function syncPools(){ _markLocalDirty('pools'); }
+function syncPoolToServer(){ _markLocalDirty('pools'); }
+function syncProgress(){ _markLocalDirty('progress'); }
+function syncChats(){ _markLocalDirty('chats'); }
+window.addEventListener('pagehide', ()=>{ void flushLocalSync({force:true}); });
+document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='hidden') void flushLocalSync({force:true}); });
 const mkKey = (l,p) => l+'|||'+p;
 const spKey = k => { const x=String(k||'').split('|||'); return {l:x[0]||'',p:x[1]||''}; };
 const esc = s => s.replace(/[^a-z0-9]/gi,'_');
@@ -1202,7 +1438,7 @@ function loadState() {
   }
   mistakeLog = lsGet('kivo_ml','{}');
   sessions = lsGet('kivo_sess','[]');
-  const saved = localStorage.getItem('kivo_ak');
+  const saved = lsGet('kivo_ak','""');
   if(saved && getPoolObj(saved)) activeKey=saved;
   else { const l=Object.keys(POOLS)[0]; activeKey=l?mkKey(l,Object.keys(POOLS[l])[0]):null; }
   buildVocab();
@@ -1220,16 +1456,16 @@ function buildVocab() {
   document.getElementById('home-pool-name').textContent=p;
 }
 
-function saveKnown() { lsSet('kivo_kn_'+activeKey,vocab.filter(v=>v.known).map(v=>v.id)); }
+function saveKnown() { lsSet('kivo_kn_'+activeKey,vocab.filter(v=>v.known).map(v=>v.id)); syncProgress(); }
 function saveCustom() {
   const custom={};
   for(const [l,ps] of Object.entries(POOLS))
     for(const [p,obj] of Object.entries(ps))
       if(!BUILTIN[l]?.[p]){if(!custom[l])custom[l]={};custom[l][p]=obj;}
-  lsSet('kivo_custom',custom);
+  lsSet('kivo_custom',custom); syncPools();
 }
 function setActivePool(key) {
-  activeKey=key; localStorage.setItem('kivo_ak',key); buildVocab();
+  activeKey=key; lsSet('kivo_ak',key); buildVocab();
 }
 
 function updateHomeStats() {
@@ -1357,23 +1593,13 @@ async function addXp(pts, reason='learn') {
   if(reason!=='quest'){
     const s=getQuestState(); s.daily.xp=(s.daily.xp||0)+pts; s.weekly.xp=(s.weekly.xp||0)+pts; saveQuestState(s);
   }
-  if(currentUser){
-    try{
-      const clientEventId='evt_'+Date.now()+'_'+Math.random().toString(36).slice(2);
-      const r=await fetch(SUPABASE_URL+'/functions/v1/kivo-xp',{method:'POST',headers:await edgeHeaders(),body:JSON.stringify({points:pts,reason,clientEventId})});
-      if(r.ok){const d=await r.json(); lsSet('kivo_xp',d.xp_data||{});
-        _handleLevelUp(prevLevel, _xpToLevel(d.xp_total||getTotalXp()));
-        calcStreak(); updateHomeStats(); updateCurrencyDisplay();
-        if(reason!=='quest') trackQuest('xp',pts);
-        return;}
-    }catch(e){}
-  }
   const today=new Date().toISOString().slice(0,10);
   const xp=lsGet('kivo_xp','{}');
   xp[today]=(xp[today]||0)+pts; lsSet('kivo_xp',xp);
   _handleLevelUp(prevLevel, _xpToLevel(getTotalXp()));
   updateCurrencyDisplay();
   calcStreak(); updateHomeStats();
+  syncProfile();
   if(reason!=='quest') trackQuest('xp',pts);
 }
 function _handleLevelUp(prev, now){
@@ -1401,7 +1627,7 @@ function updateCurrencyDisplay() {
   const homeVal=document.getElementById('currency-val-home');
   if(homeVal) homeVal.textContent=userCurrency;
 }
-async function syncXpToServer() { return; }
+async function syncXpToServer() { return flushLocalSync(); }
 
 // ── DAILY / WEEKLY QUESTS ───────────────────────────────────
 // Trackt Lernfortschritt pro Tag/Woche. Quests sind feste Ziele, die durch
@@ -2028,12 +2254,12 @@ async function saveEditedPool(oldKey) {
   if(!POOLS[lang])POOLS[lang]={};
   if((old.l!==lang||old.p!==name)&&POOLS[old.l]?.[old.p]){delete POOLS[old.l][old.p];if(!Object.keys(POOLS[old.l]).length)delete POOLS[old.l];}
   POOLS[lang][name]={subcats:{[name]:pairs}}; saveCustom(); await syncPoolToServer(lang,name);
-  activeKey=mkKey(lang,name); localStorage.setItem('kivo_ak',activeKey); closeModal('new-pool-modal'); loadState(); renderOverview(); toast('✓ Pool gespeichert');
+  activeKey=mkKey(lang,name); lsSet('kivo_ak',activeKey); closeModal('new-pool-modal'); loadState(); renderOverview(); toast('✓ Pool gespeichert');
 }
 
 async function syncPoolToServer(lang,name) {
   if(!currentUser)return;
-  try { await sb.from('pools').upsert({id:currentUser.id+'_'+esc(mkKey(lang,name)),user_id:currentUser.id,lang,name,data:POOLS[lang][name],updated_at:new Date().toISOString()}); } catch(e){toast('Cloud-Sync fehlgeschlagen: '+e.message);}
+  syncPools();
 }
 
 async function deletePool(key) {
@@ -2044,15 +2270,8 @@ async function deletePool(key) {
 
   if(ok){
     const {l,p}=spKey(key);
-    try {
-      const { error } = await sb.from('pools').delete().eq('id', currentUser.id+'_'+esc(mkKey(l,p)));
-      if (error) throw error;
-    } catch(e) {
-      toast('Löschen in der Cloud fehlgeschlagen: '+e.message);
-      return;
-    }
     delete POOLS[l][p]; if(!Object.keys(POOLS[l]).length)delete POOLS[l];
-    saveCustom(); if(activeKey===key){const lk=Object.keys(POOLS)[0];activeKey=mkKey(lk,Object.keys(POOLS[lk])[0]);}
+    saveCustom(); if(activeKey===key){const lk=Object.keys(POOLS)[0];activeKey=lk?mkKey(lk,Object.keys(POOLS[lk])[0]):null;}
     buildVocab(); renderOverview(); toast('Pool gelöscht');
   }
 }
@@ -2492,8 +2711,9 @@ function aiSaveChatSessions() {
       order: aiChatOrder,
       sessions: aiChatSessions
     };
-    localStorage.setItem(AI_CHAT_STORAGE_KEY, JSON.stringify(payload));
-    localStorage.setItem(AI_CHAT_ACTIVE_KEY, aiActiveChatId || '');
+    lsSet(AI_CHAT_STORAGE_KEY, payload);
+    lsSet(AI_CHAT_ACTIVE_KEY, aiActiveChatId || '');
+    syncChats();
   } catch (e) {
     console.warn('[AI] Speicherfehler:', e);
   }
@@ -2501,15 +2721,15 @@ function aiSaveChatSessions() {
 
 function aiLoadChatSessions() {
   try {
-    const raw = localStorage.getItem(AI_CHAT_STORAGE_KEY);
+    const raw = lsGet(AI_CHAT_STORAGE_KEY, 'null');
     if (raw) {
-      const parsed = JSON.parse(raw);
+      const parsed = raw;
       aiChatSessions = parsed.sessions && typeof parsed.sessions === 'object' ? parsed.sessions : {};
       aiChatOrder = Array.isArray(parsed.order)
         ? parsed.order.filter(id => aiChatSessions[id])
         : Object.keys(aiChatSessions);
 
-      const storedActive = parsed.activeId || localStorage.getItem(AI_CHAT_ACTIVE_KEY);
+      const storedActive = parsed.activeId || lsGet(AI_CHAT_ACTIVE_KEY, '""');
       aiActiveChatId = storedActive && aiChatSessions[storedActive]
         ? storedActive
         : (aiChatOrder[0] || null);
@@ -3770,13 +3990,13 @@ function claimPass(track, lvl){
   const reward = track==='free' ? _passItemFor(lvl,'free') : _passItemFor(lvl,'pro');
   if(!reward) return;
   // Item gewähren (auch wenn schon im Inventar - dann +50 Münzen statt Duplikat)
-  userItems = JSON.parse(localStorage.getItem('kivo_items')||'[]');
+  userItems = lsGet('kivo_items','[]');
   if(userItems.includes(reward.id)){
     userCurrency += 50; lsSet('kivo_currency',userCurrency);
     toast(reward.name+' bereits besessen — +50 Münzen!');
   } else {
     userItems.push(reward.id);
-    localStorage.setItem('kivo_items',JSON.stringify(userItems));
+    lsSet('kivo_items',userItems);
     toast(reward.name+' freigeschaltet!');
   }
   syncProfile();
@@ -3795,7 +4015,7 @@ function renderPass(){
   const levels=passLevels();
   const nextXp=lvl*500; const lvlStart=(lvl-1)*500;
   const lvlPct=Math.round((xp-lvlStart)/(nextXp-lvlStart)*100);
-  const userOwnedItems=JSON.parse(localStorage.getItem('kivo_items')||'[]');
+  const userOwnedItems=lsGet('kivo_items','[]');
 
   const headerHtml=`
     <div class="k-card" style="margin-bottom:16px;background:linear-gradient(135deg,var(--lime-d2),var(--panel))">
@@ -3901,7 +4121,7 @@ let _abState = {...AB_DEFAULT};
 // Devs (is_dev) erhalten automatisch ALLE Items dieser Kategorie ohne Kauf.
 function abAvailable(cat){
   const isDev=!!currentUser?.is_dev;
-  const owned=isDev?SHOP_ITEMS.map(i=>i.id):JSON.parse(localStorage.getItem('kivo_items')||'[]');
+  const owned=isDev?SHOP_ITEMS.map(i=>i.id):lsGet('kivo_items','[]');
   const fromShop=SHOP_ITEMS.filter(it=>it.cat===cat && owned.includes(it.id)).map(it=>it.value);
   return [...(AB_OPTS[cat]||[]), ...fromShop];
 }
@@ -4025,9 +4245,9 @@ async function saveAvatarBuilder(){
   const msg=document.getElementById('ab-msg');
   msg.textContent='Speichere...';
   try{
-    const {error}=await sb.from('profiles').update({avatar_data:_abState}).eq('id',currentUser.id);
-    if(error)throw error;
     currentUser.avatar_data=_abState;
+    lsSet('kivo_avatar_data', _abState);
+    syncProfile();
     msg.textContent='✓ Gespeichert';
     toast('✓ Avatar gespeichert');
     // Dashboard- + Header-Avatar sofort aktualisieren
@@ -4051,9 +4271,9 @@ function renderProfile(targetUser=null) {
     return;
   }
   const xp=currentUser?getTotalXp():0, streak=currentUser?calcStreak():0;
-  const av=localStorage.getItem('kivo_avatar_'+(user?.username||''))||'';
-  const items=currentUser?JSON.parse(localStorage.getItem('kivo_items')||'[]'):[];
-  const equipped=JSON.parse(localStorage.getItem('kivo_equipped')||'[]');
+  const av=getScopedString('kivo_avatar_'+(user?.username||''),'')||getScopedString('kivo_avatar_url','');
+  const items=currentUser?lsGet('kivo_items','[]'):[];
+  const equipped=lsGet('kivo_equipped','[]');
   el.innerHTML=`
     <div class="profile-hero">
       <div class="profile-av" id="prof-av">${getUserAvatar(user, 64)}</div>
@@ -4073,7 +4293,7 @@ function renderProfile(targetUser=null) {
     <div class="k-card-sm" style="margin-bottom:12px">
       <div class="k-section-title">Avatar-Items</div>
       <div class="profile-items-row" id="equipped-row">
-        ${(()=>{const owned=JSON.parse(localStorage.getItem('kivo_items')||'[]');const its=SHOP_ITEMS.filter(i=>owned.includes(i.id));return its.length?its.map(it=>`<div class="profile-item-badge" title="${it.name}">${it.icon}</div>`).join(''):'<div style="font-size:11px;color:var(--muted)">Noch keine Items — kaufe welche im Shop und gestalte deinen Avatar!</div>'})()}
+        ${(()=>{const owned=lsGet('kivo_items','[]');const its=SHOP_ITEMS.filter(i=>owned.includes(i.id));return its.length?its.map(it=>`<div class="profile-item-badge" title="${it.name}">${it.icon}</div>`).join(''):'<div style="font-size:11px;color:var(--muted)">Noch keine Items — kaufe welche im Shop und gestalte deinen Avatar!</div>'})()}
       </div>
       ${currentUser?`<button class="btn btn-sm btn-lime" style="margin-top:8px" onclick="openAvatarBuilder()">🎨 Avatar gestalten</button>`:''}
     </div>
@@ -4150,16 +4370,11 @@ function getUserAvatar(user, size = 24) {
     </svg>
   `;
 
-  const avatarKey = user?.username ? `kivo_avatar_${user.username}` : '';
-  const savedAvatar = avatarKey ? localStorage.getItem(avatarKey) : '';
+  const avatarData = user?.avatar_data || lsGet('kivo_avatar_data', 'null');
+  const savedAvatar = user?.avatar_url || getScopedString(`kivo_avatar_${user?.username || ''}`, '') || lsGet('kivo_avatar_url', '""');
 
-  if (user?.avatar_data) {
-    return renderCustomAvatar(user.avatar_data, size);
-  }
-
-  if (savedAvatar) {
-    return `<img src="${savedAvatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" alt="Profilbild">`;
-  }
+  if (avatarData) return renderCustomAvatar(avatarData, size);
+  if (savedAvatar) return `<img src="${savedAvatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" alt="Profilbild">`;
 
   return defaultIcon;
 }
@@ -4194,13 +4409,14 @@ async function uploadAvatar(inp) {
   const reader=new FileReader();
   reader.onload=async e=>{
     const url=e.target.result;
-    localStorage.setItem('kivo_avatar_'+(currentUser?.username||''),url);
+    lsSet('kivo_avatar_url', url);
+    currentUser.avatar_url = url;
+    syncProfile();
     document.getElementById('prof-av').innerHTML = getUserAvatar(currentUser, 64);
     const imgHtml = getUserAvatar(currentUser, 32);
     document.getElementById('avatar-btn').innerHTML = imgHtml;
     const dashAv = document.getElementById('dash-avatar-btn'); if(dashAv) dashAv.innerHTML = imgHtml;
     updateNavIcons();
-    if(currentUser){try{await sb.from('profiles').update({avatar_url:url}).eq('id',currentUser.id);}catch(e){}}
     toast('✓ Profilbild gespeichert');
   };
   reader.readAsDataURL(file);
@@ -4216,8 +4432,9 @@ async function changeUsername() {
   try {
     const {data:ex}=await sb.from('profiles').select('id').eq('username',newName).neq('id',currentUser.id).maybeSingle();
     if(ex){if(msg)msg.textContent='Bereits vergeben';return;}
-    await sb.from('profiles').update({username:newName}).eq('id',currentUser.id);
     currentUser.username=newName;
+    lsSet('kivo_username', newName);
+    syncProfile();
     document.getElementById('um-name').textContent=newName;
     if(msg)msg.textContent='✓ Gespeichert!';
     toast('✓ Nutzername geändert');
@@ -4246,7 +4463,7 @@ function renderShop() {
   }
 
   userCurrency=parseInt(lsGet('kivo_currency','0'))||0;
-  userItems=JSON.parse(localStorage.getItem('kivo_items')||'[]');
+  userItems=lsGet('kivo_items','[]');
   const dailyItems = getDailyShopItems(6);
   el.innerHTML=`
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap">
@@ -4291,7 +4508,7 @@ async function buyItem(id) {
     lsSet('kivo_currency', userCurrency);
 
     userItems.push(id);
-    localStorage.setItem('kivo_items', JSON.stringify(userItems));
+    lsSet('kivo_items', userItems);
     syncProfile();
 
     toast(it.name+' gekauft! Verfügbar im Avatar-Builder.');
@@ -4763,7 +4980,12 @@ async function doForgotPw(){
   try{await sb.auth.resetPasswordForEmail(email,{redirectTo:location.href});authMsg('✓ Reset-Link gesendet!',true);}catch(e){authMsg('Fehler: '+e.message);}
 }
 async function doLogout(){
-  await sb.auth.signOut(); currentUser=null; updateUserUi(null); toast('Abgemeldet');
+  await flushLocalSync({force:true});
+  await sb.auth.signOut();
+  currentUser=null;
+  updateUserUi(null);
+  loadState();
+  toast('Abgemeldet');
 }
 function updateUserUi(user){
   const loggedIn=!!user;
@@ -4784,7 +5006,7 @@ async function hydrateSession(session){
     currentUser={id:uid,email:session.user.email,username:prof?.username||session.user.user_metadata?.username||session.user.email?.split('@')[0]||'User',is_dev:!!prof?.is_dev,avatar_data:prof?.avatar_data||null};
     if(prof?.xp_data){const local=lsGet('kivo_xp','{}');const merged={...(prof.xp_data||{})};for(const[d,p] of Object.entries(local))merged[d]=Math.max(merged[d]||0,p);lsSet('kivo_xp',merged);}
     if(prof?.is_dev){document.getElementById('rb-coding')?.style.setProperty('display','flex');}
-    if(prof?.avatar_url){localStorage.setItem('kivo_avatar_'+currentUser.username,prof.avatar_url);}
+    if(prof?.avatar_url){lsSet('kivo_avatar_url', prof.avatar_url);}
     // Münzen / Items / Pass aus DB übernehmen (Server gewinnt, mit lokalem Fallback bei Differenz)
     {
       const localCoins = parseInt(lsGet('kivo_currency','0'))||0;
@@ -4792,10 +5014,10 @@ async function hydrateSession(session){
       userCurrency = Math.max(serverCoins, localCoins);
       lsSet('kivo_currency', userCurrency);
       const serverItems = Array.isArray(prof?.items) ? prof.items : [];
-      let localItems = []; try { localItems = JSON.parse(localStorage.getItem('kivo_items')||'[]'); } catch(e){}
+      let localItems = lsGet('kivo_items','[]');
       const mergedItems = Array.from(new Set([...(serverItems||[]), ...(localItems||[])]));
       userItems = mergedItems;
-      localStorage.setItem('kivo_items', JSON.stringify(mergedItems));
+      lsSet('kivo_items', mergedItems);
       const serverPass = (prof?.pass_data && typeof prof.pass_data==='object') ? prof.pass_data : null;
       if(serverPass){ lsSet('kivo_pass', serverPass); }
       // Falls lokale Werte größer waren oder Items zusätzlich vorhanden, wieder nach oben syncen
@@ -4812,6 +5034,100 @@ async function hydrateSession(session){
     currentUser=null; updateUserUi(null); loadState();
   }
 }
+async function hydrateSession(session){
+  if(session?.user){
+    const uid=session.user.id;
+    const{data:prof}=await sb.from('profiles').select('*').eq('id',uid).maybeSingle();
+
+    const serverXp = prof?.xp_data && typeof prof.xp_data==='object' ? prof.xp_data : {};
+    const localXp = lsGet('kivo_xp','{}');
+    const mergedXp = mergeMaxMap(localXp, serverXp);
+    lsSet('kivo_xp', mergedXp);
+
+    const serverCoins = parseInt(prof?.currency||0)||0;
+    const localCoins = parseInt(lsGet('kivo_currency','0'))||0;
+    const mergedCoins = Math.max(serverCoins, localCoins);
+    lsSet('kivo_currency', mergedCoins);
+    userCurrency = mergedCoins;
+
+    const serverItems = Array.isArray(prof?.items) ? prof.items : [];
+    const localItems = lsGet('kivo_items','[]');
+    const mergedItems = mergeUniqueList(localItems, serverItems);
+    lsSet('kivo_items', mergedItems);
+    userItems = mergedItems;
+
+    const serverPass = (prof?.pass_data && typeof prof.pass_data==='object') ? prof.pass_data : {};
+    const localPass = lsGet('kivo_pass','{}');
+    const mergedPass = mergePassState(serverPass, localPass);
+    lsSet('kivo_pass', mergedPass);
+
+    const mergedUsername = lsGet('kivo_username','""') || prof?.username || session.user.user_metadata?.username || session.user.email?.split('@')[0] || 'User';
+    lsSet('kivo_username', mergedUsername);
+
+    const mergedAvatarData = lsGet('kivo_avatar_data','null') || prof?.avatar_data || null;
+    if(mergedAvatarData) lsSet('kivo_avatar_data', mergedAvatarData);
+    const mergedAvatarUrl = getScopedString('kivo_avatar_url','') || prof?.avatar_url || '';
+    if(mergedAvatarUrl) lsSet('kivo_avatar_url', mergedAvatarUrl);
+
+    currentUser={id:uid,email:session.user.email,username:mergedUsername,is_dev:!!prof?.is_dev,avatar_data:mergedAvatarData||null,avatar_url:mergedAvatarUrl||null};
+    if(prof?.is_dev){document.getElementById('rb-coding')?.style.setProperty('display','flex');}
+
+    const{data:poolRows}=await sb.from('pools').select('*').eq('user_id',uid);
+    const customFromServer={};
+    (poolRows||[]).forEach(row=>{if(row.lang&&row.name&&row.data){if(!customFromServer[row.lang])customFromServer[row.lang]={};customFromServer[row.lang][row.name]=row.data;}});
+    const localCustom = lsGet('kivo_custom','{}') || {};
+    const mergedCustom = JSON.parse(JSON.stringify(customFromServer));
+    for(const [lang,pools] of Object.entries(localCustom)){
+      if(!mergedCustom[lang]) mergedCustom[lang]={};
+      for(const [name,obj] of Object.entries(pools||{})) mergedCustom[lang][name]=obj;
+    }
+    lsSet('kivo_custom', mergedCustom);
+    if(JSON.stringify(mergedCustom)!==JSON.stringify(customFromServer)) syncPools();
+
+    const{data:progRows}=await sb.from('progress').select('*').eq('user_id',uid);
+    const mergedProgress={};
+    (progRows||[]).forEach(row=>{ if(row.pool_key) mergedProgress[row.pool_key]=Array.isArray(row.known_ids)?row.known_ids:[]; });
+    for(let i=0;i<localStorage.length;i++){
+      const key=localStorage.key(i);
+      if(!key||!key.startsWith('kivo_kn_')) continue;
+      const raw=localStorage.getItem(key);
+      if(raw===null) continue;
+      const val=safeJsonParse(raw, null);
+      if(val===null) continue;
+      const poolKey=key.slice('kivo_kn_'.length);
+      mergedProgress[poolKey]=_mergeUnique(mergedProgress[poolKey]||[], val);
+    }
+    Object.entries(mergedProgress).forEach(([poolKey,ids])=>lsSet('kivo_kn_'+poolKey,ids));
+    if(JSON.stringify(mergedProgress)!==JSON.stringify(Object.fromEntries((progRows||[]).map(r=>[r.pool_key,Array.isArray(r.known_ids)?r.known_ids:[]])))) syncProgress();
+
+    const{data:chatProf}=await sb.from('profiles').select('chat_data').eq('id',uid).maybeSingle();
+    const localChats = lsGet(AI_CHAT_STORAGE_KEY,'{}') || {};
+    const serverChats = chatProf?.chat_data && typeof chatProf.chat_data==='object' ? chatProf.chat_data : {};
+    const mergedChats = _mergeChatPayload(serverChats, localChats);
+    lsSet(AI_CHAT_STORAGE_KEY, mergedChats);
+    lsSet(AI_CHAT_ACTIVE_KEY, mergedChats.activeId || '');
+    if(JSON.stringify(mergedChats)!==JSON.stringify(serverChats)) syncChats();
+
+    const profileChanged =
+      mergedCoins !== serverCoins ||
+      JSON.stringify(mergedItems) !== JSON.stringify(serverItems) ||
+      JSON.stringify(mergedPass) !== JSON.stringify(serverPass) ||
+      JSON.stringify(mergedXp) !== JSON.stringify(serverXp) ||
+      mergedUsername !== (prof?.username || session.user.user_metadata?.username || session.user.email?.split('@')[0] || 'User') ||
+      mergedAvatarUrl !== (prof?.avatar_url || '') ||
+      JSON.stringify(mergedAvatarData || null) !== JSON.stringify(prof?.avatar_data || null);
+    if(profileChanged) syncProfile();
+
+    loadState();
+    updateUserUi(currentUser);
+    checkPendingFriendReqs();
+  } else {
+    currentUser=null;
+    updateUserUi(null);
+    loadState();
+  }
+}
+
 async function initAuth(){
   const{data:{session}}=await sb.auth.getSession();
   await hydrateSession(session);
