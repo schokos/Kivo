@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="de"><head>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 <meta charset="UTF-8">
@@ -313,6 +313,44 @@ textarea.k-input{resize:vertical;min-height:70px}
 .fp-tabs{display:flex;background:var(--panel-2);border-radius:var(--r-sm);padding:3px;margin-bottom:14px}
 .fp-tab{flex:1;padding:6px;border-radius:8px;border:none;background:transparent;color:var(--muted);font-family:inherit;font-size:10px;cursor:pointer;transition:all .15s}
 .fp-tab.active{background:var(--panel);color:var(--text)}
+.release-head{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.release-meta{font-size:10px;color:var(--muted);line-height:1.4}
+.release-body{font-size:12px;line-height:1.65;color:var(--text)}
+.release-body h1,.release-body h2,.release-body h3,.release-body h4{margin:14px 0 8px;line-height:1.25}
+.release-body h1{font-size:18px}.release-body h2{font-size:15px}.release-body h3{font-size:13px}.release-body h4{font-size:12px}
+.release-body p,.release-body ul,.release-body ol,.release-body blockquote,.release-body pre,.release-body table{margin:0 0 10px}
+.release-body ul,.release-body ol{padding-left:18px}
+.release-body li{margin-bottom:4px}
+.release-body blockquote{padding:8px 10px;border-left:3px solid var(--lime);background:var(--lime-d);border-radius:8px}
+.release-body pre{overflow:auto;padding:10px 12px;background:var(--canvas);border:1px solid var(--line);border-radius:10px}
+.release-body code{font-family:Consolas,'SFMono-Regular',monospace;font-size:11px}
+.release-body a{color:var(--lime)}
+.release-body .md-table-wrap{overflow-x:auto;margin:0 0 10px;border:1px solid var(--line);border-radius:12px;background:var(--canvas)}
+.release-body table{width:100%;border-collapse:collapse;min-width:100%}
+.release-body th,.release-body td{padding:9px 10px;border-bottom:1px solid var(--line);border-right:1px solid var(--line);text-align:left;vertical-align:top}
+.release-body th:last-child,.release-body td:last-child{border-right:none}
+.release-body thead th{background:var(--panel-2);font-weight:700}
+.release-body tbody tr:nth-child(even){background:color-mix(in srgb,#FFFFFF 2%,transparent)}
+.release-body tbody tr:last-child td{border-bottom:none}
+.wn-overlay{position:fixed;inset:0;background:color-mix(in srgb,#1E1E1E 60%,transparent);z-index:150;opacity:0;pointer-events:none;transition:opacity .25s}
+.wn-overlay.open{opacity:1;pointer-events:all}
+.wn-panel{position:fixed;top:0;right:-480px;width:460px;max-width:100vw;height:100vh;background:var(--panel);border-left:1px solid var(--line2);display:flex;flex-direction:column;z-index:151;transition:right .3s cubic-bezier(.4,0,.2,1);box-shadow:var(--shadow)}
+.wn-panel.open{right:0}
+.wn-head{padding:16px 18px 12px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-shrink:0}
+.wn-head-title{font-size:14px;font-weight:700}
+.wn-head-sub{font-size:10px;color:var(--muted);margin-top:3px;line-height:1.4}
+.wn-body{flex:1;display:flex;min-height:0}
+.wn-list{width:170px;flex-shrink:0;border-right:1px solid var(--line);padding:12px;overflow-y:auto;background:color-mix(in srgb,var(--panel-2) 35%,transparent)}
+.wn-content{flex:1;overflow-y:auto;padding:14px 16px 18px}
+.wn-item{width:100%;display:block;text-align:left;border:1px solid transparent;background:transparent;color:var(--text);border-radius:12px;padding:10px 11px;margin-bottom:8px;cursor:pointer;transition:all .15s}
+.wn-item:hover{border-color:var(--line);background:color-mix(in srgb,#FFFFFF 3%,transparent)}
+.wn-item.active{border-color:color-mix(in srgb,#6AC28A 30%,transparent);background:var(--lime-d2)}
+.wn-item-tag{font-size:9px;color:var(--muted);margin-top:3px}
+.wn-item-title{font-size:11px;font-weight:700;line-height:1.35}
+.wn-empty{padding:24px 10px;text-align:center;font-size:11px;color:var(--muted)}
+.wn-mobile-actions{display:flex;gap:8px;flex-wrap:wrap}
+.wn-mobile-actions .btn{flex:1 1 auto}
+.mobile-only{display:none !important}
 .req-badge{display:inline-flex;align-items:center;justify-content:center;min-width:15px;height:15px;background:var(--danger);border-radius:999px;font-size:8px;color:#E6E6E6;padding:0 3px;margin-left:3px;font-weight:700}
 .friend-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--r-sm);margin-bottom:6px;transition:all .15s}
 .friend-row.me{border-color:color-mix(in srgb,#6AC28A 25%,transparent);background:var(--lime-d2)}
@@ -586,11 +624,18 @@ textarea.k-input{resize:vertical;min-height:70px}
   .fc{height:170px}
   .fp-panel{width:100%;border-left:none;border-top:1px solid var(--line2);border-radius:var(--r-lg) var(--r-lg) 0 0;top:auto;bottom:-100%;height:90vh;right:0;transition:bottom .3s cubic-bezier(.4,0,.2,1)}
   .fp-panel.open{bottom:0;right:0}
+  .wn-panel{width:100%;border-left:none;border-top:1px solid var(--line2);border-radius:var(--r-lg) var(--r-lg) 0 0;top:auto;bottom:-100%;height:90vh;right:0;transition:bottom .3s cubic-bezier(.4,0,.2,1)}
+  .wn-panel.open{bottom:0;right:0}
+  .wn-body{flex-direction:column}
+  .wn-list{width:100%;border-right:none;border-bottom:1px solid var(--line);display:flex;gap:8px;overflow-x:auto;overflow-y:hidden;padding:10px}
+.wn-item{min-width:160px;flex:0 0 auto;margin-bottom:0}
+  .wn-content{padding:12px 14px 16px}
   .modal{border-radius:var(--r-lg) var(--r-lg) 0 0;position:fixed;bottom:-100%;left:0;right:0;max-width:100%;max-height:90vh;border-radius:var(--r-lg) var(--r-lg) 0 0;transition:bottom .3s}
   .modal-overlay.open .modal{bottom:0}
   .modal-overlay{align-items:flex-end;padding:0}
   .shop-grid{grid-template-columns:repeat(auto-fill,minmax(100px,1fr))}
   .topbar{padding:14px}.tb-title{font-size:18px}.home-title,.app-page-title{font-size:22px}.dashboard-grid,.course-grid{grid-template-columns:1fr}.home-metrics{width:100%;justify-content:space-between}.screens{padding:10px 14px 70px}
+  .mobile-only{display:inline-flex !important}
 }
 @media(min-width:980px){
   .k-grid{grid-template-columns:1.1fr .9fr}
@@ -1082,6 +1127,22 @@ textarea.k-input{resize:vertical;min-height:70px}
   </div>
 </div>
 
+<!-- WHAT'S NEW MENU -->
+<div class="wn-overlay" id="wn-overlay" onclick="closeWhatsNewPanel()"></div>
+<div class="wn-panel" id="wn-panel">
+  <div class="wn-head">
+    <div>
+      <div class="wn-head-title">🆕 What's New</div>
+      <div class="wn-head-sub">Release-Notizen und Versionsverlauf.</div>
+    </div>
+    <button class="modal-close" onclick="closeWhatsNewPanel()">✕</button>
+  </div>
+  <div class="wn-body">
+    <div class="wn-list" id="wn-list"></div>
+    <div class="wn-content" id="wn-content"></div>
+  </div>
+</div>
+
 <!-- ═══════════════════════════════════════════ SCRIPT ══════ -->
 <script>
 // ── CONFIG ──────────────────────────────────────────────────
@@ -1113,6 +1174,35 @@ let userCurrency = 0;
 let userItems = [];
 let equippedItems = [];
 let selectedCourseLang = null;
+let latestReleaseCache = null;
+let latestReleaseCacheAt = 0;
+let latestReleaseListCache = [];
+let latestReleaseListCacheAt = 0;
+let latestReleaseSelectedTag = null;
+const GITHUB_RELEASES_URL = 'https://api.github.com/repos/schokos/Kivo/releases';
+const GITHUB_ISSUES_URL = 'https://github.com/schokos/Kivo/issues';
+const WHATSNEW_ACTIVE_TAG_KEY = 'kivo_whatsnew_active_tag';
+
+if (typeof marked !== 'undefined' && !marked.__kivoReady) {
+  marked.setOptions({
+    gfm: true,
+    breaks: true,
+    mangle: false,
+    headerIds: false
+  });
+
+  const renderer = new marked.Renderer();
+  const baseTable = renderer.table?.bind(renderer);
+  renderer.table = (header, body) => {
+    const tableHtml = baseTable
+      ? baseTable(header, body)
+      : `<table><thead>${header}</thead><tbody>${body}</tbody></table>`;
+    return `<div class="md-table-wrap">${tableHtml}</div>`;
+  };
+
+  marked.use({ renderer });
+  marked.__kivoReady = true;
+}
 
 // ── ICON LIBRARY (Lucide-style inline SVGs) ──────────────────
 // Ersetzt alle Emojis durch konsistente Stroke-Icons.
@@ -1175,6 +1265,7 @@ async function _doProfileSync(){
       currency: parseInt(userCurrency)||0,
       items: itemsArr,
       pass_data: passRaw||{},
+      release_seen_tag: currentUser.release_seen_tag || null,
       updated_at: new Date().toISOString(),
     }).eq('id', currentUser.id);
   } catch(e){ /* offline-tolerant */ }
@@ -1278,6 +1369,7 @@ async function _syncProfileToServer(){
     const avatarUrl = getScopedString('kivo_avatar_url', '') || currentUser.avatar_url || '';
     const avatarData = currentUser.avatar_data || null;
     const username = currentUser.username || '';
+    const releaseSeenTag = currentUser.release_seen_tag || null;
     const payload = {
       username,
       avatar_url: avatarUrl || null,
@@ -1288,6 +1380,7 @@ async function _syncProfileToServer(){
       currency,
       items: Array.isArray(items)?items:[],
       pass_data: passData,
+      release_seen_tag: releaseSeenTag,
       updated_at: new Date().toISOString(),
     };
     const { error } = await sb.from('profiles').update(payload).eq('id', currentUser.id);
@@ -1573,6 +1666,234 @@ function confirm2(title, msg) {
 
 function openModal(id) { document.getElementById(id)?.classList.add('open'); }
 function closeModal(id) { document.getElementById(id)?.classList.remove('open'); }
+
+function openFeedbackIssues() {
+  window.open(GITHUB_ISSUES_URL, '_blank', 'noopener,noreferrer');
+}
+
+function getReleaseSeenTag() {
+  return currentUser?.release_seen_tag || '';
+}
+
+function formatReleaseDate(release) {
+  const dt = release?.published_at || release?.created_at;
+  if (!dt) return '';
+  try {
+    return new Date(dt).toLocaleDateString('de-DE', {
+      year: 'numeric',
+      month: 'long',
+      day: '2-digit'
+    });
+  } catch (e) {
+    return '';
+  }
+}
+
+function getReleaseIdentity(release) {
+  return release?.tag_name || release?.name || '';
+}
+
+function getStoredWhatsNewTag() {
+  return localStorage.getItem(WHATSNEW_ACTIVE_TAG_KEY) || '';
+}
+
+function setStoredWhatsNewTag(tag) {
+  if (tag) localStorage.setItem(WHATSNEW_ACTIVE_TAG_KEY, tag);
+  else localStorage.removeItem(WHATSNEW_ACTIVE_TAG_KEY);
+}
+
+async function fetchLatestRelease(force = false) {
+  const now = Date.now();
+  if (!force && latestReleaseCache && now - latestReleaseCacheAt < 5 * 60 * 1000) {
+    return latestReleaseCache;
+  }
+  const res = await fetch(GITHUB_RELEASES_URL, {
+    headers: { Accept: 'application/vnd.github+json' }
+  });
+  if (!res.ok) {
+    throw new Error(`GitHub API ${res.status}`);
+  }
+  const releases = await res.json();
+  const latest = (Array.isArray(releases) ? releases : [])
+    .filter(r => r && !r.draft && !r.prerelease)
+    .sort((a, b) => {
+      const at = new Date(a.published_at || a.created_at || 0).getTime();
+      const bt = new Date(b.published_at || b.created_at || 0).getTime();
+      return bt - at;
+    })[0] || null;
+  latestReleaseCache = latest;
+  latestReleaseCacheAt = now;
+  return latest;
+}
+
+async function fetchReleaseFeed(force = false) {
+  const now = Date.now();
+  if (!force && latestReleaseListCache.length && now - latestReleaseListCacheAt < 5 * 60 * 1000) {
+    return latestReleaseListCache;
+  }
+  try {
+    const res = await fetch(GITHUB_RELEASES_URL, {
+      headers: { Accept: 'application/vnd.github+json' }
+    });
+    if (!res.ok) {
+      throw new Error(`GitHub API ${res.status}`);
+    }
+    const releases = await res.json();
+    const sorted = (Array.isArray(releases) ? releases : [])
+      .filter(r => r && !r.draft && !r.prerelease)
+      .sort((a, b) => {
+        const at = new Date(a.published_at || a.created_at || 0).getTime();
+        const bt = new Date(b.published_at || b.created_at || 0).getTime();
+        return bt - at;
+      });
+    latestReleaseListCache = sorted;
+    latestReleaseListCacheAt = now;
+    latestReleaseCache = sorted[0] || null;
+    latestReleaseCacheAt = now;
+    return sorted;
+  } catch (err) {
+    console.warn('Failed to fetch releases:', err);
+    if (latestReleaseListCache.length) {
+      return latestReleaseListCache;
+    }
+    const fallback = getLocalReleaseFallback();
+    latestReleaseListCache = fallback;
+    latestReleaseListCacheAt = now;
+    latestReleaseCache = fallback[0] || null;
+    latestReleaseCacheAt = now;
+    return fallback;
+  }
+}
+
+function getReleaseTag(release) {
+  return release?.tag_name || release?.name || '';
+}
+
+function renderWhatsNewReleaseList(releases, activeTag) {
+  const el = document.getElementById('wn-list');
+  if (!el) return;
+  if (!releases.length) {
+    el.innerHTML = `<div class="wn-empty">Keine veröffentlichte Release-Version gefunden.</div>`;
+    return;
+  }
+  el.innerHTML = releases.map((release, idx) => {
+    const tag = getReleaseTag(release);
+    const title = release.name || release.tag_name || `Release ${idx + 1}`;
+    const date = formatReleaseDate(release);
+    const active = tag && tag === activeTag;
+    return `
+      <button class="wn-item ${active ? 'active' : ''}" onclick="openWhatsNewRelease(${JSON.stringify(tag)})">
+        <div class="wn-item-title">${escapeHtml(title)}</div>
+        <div class="wn-item-tag">${escapeHtml(tag || 'ohne Tag')}${date ? ' · ' + escapeHtml(date) : ''}</div>
+      </button>
+    `;
+  }).join('');
+}
+
+function renderWhatsNewReleaseDetail(release) {
+  const el = document.getElementById('wn-content');
+  if (!el) return null;
+  if (!release) {
+    el.innerHTML = `<div class="wn-empty">Kein Release ausgewählt.</div>`;
+    return null;
+  }
+
+  const releaseId = getReleaseTag(release);
+  const releaseTitle = release.name || release.tag_name || 'Neues Update';
+  const releaseDate = formatReleaseDate(release);
+  const notes = release.body || '_Keine Release-Notes verfügbar._';
+  const meta = [release.tag_name ? `Tag ${release.tag_name}` : '', releaseDate ? `Veröffentlicht ${releaseDate}` : '']
+    .filter(Boolean)
+    .join(' · ');
+
+  el.innerHTML = `
+    <div class="k-card-sm" style="margin-bottom:12px">
+      <div class="release-head">
+        <div class="k-section-title" style="margin-bottom:0">What's new</div>
+        <div style="font-size:16px;font-weight:800">${escapeHtml(releaseTitle)}</div>
+        <div class="release-meta">${escapeHtml(meta || 'Neueste Release-Notizen von GitHub')}</div>
+      </div>
+      <div class="release-body">${renderMarkdown(notes)}</div>
+    </div>`;
+
+  if (releaseId && currentUser && getReleaseSeenTag() !== releaseId) {
+    currentUser.release_seen_tag = releaseId;
+    syncProfile();
+  }
+
+  return release;
+}
+
+async function loadWhatsNew(options = {}) {
+  const listEl = document.getElementById('wn-list');
+  const contentEl = document.getElementById('wn-content');
+  if (!listEl || !contentEl) return null;
+
+  listEl.innerHTML = `<div class="wn-empty" style="display:flex;align-items:center;justify-content:center;min-height:140px">${makeLoadingHTML("Lade What's New...", undefined, 'loading')}</div>`;
+  contentEl.innerHTML = makeLoadingHTML("Lade What's New...", undefined, 'loading');
+
+  try {
+    const releases = options.releases || await fetchReleaseFeed(!!options.force);
+    if (!releases.length) {
+      renderWhatsNewReleaseList([], '');
+      contentEl.innerHTML = `
+        <div class="k-card-sm" style="text-align:center;padding:24px">
+          <div class="k-section-title">What's new</div>
+          <div style="font-size:12px;color:var(--muted)">Keine veröffentlichte Release-Version gefunden.</div>
+        </div>`;
+      return null;
+    }
+
+    const activeTag = options.releaseTag || latestReleaseSelectedTag || getStoredWhatsNewTag() || getReleaseTag(releases[0]);
+    latestReleaseSelectedTag = activeTag;
+    setStoredWhatsNewTag(activeTag);
+    renderWhatsNewReleaseList(releases, activeTag);
+
+    const activeRelease = releases.find(r => getReleaseTag(r) === activeTag) || releases[0];
+    if (!activeRelease) {
+      contentEl.innerHTML = `
+        <div class="k-card-sm" style="text-align:center;padding:24px">
+          <div class="k-section-title">What's new</div>
+          <div style="font-size:12px;color:var(--muted)">Keine Release-Daten verfügbar.</div>
+        </div>`;
+      return null;
+    }
+    return renderWhatsNewReleaseDetail(activeRelease);
+  } catch (e) {
+    listEl.innerHTML = `<div class="wn-empty">Fehler beim Laden</div>`;
+    contentEl.innerHTML = `
+      <div class="k-card-sm" style="text-align:center;padding:24px">
+        <div class="k-section-title">What's new</div>
+        <div style="font-size:12px;color:var(--danger);margin-bottom:10px">Release-Notizen konnten nicht geladen werden.</div>
+        <button class="btn btn-sm btn-lime" onclick="loadWhatsNew({force:true})">Erneut versuchen</button>
+      </div>`;
+    return null;
+  }
+}
+
+function openWhatsNewRelease(tag) {
+  if (!tag) return;
+  latestReleaseSelectedTag = tag;
+  setStoredWhatsNewTag(tag);
+  loadWhatsNew({ releaseTag: tag });
+}
+
+function openWhatsNewPanel(options = {}) {
+  if (!currentUser) {
+    openModal('auth-modal');
+    return;
+  }
+  closeFriendPanel();
+  document.getElementById('wn-overlay')?.classList.add('open');
+  document.getElementById('wn-panel')?.classList.add('open');
+  loadWhatsNew(options);
+}
+
+function closeWhatsNewPanel() {
+  document.getElementById('wn-overlay')?.classList.remove('open');
+  document.getElementById('wn-panel')?.classList.remove('open');
+}
+
 
 // ── USER MENU ────────────────────────────────────────────────
 function toggleUserMenu() {
@@ -4305,7 +4626,7 @@ function renderProfile(targetUser=null) {
       ${renderStatsVs(null)}
     </div>`:'' }
 
-  ${currentUser ? `
+${currentUser ? `
     <div class="k-card-sm" role="region" aria-label="Benutzereinstellungen">
       <div class="k-section-title">Einstellungen</div>
       <div class="k-group">
@@ -4347,6 +4668,29 @@ function renderProfile(targetUser=null) {
         aria-label="Abmelden"
       >↩ Abmelden</button>
     </div>
+
+    <!-- Spacer -->
+    <div style="height: 12px;"></div>
+
+    <div class="k-card-sm" style="margin-bottom:12px;position:relative;overflow:hidden;border:1px solid color-mix(in srgb,#6AC28A 22%,transparent);background:linear-gradient(135deg,color-mix(in srgb,#1F2521 92%,#000 8%),color-mix(in srgb,#262D28 96%,#6AC28A 4%))">
+      <div style="position:absolute;inset:auto -30px -30px auto;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle, color-mix(in srgb,#6AC28A 28%,transparent) 0%, transparent 70%);pointer-events:none"></div>
+      <div class="k-section-title">GitHub</div>
+      <div style="display:flex;gap:14px;align-items:flex-start">
+        <div style="width:46px;height:46px;border-radius:14px;background:var(--panel-2);border:1px solid var(--line);display:grid;place-items:center;flex-shrink:0;box-shadow:0 10px 24px color-mix(in srgb,#000 26%,transparent)">
+          <img src="assets/GitHub_Logos/SVG/GitHub_Invertocat_White_Clearspace.svg" alt="GitHub" width="24" height="24">
+        </div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:15px;font-weight:800;margin-bottom:4px">GitHub &amp; What's New</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:10px">
+            Hier kannst du Fehler melden, Ideen teilen und die neuesten Release-Notizen im
+            eigenen What's-New-Bereich ansehen.
+          </div>
+          <div class="btn-row" style="margin-top:0">
+            <button class="btn btn-ghost btn-sm mobile-only" onclick="openFeedbackIssues()">Feedback abgeben</button>
+            <button class="btn btn-blue btn-sm" onclick="openWhatsNewPanel()">What's New</button>
+          </div>
+        </div>
+      </div>
   ` : ''}
   `;
 }
@@ -4519,16 +4863,18 @@ async function buyItem(id) {
 }
 
 // ── FRIEND PANEL ──────────────────────────────────────────────
-function openFriendPanel() {
+function openFriendPanel(tab = 'board') {
+  closeWhatsNewPanel();
   document.getElementById('fp-overlay').classList.add('open');
   document.getElementById('fp-panel').classList.add('open');
   loadFriendPanel();
+  switchFpTab(tab);
 }
 function closeFriendPanel() {
   document.getElementById('fp-overlay').classList.remove('open');
   document.getElementById('fp-panel').classList.remove('open');
 }
-function switchFpTab(tab) {
+function switchFpTab(tab, opts = {}) {
   fpTab=tab;
   document.querySelectorAll('.fp-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('fpt-'+tab)?.classList.add('active');
@@ -5069,7 +5415,9 @@ async function hydrateSession(session){
     const mergedAvatarUrl = getScopedString('kivo_avatar_url','') || prof?.avatar_url || '';
     if(mergedAvatarUrl) lsSet('kivo_avatar_url', mergedAvatarUrl);
 
-    currentUser={id:uid,email:session.user.email,username:mergedUsername,is_dev:!!prof?.is_dev,avatar_data:mergedAvatarData||null,avatar_url:mergedAvatarUrl||null};
+    const mergedReleaseSeenTag = prof?.release_seen_tag || '';
+
+    currentUser={id:uid,email:session.user.email,username:mergedUsername,is_dev:!!prof?.is_dev,avatar_data:mergedAvatarData||null,avatar_url:mergedAvatarUrl||null,release_seen_tag:mergedReleaseSeenTag||null};
     if(prof?.is_dev){document.getElementById('rb-coding')?.style.setProperty('display','flex');}
 
     const{data:poolRows}=await sb.from('pools').select('*').eq('user_id',uid);
@@ -5115,7 +5463,8 @@ async function hydrateSession(session){
       JSON.stringify(mergedXp) !== JSON.stringify(serverXp) ||
       mergedUsername !== (prof?.username || session.user.user_metadata?.username || session.user.email?.split('@')[0] || 'User') ||
       mergedAvatarUrl !== (prof?.avatar_url || '') ||
-      JSON.stringify(mergedAvatarData || null) !== JSON.stringify(prof?.avatar_data || null);
+      JSON.stringify(mergedAvatarData || null) !== JSON.stringify(prof?.avatar_data || null) ||
+      mergedReleaseSeenTag !== (prof?.release_seen_tag || '');
     if(profileChanged) syncProfile();
 
     loadState();

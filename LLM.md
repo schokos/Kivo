@@ -247,6 +247,28 @@ Eine Session enthaelt:
 
 KI-Antworten laufen ueber `kivo-ai`. Antworten koennen Vokabellisten enthalten, die per `importAiList(...)` als Custom Pool importiert werden.
 
+## Feature: Release Notes / What's new
+
+Die App zeigt jetzt GitHub-Releases als Markdown im Friend-Panel an.
+
+Wichtige Details:
+
+- Der neue Tab `What's new` im `fp-panel` laedt die Release-Liste aus `https://api.github.com/repos/schokos/Kivo/releases`
+- Das Panel wird manuell ueber den GitHub-Bereich im Profil geoeffnet, nicht mehr automatisch beim Start
+- Im Profil gibt es jetzt eine eigene GitHub-Kategorie mit Erklaertext und den Aktionen `Feedback abgeben` und `What's new`
+- Der zuletzt gesehene Release wird kontoweit in `public.profiles.release_seen_tag` gespeichert und ueber `syncProfile()` bzw. `_syncProfileToServer()` mitgeschrieben
+
+Betroffene Stellen:
+
+- `index.html`: Release-Fetching, Markdown-Rendering, Panel-Tab, Profil-Buttons, Sync-Erweiterung
+- `public.profiles`: neues Feld `release_seen_tag`
+
+Test-Hinweise:
+
+- Mit frischem oder geloeschtem `release_seen_tag` sollte das Panel beim manuellen Oeffnen den aktuellen Release zeigen
+- Der Profil-Button muss das gleiche Panel manuell oeffnen koennen
+- Der Feedback-Button muss auf `https://github.com/schokos/Kivo/issues` fuehren
+
 ## Lernlogik
 
 Kivo bietet mehrere Lernmodi:
