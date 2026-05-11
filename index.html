@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="de"><head>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 <meta charset="UTF-8">
@@ -313,6 +313,44 @@ textarea.k-input{resize:vertical;min-height:70px}
 .fp-tabs{display:flex;background:var(--panel-2);border-radius:var(--r-sm);padding:3px;margin-bottom:14px}
 .fp-tab{flex:1;padding:6px;border-radius:8px;border:none;background:transparent;color:var(--muted);font-family:inherit;font-size:10px;cursor:pointer;transition:all .15s}
 .fp-tab.active{background:var(--panel);color:var(--text)}
+.release-head{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.release-meta{font-size:10px;color:var(--muted);line-height:1.4}
+.release-body{font-size:12px;line-height:1.65;color:var(--text)}
+.release-body h1,.release-body h2,.release-body h3,.release-body h4{margin:14px 0 8px;line-height:1.25}
+.release-body h1{font-size:18px}.release-body h2{font-size:15px}.release-body h3{font-size:13px}.release-body h4{font-size:12px}
+.release-body p,.release-body ul,.release-body ol,.release-body blockquote,.release-body pre,.release-body table{margin:0 0 10px}
+.release-body ul,.release-body ol{padding-left:18px}
+.release-body li{margin-bottom:4px}
+.release-body blockquote{padding:8px 10px;border-left:3px solid var(--lime);background:var(--lime-d);border-radius:8px}
+.release-body pre{overflow:auto;padding:10px 12px;background:var(--canvas);border:1px solid var(--line);border-radius:10px}
+.release-body code{font-family:Consolas,'SFMono-Regular',monospace;font-size:11px}
+.release-body a{color:var(--lime)}
+.release-body .md-table-wrap{overflow-x:auto;margin:0 0 10px;border:1px solid var(--line);border-radius:12px;background:var(--canvas)}
+.release-body table{width:100%;border-collapse:collapse;min-width:100%}
+.release-body th,.release-body td{padding:9px 10px;border-bottom:1px solid var(--line);border-right:1px solid var(--line);text-align:left;vertical-align:top}
+.release-body th:last-child,.release-body td:last-child{border-right:none}
+.release-body thead th{background:var(--panel-2);font-weight:700}
+.release-body tbody tr:nth-child(even){background:color-mix(in srgb,#FFFFFF 2%,transparent)}
+.release-body tbody tr:last-child td{border-bottom:none}
+.wn-overlay{position:fixed;inset:0;background:color-mix(in srgb,#1E1E1E 60%,transparent);z-index:150;opacity:0;pointer-events:none;transition:opacity .25s}
+.wn-overlay.open{opacity:1;pointer-events:all}
+.wn-panel{position:fixed;top:0;right:-480px;width:460px;max-width:100vw;height:100vh;background:var(--panel);border-left:1px solid var(--line2);display:flex;flex-direction:column;z-index:151;transition:right .3s cubic-bezier(.4,0,.2,1);box-shadow:var(--shadow)}
+.wn-panel.open{right:0}
+.wn-head{padding:16px 18px 12px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-shrink:0}
+.wn-head-title{font-size:14px;font-weight:700}
+.wn-head-sub{font-size:10px;color:var(--muted);margin-top:3px;line-height:1.4}
+.wn-body{flex:1;display:flex;min-height:0}
+.wn-list{width:170px;flex-shrink:0;border-right:1px solid var(--line);padding:12px;overflow-y:auto;background:color-mix(in srgb,var(--panel-2) 35%,transparent)}
+.wn-content{flex:1;overflow-y:auto;padding:14px 16px 18px}
+.wn-item{width:100%;display:block;text-align:left;border:1px solid transparent;background:transparent;color:var(--text);border-radius:12px;padding:10px 11px;margin-bottom:8px;cursor:pointer;transition:all .15s}
+.wn-item:hover{border-color:var(--line);background:color-mix(in srgb,#FFFFFF 3%,transparent)}
+.wn-item.active{border-color:color-mix(in srgb,#6AC28A 30%,transparent);background:var(--lime-d2)}
+.wn-item-tag{font-size:9px;color:var(--muted);margin-top:3px}
+.wn-item-title{font-size:11px;font-weight:700;line-height:1.35}
+.wn-empty{padding:24px 10px;text-align:center;font-size:11px;color:var(--muted)}
+.wn-mobile-actions{display:flex;gap:8px;flex-wrap:wrap}
+.wn-mobile-actions .btn{flex:1 1 auto}
+.mobile-only{display:none !important}
 .req-badge{display:inline-flex;align-items:center;justify-content:center;min-width:15px;height:15px;background:var(--danger);border-radius:999px;font-size:8px;color:#E6E6E6;padding:0 3px;margin-left:3px;font-weight:700}
 .friend-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--r-sm);margin-bottom:6px;transition:all .15s}
 .friend-row.me{border-color:color-mix(in srgb,#6AC28A 25%,transparent);background:var(--lime-d2)}
@@ -586,11 +624,18 @@ textarea.k-input{resize:vertical;min-height:70px}
   .fc{height:170px}
   .fp-panel{width:100%;border-left:none;border-top:1px solid var(--line2);border-radius:var(--r-lg) var(--r-lg) 0 0;top:auto;bottom:-100%;height:90vh;right:0;transition:bottom .3s cubic-bezier(.4,0,.2,1)}
   .fp-panel.open{bottom:0;right:0}
+  .wn-panel{width:100%;border-left:none;border-top:1px solid var(--line2);border-radius:var(--r-lg) var(--r-lg) 0 0;top:auto;bottom:-100%;height:90vh;right:0;transition:bottom .3s cubic-bezier(.4,0,.2,1)}
+  .wn-panel.open{bottom:0;right:0}
+  .wn-body{flex-direction:column}
+  .wn-list{width:100%;border-right:none;border-bottom:1px solid var(--line);display:flex;gap:8px;overflow-x:auto;overflow-y:hidden;padding:10px}
+.wn-item{min-width:160px;flex:0 0 auto;margin-bottom:0}
+  .wn-content{padding:12px 14px 16px}
   .modal{border-radius:var(--r-lg) var(--r-lg) 0 0;position:fixed;bottom:-100%;left:0;right:0;max-width:100%;max-height:90vh;border-radius:var(--r-lg) var(--r-lg) 0 0;transition:bottom .3s}
   .modal-overlay.open .modal{bottom:0}
   .modal-overlay{align-items:flex-end;padding:0}
   .shop-grid{grid-template-columns:repeat(auto-fill,minmax(100px,1fr))}
   .topbar{padding:14px}.tb-title{font-size:18px}.home-title,.app-page-title{font-size:22px}.dashboard-grid,.course-grid{grid-template-columns:1fr}.home-metrics{width:100%;justify-content:space-between}.screens{padding:10px 14px 70px}
+  .mobile-only{display:inline-flex !important}
 }
 @media(min-width:980px){
   .k-grid{grid-template-columns:1.1fr .9fr}
@@ -614,7 +659,22 @@ textarea.k-input{resize:vertical;min-height:70px}
       <button class="rail-btn" id="rb-shop" data-s="shop" onclick="goTo('shop')" title="Belohnungen"><span class="rail-ico"><svg viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6L5 8z"></path><path d="M9 8V6a3 3 0 0 1 6 0v2"></path><path d="M9 12v2M15 12v2"></path></svg></span><span class="rail-lbl">Belohnungen</span></button>
     </div>
     <div class="rail-bot">
-      <button class="rail-btn" id="rb-github" data-s="github" onclick="confirm2('URL öffnen?','Möchten Sie https\://github.com/schokos/Kivo/issues wirklich öffnen?', () => window.open('https://github.com/schokos/Kivo/issues', '_blank'))" title="GitHub"><span class="rail-ico"><img src="assets/GitHub_Logos/SVG/GitHub_Invertocat_White.svg" alt="GitHub" width="24" height="24"></span><span class="rail-lbl">GitHub</span></button>
+      <button class="rail-btn" id="rb-github" data-s="github"
+      onclick="(async()=>{ 
+        const ok = await confirm2(
+          'URL öffnen?',
+          'Möchten Sie https://github.com/schokos/Kivo/issues wirklich öffnen?'
+        );
+        if(ok){
+          window.open('https://github.com/schokos/Kivo/issues', '_blank');
+        }
+      })()"
+      title="GitHub">
+        <span class="rail-ico">
+          <img src="assets/GitHub_Logos/SVG/GitHub_Invertocat_White_Clearspace.svg" alt="GitHub" width="24" height="24">
+        </span>
+        <span class="rail-lbl">GitHub</span>
+      </button>
       <button class="rail-btn" id="rb-aibot" data-s="aibot" onclick="goTo('aibot')" title="KI-Assistent"><span class="rail-ico"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H8l-4 4V5z"></path><circle cx="9" cy="10.5" r="1.1" fill="currentColor" stroke="none"></circle><circle cx="15" cy="10.5" r="1.1" fill="currentColor" stroke="none"></circle></svg>
       </span><span class="rail-lbl">KI-Assistent</span></button>
       <button class="rail-btn" id="rb-profile" data-s="profile" onclick="goTo('profile')" title="Profil"><span class="rail-ico" id="profile-rail-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"></path></svg></span><span class="rail-lbl">Profil</span></button>
@@ -629,7 +689,6 @@ textarea.k-input{resize:vertical;min-height:70px}
       <div class="um-email" id="um-email"></div>
       <div class="um-item" onclick="closeUserMenu();openModal('auth-modal')"><svg class="um-ico" viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg><span>Anmelden</span></div>
       <div class="um-sep"></div>
-      <div class="um-item" onclick="closeUserMenu();openSettings()"><svg class="um-ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg><span>Einstellungen</span></div>
       <div class="um-item" onclick="closeUserMenu();goTo('profile')"><svg class="um-ico" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><span>Mein Profil</span></div>
       <div class="um-item" onclick="closeUserMenu();goTo('pass')"><svg class="um-ico" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8.5-8 9-4.5-.5-8-4-8-9V6l8-3z"></path><path d="m9 12 2 2 4-4"></path></svg><span>Lern-Pass</span></div>
       <div class="um-item" onclick="closeUserMenu();goTo('shop')"><svg class="um-ico" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg><span>Shop</span></div>
@@ -659,7 +718,7 @@ textarea.k-input{resize:vertical;min-height:70px}
           </div>
           <div class="home-metrics">
             <div class="metric-chip"><span class="dash-ico" style="color:#6AC28A"><svg viewBox="0 0 24 24"><path d="M12 2c1 4 5 5 5 10a5 5 0 1 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3 1-6 1-9z"></path></svg></span> <span id="hm-streak-top">0</span></div>
-            <div class="metric-chip"><span class="dash-ico gem"><svg viewBox="0 0 24 24"><path d="M6 3h12l3 6-9 12L3 9z"></path><path d="M3 9h18M9 3l3 6 3-6"></path></svg></span> <span id="currency-val-home">0</span></div>
+            <div class="metric-chip"><span class="dash-ico gem"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 6v12M9 9h4.5a2 2 0 0 1 0 4H9.5a2 2 0 0 0 0 4H15"/></svg></span> <span id="currency-val-home">0</span></div>
             <div class="avatar-btn" id="dash-avatar-btn" onclick="event.stopPropagation();toggleUserMenu()" title="Profilmenü"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-7 8-7s8 3 8 7"></path></svg></div>
           </div>
         </div>
@@ -834,7 +893,7 @@ textarea.k-input{resize:vertical;min-height:70px}
             <div class="app-page-title">KI-Assistent</div>
             <div class="app-page-sub">Stelle Fragen oder lass dir Lerntipps geben.</div>
           </div>
-          <!-- <button class="btn btn-lime btn-sm" onclick="openChatModal()">Chats</button> -->
+          <button class="btn btn-lime btn-sm" onclick="openChatModal()">Chats</button>
         </div>
         <div class="aibot-wrap" id="aibot-wrap"></div>
       </div>
@@ -1006,14 +1065,6 @@ textarea.k-input{resize:vertical;min-height:70px}
   </div>
 </div>
 
-<!-- SETTINGS MODAL -->
-<div class="modal-overlay" id="settings-modal" onclick="if(event.target===this)closeModal('settings-modal')">
-  <div class="modal">
-    <div class="modal-head"><div class="modal-title">⚙ Einstellungen</div><button class="modal-close" onclick="closeModal('settings-modal')">✕</button></div>
-    <div id="settings-content"></div>
-  </div>
-</div>
-
 <!-- PHOTO IMPORT MODAL -->
 <div class="modal-overlay" id="photo-modal" onclick="if(event.target===this)closeModal('photo-modal')">
   <div class="modal">
@@ -1076,6 +1127,22 @@ textarea.k-input{resize:vertical;min-height:70px}
   </div>
 </div>
 
+<!-- WHAT'S NEW MENU -->
+<div class="wn-overlay" id="wn-overlay" onclick="closeWhatsNewPanel()"></div>
+<div class="wn-panel" id="wn-panel">
+  <div class="wn-head">
+    <div>
+      <div class="wn-head-title">🆕 What's New</div>
+      <div class="wn-head-sub">Release-Notizen und Versionsverlauf.</div>
+    </div>
+    <button class="modal-close" onclick="closeWhatsNewPanel()">✕</button>
+  </div>
+  <div class="wn-body">
+    <div class="wn-list" id="wn-list"></div>
+    <div class="wn-content" id="wn-content"></div>
+  </div>
+</div>
+
 <!-- ═══════════════════════════════════════════ SCRIPT ══════ -->
 <script>
 // ── CONFIG ──────────────────────────────────────────────────
@@ -1096,7 +1163,6 @@ let sessions = [];
 let currentUser = null;
 let fpFriendIds = [];
 let fpTab = 'board';
-let aiBotHistory = [];
 let gapVocab = [];
 let confirmCb = null;
 let cIdx = 0, cDeck = [], cFlipped = false;
@@ -1108,6 +1174,35 @@ let userCurrency = 0;
 let userItems = [];
 let equippedItems = [];
 let selectedCourseLang = null;
+let latestReleaseCache = null;
+let latestReleaseCacheAt = 0;
+let latestReleaseListCache = [];
+let latestReleaseListCacheAt = 0;
+let latestReleaseSelectedTag = null;
+const GITHUB_RELEASES_URL = 'https://api.github.com/repos/schokos/Kivo/releases';
+const GITHUB_ISSUES_URL = 'https://github.com/schokos/Kivo/issues';
+const WHATSNEW_ACTIVE_TAG_KEY = 'kivo_whatsnew_active_tag';
+
+if (typeof marked !== 'undefined' && !marked.__kivoReady) {
+  marked.setOptions({
+    gfm: true,
+    breaks: true,
+    mangle: false,
+    headerIds: false
+  });
+
+  const renderer = new marked.Renderer();
+  const baseTable = renderer.table?.bind(renderer);
+  renderer.table = (header, body) => {
+    const tableHtml = baseTable
+      ? baseTable(header, body)
+      : `<table><thead>${header}</thead><tbody>${body}</tbody></table>`;
+    return `<div class="md-table-wrap">${tableHtml}</div>`;
+  };
+
+  marked.use({ renderer });
+  marked.__kivoReady = true;
+}
 
 // ── ICON LIBRARY (Lucide-style inline SVGs) ──────────────────
 // Ersetzt alle Emojis durch konsistente Stroke-Icons.
@@ -1147,6 +1242,270 @@ function levelUpReward(){ return 10; }
 // ── STORAGE ──────────────────────────────────────────────────
 const lsGet = (k,d) => { try { return JSON.parse(localStorage.getItem(k)??d); } catch(e) { return JSON.parse(d); } };
 const lsSet = (k,v) => { try { localStorage.setItem(k,JSON.stringify(v)); } catch(e){} };
+function getScopedString(key, fallback='') {
+  try {
+    const raw = localStorage.getItem(key);
+    if (raw === null) return fallback;
+    try { return JSON.parse(raw); } catch { return raw; }
+  } catch(e) {
+    return fallback;
+  }
+}
+
+// ── PROFILE SYNC (currency / items / pass_data) ───────────────
+let _profileSyncTimer = null;
+let _profileSyncPending = false;
+async function _doProfileSync(){
+  if(!currentUser) return;
+  _profileSyncPending = false;
+  try {
+    const passRaw = lsGet('kivo_pass','{}');
+    const itemsArr = lsGet('kivo_items','[]');
+    await sb.from('profiles').update({
+      currency: parseInt(userCurrency)||0,
+      items: itemsArr,
+      pass_data: passRaw||{},
+      release_seen_tag: currentUser.release_seen_tag || null,
+      updated_at: new Date().toISOString(),
+    }).eq('id', currentUser.id);
+  } catch(e){ /* offline-tolerant */ }
+}
+function syncProfile(){
+  if(!currentUser) return;
+  _profileSyncPending = true;
+  if(_profileSyncTimer) clearTimeout(_profileSyncTimer);
+  _profileSyncTimer = setTimeout(_doProfileSync, 600);
+}
+window.addEventListener('beforeunload', ()=>{ if(_profileSyncPending) _doProfileSync(); });
+const LOCAL_SYNC_DEBOUNCE_MS = 1200;
+function safeJsonParse(raw, fallback) {
+  try {
+    if (raw === null || raw === undefined) return fallback;
+    return JSON.parse(raw);
+  } catch (e) {
+    return fallback;
+  }
+}
+const _localSyncDirty = { profile:false, pools:false, progress:false, chats:false };
+let _localSyncTimer = null;
+let _localSyncInFlight = null;
+
+function _markLocalDirty(kind){
+  if(!currentUser) return;
+  _localSyncDirty[kind] = true;
+  if(_localSyncTimer) clearTimeout(_localSyncTimer);
+  _localSyncTimer = setTimeout(()=>{ void flushLocalSync(); }, LOCAL_SYNC_DEBOUNCE_MS);
+}
+
+function _clearLocalDirty(kind){ _localSyncDirty[kind] = false; }
+function _hasLocalDirty(){ return Object.values(_localSyncDirty).some(Boolean); }
+
+function _mergeUnique(a,b){
+  return Array.from(new Set([...(Array.isArray(a)?a:[]), ...(Array.isArray(b)?b:[])]));
+}
+
+function mergeMaxMap(localMap = {}, serverMap = {}) {
+  const merged = { ...(serverMap || {}) };
+  for (const [k, v] of Object.entries(localMap || {})) {
+    const localVal = Number(v || 0);
+    const serverVal = Number(merged[k] || 0);
+    merged[k] = Math.max(serverVal, localVal);
+  }
+  return merged;
+}
+
+function mergeUniqueList(primary = [], secondary = []) {
+  return _mergeUnique(primary, secondary);
+}
+
+function mergePassState(serverPass = {}, localPass = {}) {
+  const serverClaimed = serverPass?.claimed || {};
+  const localClaimed = localPass?.claimed || {};
+  return {
+    ...serverPass,
+    ...localPass,
+    claimed: {
+      free: _mergeUnique(localClaimed.free, serverClaimed.free),
+      pro: _mergeUnique(localClaimed.pro, serverClaimed.pro),
+    },
+    proOwned: !!(serverPass?.proOwned || localPass?.proOwned),
+  };
+}
+
+function _mergeChatPayload(serverPayload={}, localPayload={}) {
+  const serverSessions = serverPayload.sessions && typeof serverPayload.sessions === 'object' ? serverPayload.sessions : {};
+  const localSessions = localPayload.sessions && typeof localPayload.sessions === 'object' ? localPayload.sessions : {};
+  const mergedSessions = {};
+  const ids = new Set([...Object.keys(serverSessions), ...Object.keys(localSessions)]);
+  for (const id of ids) {
+    const s = serverSessions[id];
+    const l = localSessions[id];
+    if (!s) mergedSessions[id] = l;
+    else if (!l) mergedSessions[id] = s;
+    else {
+      const st = Number(s.updatedAt || s.createdAt || 0);
+      const lt = Number(l.updatedAt || l.createdAt || 0);
+      mergedSessions[id] = lt >= st ? l : s;
+    }
+  }
+  const mergedOrder = [];
+  const addOrder = order => { for (const id of (Array.isArray(order)?order:[])) if (mergedSessions[id] && !mergedOrder.includes(id)) mergedOrder.push(id); };
+  addOrder(localPayload.order);
+  addOrder(serverPayload.order);
+  for (const id of Object.keys(mergedSessions)) if (!mergedOrder.includes(id)) mergedOrder.push(id);
+  const activeId = localPayload.activeId && mergedSessions[localPayload.activeId]
+    ? localPayload.activeId
+    : (serverPayload.activeId && mergedSessions[serverPayload.activeId] ? serverPayload.activeId : (mergedOrder[0] || null));
+  return { activeId, order: mergedOrder, sessions: mergedSessions };
+}
+
+async function _syncProfileToServer(){
+  if(!currentUser) return false;
+  try{
+    const xpData = lsGet('kivo_xp','{}') || {};
+    const currency = parseInt(lsGet('kivo_currency','0')) || 0;
+    const items = lsGet('kivo_items','[]') || [];
+    const passData = lsGet('kivo_pass','{}') || {};
+    const avatarUrl = getScopedString('kivo_avatar_url', '') || currentUser.avatar_url || '';
+    const avatarData = currentUser.avatar_data || null;
+    const username = currentUser.username || '';
+    const releaseSeenTag = currentUser.release_seen_tag || null;
+    const payload = {
+      username,
+      avatar_url: avatarUrl || null,
+      avatar_data: avatarData,
+      xp_data: xpData,
+      xp_total: Object.values(xpData).reduce((a,b)=>a+Number(b||0),0),
+      streak: calcStreak(),
+      currency,
+      items: Array.isArray(items)?items:[],
+      pass_data: passData,
+      release_seen_tag: releaseSeenTag,
+      updated_at: new Date().toISOString(),
+    };
+    const { error } = await sb.from('profiles').update(payload).eq('id', currentUser.id);
+    if(error) throw error;
+    currentUser.avatar_data = avatarData || currentUser.avatar_data || null;
+    currentUser.avatar_url = avatarUrl || currentUser.avatar_url || null;
+    return true;
+  }catch(e){
+    console.warn('[SYNC] profile failed', e);
+    return false;
+  }
+}
+
+async function _syncPoolsToServer(){
+  if(!currentUser) return false;
+  try{
+    const custom = lsGet('kivo_custom','{}') || {};
+    const wanted = new Set();
+    for(const [lang,pools] of Object.entries(custom)){
+      for(const [name,data] of Object.entries(pools||{})){
+        if(BUILTIN[lang]?.[name]) continue;
+        const id = currentUser.id+'_'+esc(mkKey(lang,name));
+        wanted.add(id);
+        const { error } = await sb.from('pools').upsert({id,user_id:currentUser.id,lang,name,data,updated_at:new Date().toISOString()});
+        if(error) throw error;
+      }
+    }
+    const { data:rows, error } = await sb.from('pools').select('id').eq('user_id',currentUser.id);
+    if(error) throw error;
+    for(const row of rows||[]){
+      if(!wanted.has(row.id)){
+        const { error:delErr } = await sb.from('pools').delete().eq('id',row.id);
+        if(delErr) throw delErr;
+      }
+    }
+    return true;
+  }catch(e){
+    console.warn('[SYNC] pools failed', e);
+    return false;
+  }
+}
+
+async function _syncProgressToServer(){
+  if(!currentUser) return false;
+  try{
+    const prefix = 'kivo_kn_';
+    const wanted = new Set();
+    const rowsToSave = [];
+    for(let i=0;i<localStorage.length;i++){
+      const key = localStorage.key(i);
+      if(!key || !key.startsWith(prefix)) continue;
+      const raw = localStorage.getItem(key);
+      if(raw===null) continue;
+      const val = safeJsonParse(raw, null);
+      if(val===null) continue;
+      const poolKey = key.slice(prefix.length);
+      wanted.add(poolKey);
+      rowsToSave.push({user_id:currentUser.id,pool_key:poolKey,known_ids:Array.isArray(val)?val:[],updated_at:new Date().toISOString()});
+    }
+    for(const row of rowsToSave){
+      const { error } = await sb.from('progress').upsert(row);
+      if(error) throw error;
+    }
+    const { data:rows, error } = await sb.from('progress').select('pool_key').eq('user_id',currentUser.id);
+    if(error) throw error;
+    for(const row of rows||[]){
+      if(!wanted.has(row.pool_key)){
+        const { error:delErr } = await sb.from('progress').delete().eq('user_id',currentUser.id).eq('pool_key',row.pool_key);
+        if(delErr) throw delErr;
+      }
+    }
+    return true;
+  }catch(e){
+    console.warn('[SYNC] progress failed', e);
+    return false;
+  }
+}
+
+async function _syncChatsToServer(){
+  if(!currentUser) return false;
+  try{
+    const localPayload = lsGet(AI_CHAT_STORAGE_KEY,'{}') || {};
+    const { data:prof, error } = await sb.from('profiles').select('chat_data').eq('id',currentUser.id).maybeSingle();
+    if(error) throw error;
+    const serverPayload = prof?.chat_data && typeof prof.chat_data==='object' ? prof.chat_data : {};
+    const merged = _mergeChatPayload(serverPayload, localPayload);
+    const { error:updErr } = await sb.from('profiles').update({chat_data:merged, updated_at:new Date().toISOString()}).eq('id',currentUser.id);
+    if(updErr) throw updErr;
+    lsSet(AI_CHAT_STORAGE_KEY, merged);
+    lsSet(AI_CHAT_ACTIVE_KEY, merged.activeId || '');
+    return true;
+  }catch(e){
+    console.warn('[SYNC] chats failed', e);
+    return false;
+  }
+}
+
+async function flushLocalSync({force=false}={}){
+  if(!currentUser) return;
+  if(_localSyncInFlight) return _localSyncInFlight;
+  if(!force && !_hasLocalDirty()) return;
+  if(_localSyncTimer){ clearTimeout(_localSyncTimer); _localSyncTimer=null; }
+  const run = (async()=>{
+    if(force || _localSyncDirty.profile){ if(await _syncProfileToServer()) _clearLocalDirty('profile'); }
+    if(force || _localSyncDirty.pools){ if(await _syncPoolsToServer()) _clearLocalDirty('pools'); }
+    if(force || _localSyncDirty.progress){ if(await _syncProgressToServer()) _clearLocalDirty('progress'); }
+    if(force || _localSyncDirty.chats){ if(await _syncChatsToServer()) _clearLocalDirty('chats'); }
+  })();
+  _localSyncInFlight = run;
+  try{ await run; } finally {
+    _localSyncInFlight = null;
+    if(!force && _hasLocalDirty()){
+      if(_localSyncTimer) clearTimeout(_localSyncTimer);
+      _localSyncTimer = setTimeout(()=>{ void flushLocalSync(); }, LOCAL_SYNC_DEBOUNCE_MS);
+    }
+  }
+}
+
+function syncProfile(){ _markLocalDirty('profile'); }
+function syncPools(){ _markLocalDirty('pools'); }
+function syncPoolToServer(){ _markLocalDirty('pools'); }
+function syncProgress(){ _markLocalDirty('progress'); }
+function syncChats(){ _markLocalDirty('chats'); }
+window.addEventListener('pagehide', ()=>{ void flushLocalSync({force:true}); });
+document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='hidden') void flushLocalSync({force:true}); });
 const mkKey = (l,p) => l+'|||'+p;
 const spKey = k => { const x=String(k||'').split('|||'); return {l:x[0]||'',p:x[1]||''}; };
 const esc = s => s.replace(/[^a-z0-9]/gi,'_');
@@ -1172,7 +1531,7 @@ function loadState() {
   }
   mistakeLog = lsGet('kivo_ml','{}');
   sessions = lsGet('kivo_sess','[]');
-  const saved = localStorage.getItem('kivo_ak');
+  const saved = lsGet('kivo_ak','""');
   if(saved && getPoolObj(saved)) activeKey=saved;
   else { const l=Object.keys(POOLS)[0]; activeKey=l?mkKey(l,Object.keys(POOLS[l])[0]):null; }
   buildVocab();
@@ -1190,16 +1549,16 @@ function buildVocab() {
   document.getElementById('home-pool-name').textContent=p;
 }
 
-function saveKnown() { lsSet('kivo_kn_'+activeKey,vocab.filter(v=>v.known).map(v=>v.id)); }
+function saveKnown() { lsSet('kivo_kn_'+activeKey,vocab.filter(v=>v.known).map(v=>v.id)); syncProgress(); }
 function saveCustom() {
   const custom={};
   for(const [l,ps] of Object.entries(POOLS))
     for(const [p,obj] of Object.entries(ps))
       if(!BUILTIN[l]?.[p]){if(!custom[l])custom[l]={};custom[l][p]=obj;}
-  lsSet('kivo_custom',custom);
+  lsSet('kivo_custom',custom); syncPools();
 }
 function setActivePool(key) {
-  activeKey=key; localStorage.setItem('kivo_ak',key); buildVocab();
+  activeKey=key; lsSet('kivo_ak',key); buildVocab();
 }
 
 function updateHomeStats() {
@@ -1272,15 +1631,269 @@ function toast(msg) {
   const el=document.createElement('div'); el.className='k-toast'; el.textContent=msg;
   wrap.appendChild(el); setTimeout(()=>el.remove(),2800);
 }
-function confirm2(title,msg,cb) {
-  document.getElementById('confirm-title').textContent=title;
-  document.getElementById('confirm-msg').textContent=msg;
-  confirmCb=cb;
-  document.getElementById('confirm-ok').onclick=()=>{document.getElementById('confirm-overlay').classList.remove('open');cb&&cb();};
-  document.getElementById('confirm-overlay').classList.add('open');
+function confirm2(title, msg) {
+  return new Promise((resolve) => {
+    const overlay = document.getElementById('confirm-overlay');
+    const okBtn = document.getElementById('confirm-ok');
+    const cancelBtn = document.getElementById('confirm-cancel');
+
+    document.getElementById('confirm-title').textContent = title;
+    document.getElementById('confirm-msg').textContent = msg;
+
+    overlay.classList.add('open');
+
+    const close = (result) => {
+      overlay.classList.remove('open');
+
+      okBtn.onclick = null;
+      if (cancelBtn) cancelBtn.onclick = null;
+
+      resolve(result);
+    };
+
+    okBtn.onclick = () => close(true);
+
+    if (cancelBtn) {
+      cancelBtn.onclick = () => close(false);
+    }
+
+    // optional: Klick auf Hintergrund = cancel
+    overlay.onclick = (e) => {
+      if (e.target === overlay) close(false);
+    };
+  });
 }
+
 function openModal(id) { document.getElementById(id)?.classList.add('open'); }
 function closeModal(id) { document.getElementById(id)?.classList.remove('open'); }
+
+function openFeedbackIssues() {
+  window.open(GITHUB_ISSUES_URL, '_blank', 'noopener,noreferrer');
+}
+
+function getReleaseSeenTag() {
+  return currentUser?.release_seen_tag || '';
+}
+
+function formatReleaseDate(release) {
+  const dt = release?.published_at || release?.created_at;
+  if (!dt) return '';
+  try {
+    return new Date(dt).toLocaleDateString('de-DE', {
+      year: 'numeric',
+      month: 'long',
+      day: '2-digit'
+    });
+  } catch (e) {
+    return '';
+  }
+}
+
+function getReleaseIdentity(release) {
+  return release?.tag_name || release?.name || '';
+}
+
+function getStoredWhatsNewTag() {
+  return localStorage.getItem(WHATSNEW_ACTIVE_TAG_KEY) || '';
+}
+
+function setStoredWhatsNewTag(tag) {
+  if (tag) localStorage.setItem(WHATSNEW_ACTIVE_TAG_KEY, tag);
+  else localStorage.removeItem(WHATSNEW_ACTIVE_TAG_KEY);
+}
+
+async function fetchLatestRelease(force = false) {
+  const now = Date.now();
+  if (!force && latestReleaseCache && now - latestReleaseCacheAt < 5 * 60 * 1000) {
+    return latestReleaseCache;
+  }
+  const res = await fetch(GITHUB_RELEASES_URL, {
+    headers: { Accept: 'application/vnd.github+json' }
+  });
+  if (!res.ok) {
+    throw new Error(`GitHub API ${res.status}`);
+  }
+  const releases = await res.json();
+  const latest = (Array.isArray(releases) ? releases : [])
+    .filter(r => r && !r.draft && !r.prerelease)
+    .sort((a, b) => {
+      const at = new Date(a.published_at || a.created_at || 0).getTime();
+      const bt = new Date(b.published_at || b.created_at || 0).getTime();
+      return bt - at;
+    })[0] || null;
+  latestReleaseCache = latest;
+  latestReleaseCacheAt = now;
+  return latest;
+}
+
+async function fetchReleaseFeed(force = false) {
+  const now = Date.now();
+  if (!force && latestReleaseListCache.length && now - latestReleaseListCacheAt < 5 * 60 * 1000) {
+    return latestReleaseListCache;
+  }
+  try {
+    const res = await fetch(GITHUB_RELEASES_URL, {
+      headers: { Accept: 'application/vnd.github+json' }
+    });
+    if (!res.ok) {
+      throw new Error(`GitHub API ${res.status}`);
+    }
+    const releases = await res.json();
+    const sorted = (Array.isArray(releases) ? releases : [])
+      .filter(r => r && !r.draft && !r.prerelease)
+      .sort((a, b) => {
+        const at = new Date(a.published_at || a.created_at || 0).getTime();
+        const bt = new Date(b.published_at || b.created_at || 0).getTime();
+        return bt - at;
+      });
+    latestReleaseListCache = sorted;
+    latestReleaseListCacheAt = now;
+    latestReleaseCache = sorted[0] || null;
+    latestReleaseCacheAt = now;
+    return sorted;
+  } catch (err) {
+    console.warn('Failed to fetch releases:', err);
+    if (latestReleaseListCache.length) {
+      return latestReleaseListCache;
+    }
+    const fallback = getLocalReleaseFallback();
+    latestReleaseListCache = fallback;
+    latestReleaseListCacheAt = now;
+    latestReleaseCache = fallback[0] || null;
+    latestReleaseCacheAt = now;
+    return fallback;
+  }
+}
+
+function getReleaseTag(release) {
+  return release?.tag_name || release?.name || '';
+}
+
+function renderWhatsNewReleaseList(releases, activeTag) {
+  const el = document.getElementById('wn-list');
+  if (!el) return;
+  if (!releases.length) {
+    el.innerHTML = `<div class="wn-empty">Keine veröffentlichte Release-Version gefunden.</div>`;
+    return;
+  }
+  el.innerHTML = releases.map((release, idx) => {
+    const tag = getReleaseTag(release);
+    const title = release.name || release.tag_name || `Release ${idx + 1}`;
+    const date = formatReleaseDate(release);
+    const active = tag && tag === activeTag;
+    return `
+      <button class="wn-item ${active ? 'active' : ''}" onclick="openWhatsNewRelease(${JSON.stringify(tag)})">
+        <div class="wn-item-title">${escapeHtml(title)}</div>
+        <div class="wn-item-tag">${escapeHtml(tag || 'ohne Tag')}${date ? ' · ' + escapeHtml(date) : ''}</div>
+      </button>
+    `;
+  }).join('');
+}
+
+function renderWhatsNewReleaseDetail(release) {
+  const el = document.getElementById('wn-content');
+  if (!el) return null;
+  if (!release) {
+    el.innerHTML = `<div class="wn-empty">Kein Release ausgewählt.</div>`;
+    return null;
+  }
+
+  const releaseId = getReleaseTag(release);
+  const releaseTitle = release.name || release.tag_name || 'Neues Update';
+  const releaseDate = formatReleaseDate(release);
+  const notes = release.body || '_Keine Release-Notes verfügbar._';
+  const meta = [release.tag_name ? `Tag ${release.tag_name}` : '', releaseDate ? `Veröffentlicht ${releaseDate}` : '']
+    .filter(Boolean)
+    .join(' · ');
+
+  el.innerHTML = `
+    <div class="k-card-sm" style="margin-bottom:12px">
+      <div class="release-head">
+        <div class="k-section-title" style="margin-bottom:0">What's new</div>
+        <div style="font-size:16px;font-weight:800">${escapeHtml(releaseTitle)}</div>
+        <div class="release-meta">${escapeHtml(meta || 'Neueste Release-Notizen von GitHub')}</div>
+      </div>
+      <div class="release-body">${renderMarkdown(notes)}</div>
+    </div>`;
+
+  if (releaseId && currentUser && getReleaseSeenTag() !== releaseId) {
+    currentUser.release_seen_tag = releaseId;
+    syncProfile();
+  }
+
+  return release;
+}
+
+async function loadWhatsNew(options = {}) {
+  const listEl = document.getElementById('wn-list');
+  const contentEl = document.getElementById('wn-content');
+  if (!listEl || !contentEl) return null;
+
+  listEl.innerHTML = `<div class="wn-empty" style="display:flex;align-items:center;justify-content:center;min-height:140px">${makeLoadingHTML("Lade What's New...", undefined, 'loading')}</div>`;
+  contentEl.innerHTML = makeLoadingHTML("Lade What's New...", undefined, 'loading');
+
+  try {
+    const releases = options.releases || await fetchReleaseFeed(!!options.force);
+    if (!releases.length) {
+      renderWhatsNewReleaseList([], '');
+      contentEl.innerHTML = `
+        <div class="k-card-sm" style="text-align:center;padding:24px">
+          <div class="k-section-title">What's new</div>
+          <div style="font-size:12px;color:var(--muted)">Keine veröffentlichte Release-Version gefunden.</div>
+        </div>`;
+      return null;
+    }
+
+    const activeTag = options.releaseTag || latestReleaseSelectedTag || getStoredWhatsNewTag() || getReleaseTag(releases[0]);
+    latestReleaseSelectedTag = activeTag;
+    setStoredWhatsNewTag(activeTag);
+    renderWhatsNewReleaseList(releases, activeTag);
+
+    const activeRelease = releases.find(r => getReleaseTag(r) === activeTag) || releases[0];
+    if (!activeRelease) {
+      contentEl.innerHTML = `
+        <div class="k-card-sm" style="text-align:center;padding:24px">
+          <div class="k-section-title">What's new</div>
+          <div style="font-size:12px;color:var(--muted)">Keine Release-Daten verfügbar.</div>
+        </div>`;
+      return null;
+    }
+    return renderWhatsNewReleaseDetail(activeRelease);
+  } catch (e) {
+    listEl.innerHTML = `<div class="wn-empty">Fehler beim Laden</div>`;
+    contentEl.innerHTML = `
+      <div class="k-card-sm" style="text-align:center;padding:24px">
+        <div class="k-section-title">What's new</div>
+        <div style="font-size:12px;color:var(--danger);margin-bottom:10px">Release-Notizen konnten nicht geladen werden.</div>
+        <button class="btn btn-sm btn-lime" onclick="loadWhatsNew({force:true})">Erneut versuchen</button>
+      </div>`;
+    return null;
+  }
+}
+
+function openWhatsNewRelease(tag) {
+  if (!tag) return;
+  latestReleaseSelectedTag = tag;
+  setStoredWhatsNewTag(tag);
+  loadWhatsNew({ releaseTag: tag });
+}
+
+function openWhatsNewPanel(options = {}) {
+  if (!currentUser) {
+    openModal('auth-modal');
+    return;
+  }
+  closeFriendPanel();
+  document.getElementById('wn-overlay')?.classList.add('open');
+  document.getElementById('wn-panel')?.classList.add('open');
+  loadWhatsNew(options);
+}
+
+function closeWhatsNewPanel() {
+  document.getElementById('wn-overlay')?.classList.remove('open');
+  document.getElementById('wn-panel')?.classList.remove('open');
+}
+
 
 // ── USER MENU ────────────────────────────────────────────────
 function toggleUserMenu() {
@@ -1301,23 +1914,13 @@ async function addXp(pts, reason='learn') {
   if(reason!=='quest'){
     const s=getQuestState(); s.daily.xp=(s.daily.xp||0)+pts; s.weekly.xp=(s.weekly.xp||0)+pts; saveQuestState(s);
   }
-  if(currentUser){
-    try{
-      const clientEventId='evt_'+Date.now()+'_'+Math.random().toString(36).slice(2);
-      const r=await fetch(SUPABASE_URL+'/functions/v1/kivo-xp',{method:'POST',headers:await edgeHeaders(),body:JSON.stringify({points:pts,reason,clientEventId})});
-      if(r.ok){const d=await r.json(); lsSet('kivo_xp',d.xp_data||{});
-        _handleLevelUp(prevLevel, _xpToLevel(d.xp_total||getTotalXp()));
-        calcStreak(); updateHomeStats(); updateCurrencyDisplay();
-        if(reason!=='quest') trackQuest('xp',pts);
-        return;}
-    }catch(e){}
-  }
   const today=new Date().toISOString().slice(0,10);
   const xp=lsGet('kivo_xp','{}');
   xp[today]=(xp[today]||0)+pts; lsSet('kivo_xp',xp);
   _handleLevelUp(prevLevel, _xpToLevel(getTotalXp()));
   updateCurrencyDisplay();
   calcStreak(); updateHomeStats();
+  syncProfile();
   if(reason!=='quest') trackQuest('xp',pts);
 }
 function _handleLevelUp(prev, now){
@@ -1326,6 +1929,7 @@ function _handleLevelUp(prev, now){
   const reward = gained * levelUpReward();
   userCurrency = (parseInt(lsGet('kivo_currency','0'))||0) + reward;
   lsSet('kivo_currency', userCurrency);
+  syncProfile();
   toast(`${ic('star',14)} Level ${now}! +${reward} Münzen`);
   // Pass-Items neu anzeigen
   if(document.getElementById('screen-pass')?.classList.contains('active')) renderPass();
@@ -1344,7 +1948,7 @@ function updateCurrencyDisplay() {
   const homeVal=document.getElementById('currency-val-home');
   if(homeVal) homeVal.textContent=userCurrency;
 }
-async function syncXpToServer() { return; }
+async function syncXpToServer() { return flushLocalSync(); }
 
 // ── DAILY / WEEKLY QUESTS ───────────────────────────────────
 // Trackt Lernfortschritt pro Tag/Woche. Quests sind feste Ziele, die durch
@@ -1393,7 +1997,7 @@ function trackQuest(metric, amount=1){
       if(scope==='weekly') s.weekly.claimed=claimed; else s.daily.claimed=claimed;
       saveQuestState(s);
       // belohnen (XP via addXp, Münzen direkt)
-      if(q.coins){ userCurrency+=q.coins; lsSet('kivo_currency',userCurrency); updateCurrencyDisplay(); }
+      if(q.coins){ userCurrency+=q.coins; lsSet('kivo_currency',userCurrency); syncProfile(); updateCurrencyDisplay(); }
       if(q.xp){ addXp(q.xp,'quest'); }
       toast(`${ic('check',13)} Quest: ${q.name} (+${q.xp} XP, +${q.coins} ${ic('coin',13)})`);
     }
@@ -1971,28 +2575,26 @@ async function saveEditedPool(oldKey) {
   if(!POOLS[lang])POOLS[lang]={};
   if((old.l!==lang||old.p!==name)&&POOLS[old.l]?.[old.p]){delete POOLS[old.l][old.p];if(!Object.keys(POOLS[old.l]).length)delete POOLS[old.l];}
   POOLS[lang][name]={subcats:{[name]:pairs}}; saveCustom(); await syncPoolToServer(lang,name);
-  activeKey=mkKey(lang,name); localStorage.setItem('kivo_ak',activeKey); closeModal('new-pool-modal'); loadState(); renderOverview(); toast('✓ Pool gespeichert');
+  activeKey=mkKey(lang,name); lsSet('kivo_ak',activeKey); closeModal('new-pool-modal'); loadState(); renderOverview(); toast('✓ Pool gespeichert');
 }
 
 async function syncPoolToServer(lang,name) {
   if(!currentUser)return;
-  try { await sb.from('pools').upsert({id:currentUser.id+'_'+esc(mkKey(lang,name)),user_id:currentUser.id,lang,name,data:POOLS[lang][name],updated_at:new Date().toISOString()}); } catch(e){toast('Cloud-Sync fehlgeschlagen: '+e.message);}
+  syncPools();
 }
 
-function deletePool(key) {
-  confirm2('Pool löschen?','Alle Fortschritte für diesen Pool werden entfernt.',async ()=>{
+async function deletePool(key) {
+  const ok = await confirm2(
+    'Pool löschen?',
+    'Alle Fortschritte für diesen Pool werden entfernt.'
+  );
+
+  if(ok){
     const {l,p}=spKey(key);
-    try {
-      const { error } = await sb.from('pools').delete().eq('id', currentUser.id+'_'+esc(mkKey(l,p)));
-      if (error) throw error;
-    } catch(e) {
-      toast('Löschen in der Cloud fehlgeschlagen: '+e.message);
-      return;
-    }
     delete POOLS[l][p]; if(!Object.keys(POOLS[l]).length)delete POOLS[l];
-    saveCustom(); if(activeKey===key){const lk=Object.keys(POOLS)[0];activeKey=mkKey(lk,Object.keys(POOLS[lk])[0]);}
+    saveCustom(); if(activeKey===key){const lk=Object.keys(POOLS)[0];activeKey=lk?mkKey(lk,Object.keys(POOLS[lk])[0]):null;}
     buildVocab(); renderOverview(); toast('Pool gelöscht');
-  });
+  }
 }
 
 function sharePool(key) {
@@ -2278,6 +2880,8 @@ function checkGapLive(inp) {
 
 
 // ── AI CHATBOT ───────────────────────────────────────────────
+let aiBotHistory = [];
+
 const AI_SYS = `Du bist der Kivo-Assistent — ein freundlicher Sprachlern-Helfer.
 Du hilfst beim Vokabellernen und beantwortest Fragen. Dein Benutzer ist ${currentUser?.username}.
 
@@ -2363,114 +2967,447 @@ function highlightCode(el) {
   });
 }
 
-function streamText(el, text, speed = 10000) {
-  if (!el) return Promise.resolve();
+/* =========================================================
+   AI CHAT SESSIONS + LOCALSTORAGE + RESUME + CHAT MODAL
+   ========================================================= */
 
-  return new Promise((resolve) => {
+const AI_CHAT_STORAGE_KEY = 'kivo_ai_chat_sessions_v1';
+const AI_CHAT_ACTIVE_KEY = 'kivo_ai_active_session_v1';
 
-    if (!el._streamState) {
-      el._streamState = {
-        fullText: '',
-        renderedLength: 0,
-        animating: false,
-        speed
-      };
-    }
+let aiChatSessions = {};
+let aiChatOrder = [];
+let aiActiveChatId = null;
 
-    const state = el._streamState;
+// Laufender Stream im aktiven Chat
+// { sessionId, assistantIndex, raw, requestId, loadingDiv }
+let aiCurrentStream = null;
 
-    state.fullText += text;
-
-    if (state.animating) return resolve(); // wichtig!
-
-    state.animating = true;
-
-    const step = () => {
-      const targetLength = state.fullText.length;
-
-      state.renderedLength += Math.max(
-        1,
-        Math.ceil((targetLength - state.renderedLength) / speed)
-      );
-
-      state.renderedLength = Math.min(state.renderedLength, targetLength);
-
-      const visibleText = state.fullText.slice(0, state.renderedLength);
-
-      el.innerHTML = renderMarkdown(visibleText);
-
-      renderLatex(el);
-      highlightCode(el);
-
-      const msgs = document.getElementById('aibot-msgs');
-      if (msgs) msgs.scrollTop = msgs.scrollHeight;
-
-      if (state.renderedLength < state.fullText.length) {
-        requestAnimationFrame(step);
-      } else {
-        state.animating = false;
-        resolve(); // 🔥 WICHTIG: Promise beenden
-      }
-    };
-
-    requestAnimationFrame(step);
-  });
+function aiUid(prefix = 'chat') {
+  return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
 }
 
-async function streamWelcomeMessage() {
-  const el = document.getElementById('welcome-msg');
-  if (!el) return;
-  // Stream-State zurücksetzen
-  el._streamState = null;
-  const text = `
-# 👋 Willkommen ${currentUser.username}
+function aiNow() {
+  return Date.now();
+}
+
+function aiWelcomeText() {
+  return `
+# 👋 Willkommen ${currentUser?.username || ''}
 Ich bin der **Kivo-Assistent**.
+
 Ich kann:
 - 📚 Vokabellisten erstellen
 - 🧠 Beim Lernen helfen
 - ✍️ Texte erklären
 - ➗ Mathe mit LaTeX darstellen
+
 Zum Beispiel:
+
 $$
 a^2+b^2=c^2
 $$
-`;
+`.trim();
+}
 
+function aiGetSession(id = aiActiveChatId) {
+  return id && aiChatSessions[id] ? aiChatSessions[id] : null;
+}
+
+function aiGetActiveSession() {
+  return aiGetSession(aiActiveChatId);
+}
+
+function aiEnsureSession() {
+  let session = aiGetActiveSession();
+  if (!session) {
+    session = aiCreateChatSession('Neuer Chat', true);
+  }
+  return session;
+}
+
+function aiSaveChatSessions() {
+  try {
+    const payload = {
+      activeId: aiActiveChatId,
+      order: aiChatOrder,
+      sessions: aiChatSessions
+    };
+    lsSet(AI_CHAT_STORAGE_KEY, payload);
+    lsSet(AI_CHAT_ACTIVE_KEY, aiActiveChatId || '');
+    syncChats();
+  } catch (e) {
+    console.warn('[AI] Speicherfehler:', e);
+  }
+}
+
+function aiLoadChatSessions() {
+  try {
+    const raw = lsGet(AI_CHAT_STORAGE_KEY, 'null');
+    if (raw) {
+      const parsed = raw;
+      aiChatSessions = parsed.sessions && typeof parsed.sessions === 'object' ? parsed.sessions : {};
+      aiChatOrder = Array.isArray(parsed.order)
+        ? parsed.order.filter(id => aiChatSessions[id])
+        : Object.keys(aiChatSessions);
+
+      const storedActive = parsed.activeId || lsGet(AI_CHAT_ACTIVE_KEY, '""');
+      aiActiveChatId = storedActive && aiChatSessions[storedActive]
+        ? storedActive
+        : (aiChatOrder[0] || null);
+    }
+
+    if (!aiActiveChatId) {
+      const s = aiCreateChatSession('Neuer Chat', true);
+      aiActiveChatId = s.id;
+    }
+
+    return aiGetActiveSession();
+  } catch (e) {
+    console.warn('[AI] Sessions konnten nicht geladen werden:', e);
+    aiChatSessions = {};
+    aiChatOrder = [];
+    const s = aiCreateChatSession('Neuer Chat', true);
+    aiActiveChatId = s.id;
+    return s;
+  }
+}
+
+function aiCreateChatSession(title = 'Neuer Chat', makeActive = true) {
+  const id = aiUid('chat');
+  const session = {
+    id,
+    title,
+    createdAt: aiNow(),
+    updatedAt: aiNow(),
+    messages: [],
+    streaming: {
+      active: false,
+      assistantIndex: null,
+      raw: ''
+    }
+  };
+
+  aiChatSessions[id] = session;
+  aiChatOrder.unshift(id);
+
+  if (makeActive) {
+    aiActiveChatId = id;
+  }
+
+  aiSaveChatSessions();
+  return session;
+}
+
+function aiTouchSession(id = aiActiveChatId) {
+  const s = aiGetSession(id);
+  if (!s) return;
+  s.updatedAt = aiNow();
+  aiSaveChatSessions();
+}
+
+function aiRenameChatSession(id, newTitle) {
+  const s = aiGetSession(id);
+  if (!s) return;
+  const t = (newTitle || '').trim();
+  if (!t) return;
+  s.title = t.slice(0, 60);
+  s.updatedAt = aiNow();
+  aiSaveChatSessions();
+  openChatModal();
+  renderAiBot();
+}
+
+function aiDeleteChatSession(id) {
+  const s = aiGetSession(id);
+  console.log('[AI] Deleting session', id, s);
+  if (!s) return;
+
+  if (aiCurrentStream?.sessionId === id) {
+    aiCurrentStream = null;
+  }
+
+  delete aiChatSessions[id];
+  aiChatOrder = aiChatOrder.filter(x => x !== id);
+
+  if (aiActiveChatId === id) {
+    aiActiveChatId = aiChatOrder[0] || null;
+
+    if (!aiActiveChatId) {
+      const fresh = aiCreateChatSession('Neuer Chat', true);
+      aiActiveChatId = fresh.id;
+    }
+  }
+
+  aiSaveChatSessions();
+  renderAiBot();
+
+  if (document.getElementById('chat-overlay')?.classList.contains('open')) {
+    openChatModal();
+  }
+}
+
+function aiSwitchChatSession(id) {
+  if (!aiChatSessions[id]) return;
+
+  aiActiveChatId = id;
+  aiSaveChatSessions();
+  closeChatModal();
+  renderAiBot();
+}
+
+function aiSessionPreview(session) {
+  const last = [...(session.messages || [])].reverse().find(m => m?.content);
+  if (!last) return 'Leerer Chat';
+
+  const text = String(last.content)
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  return text.length > 72 ? text.slice(0, 72) + '…' : text;
+}
+
+function aiFormatSessionTime(ts) {
+  try {
+    return new Date(ts).toLocaleString('de-DE', {
+      day: '2-digit',
+      month: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  } catch {
+    return '';
+  }
+}
+
+function aiEnsureChatModal() {
+  if (document.getElementById('chat-overlay') && document.getElementById('chat-panel')) return;
+
+  const overlay = document.createElement('div');
+  overlay.id = 'chat-overlay';
+  overlay.className = 'fp-overlay';
+  overlay.onclick = closeChatModal;
+
+  const panel = document.createElement('div');
+  panel.id = 'chat-panel';
+  panel.className = 'fp-panel';
+  panel.innerHTML = `
+    <div class="fp-head">
+      <div style="font-size:13px;font-weight:800;">Chats</div>
+      <button class="btn btn-sm" onclick="closeChatModal()">✕</button>
+    </div>
+    <div class="fp-body" id="chat-modal-body"></div>
+  `;
+
+  document.body.appendChild(overlay);
+  document.body.appendChild(panel);
+}
+
+function openChatModal() {
+  aiEnsureChatModal();
+
+  const overlay = document.getElementById('chat-overlay');
+  const panel = document.getElementById('chat-panel');
+  const body = document.getElementById('chat-modal-body');
+
+  if (!overlay || !panel || !body) return;
+
+  body.innerHTML = `
+    <div style="display:flex;gap:8px;margin-bottom:12px;">
+      <button class="btn btn-lime btn-sm" onclick="aiCreateAndOpenNewChat()">＋ Neuer Chat</button>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      ${
+        aiChatOrder.length
+          ? aiChatOrder.map(id => {
+              const s = aiChatSessions[id];
+              const active = id === aiActiveChatId;
+              const preview = aiSessionPreview(s);
+              const time = aiFormatSessionTime(s.updatedAt || s.createdAt);
+
+              return `
+                <div class="friend-row ${active ? 'me' : ''}"
+                    style="align-items:flex-start;cursor:pointer"
+                    onclick='aiSwitchChatSession("${id}")'>
+                  <div class="f-info" style="min-width:0;">
+                    <div class="f-name" style="display:flex;align-items:center;gap:8px;justify-content:space-between;">
+                      <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                        ${escapeHtml(s.title || 'Unbenannt')}
+                      </span>
+                    </div>
+                    <div class="f-pts" style="margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                      ${escapeHtml(preview)}
+                    </div>
+                    <div class="f-pts" style="margin-top:4px;opacity:.75;">
+                      ${escapeHtml(time)}
+                    </div>
+                  </div>
+
+                  <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
+                    <button class="btn btn-sm"
+                            onclick='event.stopPropagation();openRenameChatModal("${id}")'>
+                      Umbenennen
+                    </button>
+                    <button class="btn btn-sm btn-danger"
+                            onclick='event.stopPropagation();aiConfirmDeleteChat("${id}")'>
+                      Löschen
+                    </button>
+                  </div>
+                </div>
+              `;
+            }).join('')
+          : `<div style="color:var(--muted);font-size:12px;padding:10px 0;">Noch keine Chats vorhanden.</div>`
+      }
+    </div>
+  `;
+
+  overlay.classList.add('open');
+  panel.classList.add('open');
+}
+
+function closeChatModal() {
+  const overlay = document.getElementById('chat-overlay');
+  const panel = document.getElementById('chat-panel');
+  if (overlay) overlay.classList.remove('open');
+  if (panel) panel.classList.remove('open');
+}
+
+function aiCreateAndOpenNewChat() {
+  aiCreateChatSession('Neuer Chat', true);
+  aiSaveChatSessions();
+  closeChatModal();
+  renderAiBot();
+}
+
+function openRenameChatModal(id) {
+  const s = aiGetSession(id);
+  if (!s) return;
+
+  document.getElementById('npm-title').textContent = 'Chat umbenennen';
+
+  document.getElementById('new-pool-content').innerHTML = `
+    <div class="k-group">
+      <label class="k-label">Chat-Name</label>
+      <input class="k-input" id="chat-rename-input" value="${(s.title || '').replace(/"/g,'&quot;')}">
+    </div>
+
+    <button class="btn btn-lime" style="width:100%" onclick="saveRenamedChat('${id}')">
+      Speichern
+    </button>
+  `;
+
+  openModal('new-pool-modal');
+}
+
+function saveRenamedChat(id) {
+  const input = document.getElementById('chat-rename-input');
+  if (!input) return;
+
+  const val = input.value.trim();
+  if (!val) return;
+
+  aiRenameChatSession(id, val);
+  closeModal('new-pool-modal');
+}
+
+async function aiConfirmDeleteChat(id) {
+  const s = aiGetSession(id);
+  if (!s) return;
+
+  const ok = await Promise.resolve(
+    confirm2(`Chat "${s.title || 'Unbenannt'}" wirklich löschen?`)
+  );
+
+  if (!ok) return;
+  aiDeleteChatSession(id);
+}
+
+/* =========================================================
+   UI LOCK
+   ========================================================= */
+
+function setAiInputLocked(locked) {
   const inp = document.getElementById('aibot-inp');
-  if (inp) {
-    inp.value = '';
-    setAiInputLocked(true);
-  }
-
-  await streamText(el, text);
+  const btn = document.getElementById('aibot-send-btn');
 
   if (inp) {
-    setAiInputLocked(false);
+    inp.disabled = locked;
+    inp.style.opacity = locked ? '0.6' : '1';
+    inp.style.pointerEvents = locked ? 'none' : 'auto';
   }
+
+  if (btn) {
+    btn.disabled = locked;
+    btn.innerHTML = locked
+      ? `<div class="kivo-spinner"></div>`
+      : `➤`;
+  }
+}
+
+/* =========================================================
+   RENDER
+   ========================================================= */
+
+function aiRecoverStaleStreaming(session) {
+  if (!session?.streaming?.active) return;
+
+  const idx = session.streaming.assistantIndex;
+  const msg = session.messages?.[idx];
+
+  if (msg && msg.role === 'assistant') {
+    msg.content = msg.content || session.streaming.raw || '';
+    msg.streaming = false;
+
+    // Prüfe, ob die Nachricht eine Vokabelliste enthält
+    const vocabBlock = stripVocabBlock(msg.content);
+    if (vocabBlock.hasVocab && vocabBlock.complete) {
+      msg.vocabData = vocabBlock.vocabRaw; // Speichere die JSON-Daten für die Wiederherstellung
+    }
+  }
+
+  session.streaming = {
+    active: false,
+    assistantIndex: null,
+    raw: ''
+  };
+
+  aiSaveChatSessions();
 }
 
 function renderAiBot() {
   const wrap = document.getElementById('aibot-wrap');
   if (!wrap) return;
 
-  // Login-Prüfung
-  if(!currentUser){
-    wrap.innerHTML=`<div class="k-card" style="text-align:center;padding:42px"><div style="color:var(--lime);margin-bottom:12px">${ic('lock',42)}</div><div style="font-size:14px;font-weight:800;margin-bottom:8px">Anmeldung erforderlich</div><button class="btn btn-lime" onclick="openModal('auth-modal')">Anmelden</button></div>`;
+  if (!currentUser) {
+    wrap.innerHTML = `
+      <div class="k-card" style="text-align:center;padding:42px">
+        <div style="color:var(--lime);margin-bottom:12px">${ic('lock',42)}</div>
+        <div style="font-size:14px;font-weight:800;margin-bottom:8px">Anmeldung erforderlich</div>
+        <button class="btn btn-lime" onclick="openModal('auth-modal')">Anmelden</button>
+      </div>`;
     return;
   }
 
-  // Standard-Inhalt, falls eingeloggt
+  aiLoadChatSessions();
+  const session = aiGetActiveSession();
+  if (!session) return;
+
+  aiRecoverStaleStreaming(session);
+
   wrap.innerHTML = `
     <div class="aibot-msgs" id="aibot-msgs">
       <div class="ai-msg bot" id="welcome-msg"></div>
     </div>
+
     <div class="ai-suggest-wrap" id="ai-suggests">
       ${AI_TIPS.map(s => `
-        <div class="ai-suggest" onclick="aiBotSend('${s.replace(/'/g, "\\'")}')">
-          ${s}
+        <div class="ai-suggest" data-tip="${escapeHtml(s)}" onclick="aiBotSend(this.dataset.tip)">
+          ${escapeHtml(s)}
         </div>
       `).join('')}
     </div>
+
     <div class="ai-input-row">
       <input
         class="k-input"
@@ -2479,197 +3416,377 @@ function renderAiBot() {
         style="flex:1"
         onkeydown="if(event.key==='Enter' && !this.disabled) aiBotSend()"
       >
-      <button class="btn btn-lime btn-sm" id="aibot-send-btn" onclick="aiBotSend()">
-        ➤
-      </button>
+      <button class="btn btn-lime btn-sm" id="aibot-send-btn" onclick="aiBotSend()">➤</button>
     </div>
   `;
-  streamWelcomeMessage();
+
+  const msgs = document.getElementById('aibot-msgs');
+  const sug = document.getElementById('ai-suggests');
+
+  if (!session) return;
+
+  // Load message history from session into aiBotHistory
+  aiBotHistory = (session.messages || []).map(m => ({ role: m.role, content: m.content }));
+
+  // bestehende Chats sofort aufbauen
+  if (Array.isArray(session.messages) && session.messages.length > 0) {
+    if (sug) sug.style.display = 'none';
+    renderAiSessionMessages(session);
+    return;
+  }
+
+  // leerer Chat: Welcome direkt in den Session-Flow schreiben
+  if (sug) sug.style.display = 'flex';
+  streamWelcomeMessage({ noStream: false });
 }
 
-function setAiInputLocked(locked) {
-  const inp = document.getElementById('aibot-inp');
-  const btn = document.getElementById('aibot-send-btn');
+function renderAiSessionMessages(session) {
+  const msgs = document.getElementById('aibot-msgs');
+  const sug = document.getElementById('ai-suggests');
+  if (!msgs || !session) return;
 
-  if (!inp || !btn) return;
+  msgs.innerHTML = '';
 
-  inp.disabled = locked;
-  inp.style.opacity = locked ? '0.6' : '1';
-  inp.style.pointerEvents = locked ? 'none' : 'auto';
+  for (let i = 0; i < session.messages.length; i++) {
+    const m = session.messages[i];
+    const div = document.createElement('div');
+    div.className = `ai-msg ${m.role === 'user' ? 'user' : 'bot'}`;
 
-  btn.disabled = locked;
+    if (m.role === 'user') {
+      div.textContent = m.content || '';
+    } else {
+      // Prüfe, ob die Nachricht eine Vokabelliste enthält
+      const vocabBlock = stripVocabBlock(m.content);
+      if (vocabBlock.hasVocab && vocabBlock.complete) {
+        try {
+          const vocabData = JSON.parse(vocabBlock.vocabRaw);
+          const importEnc = encodeURIComponent(JSON.stringify(vocabData));
+          const introText = (vocabBlock.displayText || '').trim();
 
-  btn.innerHTML = locked
-    ? `<div class="kivo-spinner"></div>`
-    : `➤`;
-}
+          if (introText) {
+            const introDiv = document.createElement('div');
+            introDiv.className = 'ai-msg bot';
+            introDiv.innerHTML = renderMarkdown(vocabBlock.displayText);
+            renderLatex(introDiv);
+            highlightCode(introDiv);
+            msgs.appendChild(introDiv);
+          }
 
-function makeLoadingHTML(
-  label,
-  progress,
-  mode = 'loading',
-  buttonHTML = '',
-  errorMsg = '',
-) {
-  const isError = mode === 'error';
-  const isDone = mode === 'done';
-  const isLoading = mode === 'loading';
+          const cardDiv = document.createElement('div');
+          cardDiv.className = 'ai-msg bot ai-vocab-result';
+          const importBtnId = aiUid('import');
+          cardDiv.innerHTML = makeLoadingHTML(
+            `Vokabelliste: "${vocabData.name || 'Unbenannt'}" (${vocabData.pairs?.length || 0} Wörter)`,
+            undefined,
+            'done',
+            `
+              <button class="btn btn-lime btn-sm" data-import-btn="${importBtnId}">
+                📥 Direkt importieren
+              </button>
+            `
+          );
+          msgs.appendChild(cardDiv);
 
-  const safeProgress = Math.max(0, Math.min(100, Number(progress) || 0));
-
-  const statusText = isError
-    ? escapeHtml(label + ': ' + errorMsg || 'Ein Fehler ist aufgetreten')
-    : escapeHtml(label || (isDone ? 'Fertig' : 'Bitte warten...'));
-
-  const icon = isLoading
-    ? `<div class="kivo-spinner"></div>`
-    : `
-      <div style="width:16px;height:16px;display:flex;align-items:center;justify-content:center;font-size:14px;">
-        ${isError ? '⚠' : '✓'}
-      </div>
-    `;
-
-  buttonHTML =  buttonHTML
-    ? `<div style="margin-top:10px;">${buttonHTML}</div>`
-    : '';
-
-  return `
-    <div style="padding:12px 16px;background:rgba(0,0,0,.05);border-radius:12px;margin:4px 0;">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:${progress !== undefined ? '8px' : '0'};">
-        ${icon}
-        <span id="loading-label" style="font-size:13px;color:${isError ? 'var(--danger)' : 'var(--muted)'}">
-          ${statusText}
-        </span>
-      </div>
-
-      ${
-        progress !== undefined && isLoading
-          ? `
-          <div style="height:4px;width:100%;background:rgba(0,0,0,.1);border-radius:999px;overflow:hidden;">
-            <div id="loading-bar"
-              style="height:100%;width:${safeProgress}%;border-radius:999px;background:var(--lime);transition:width .25s ease;">
-            </div>
-          </div>
-        `
-          : ''
+          const importBtn = cardDiv.querySelector(`[data-import-btn="${importBtnId}"]`);
+          if (importBtn) {
+            importBtn.addEventListener('click', () => importAiList(importEnc));
+          }
+          continue;
+        } catch (e) {
+          console.error('[AI] Fehler beim Parsen der Vokabelliste:', e);
+          div.innerHTML = renderMarkdown(m.content);
+          renderLatex(div);
+          highlightCode(div);
+        }
+      } else {
+        // Normale Nachricht (ohne Vokabelliste)
+        div.innerHTML = renderMarkdown(m.content);
+        renderLatex(div);
+        highlightCode(div);
       }
-      ${buttonHTML}
-    </div>
-  `;
-}
 
-function aiBotSend(preset) {
+      if (m.streaming) {
+        const badge = document.createElement('div');
+        badge.className = 'streaming-badge';
+        badge.style.cssText =
+          'margin-top:8px;font-size:11px;opacity:.7;display:flex;align-items:center;gap:8px;';
+        badge.innerHTML = `<div class="kivo-spinner"></div><span>Wird wiederhergestellt…</span>`;
+        div.appendChild(badge);
+      }
+    }
+
+    msgs.appendChild(div);
+  }
+
+  if (sug) sug.style.display = session.messages.length ? 'none' : 'flex';
+  msgs.scrollTop = msgs.scrollHeight;
+}
+/* =========================================================
+   WELCOME
+   ========================================================= */
+
+async function streamWelcomeMessage({ noStream = false } = {}) {
+  const session = aiEnsureSession();
+  const el = document.getElementById('welcome-msg');
   const inp = document.getElementById('aibot-inp');
-  const msg = preset || (inp?.value || '').trim();
-  if (!msg) return;
+
+  if (!session) return;
+
+  // Wenn bereits Inhalt existiert, niemals nochmal streamen
+  if (session.messages.length > 0) {
+    renderAiSessionMessages(session);
+    return;
+  }
+
+  const text = aiWelcomeText();
+
+  if (noStream) {
+    session.messages.push({ role: 'assistant', content: text, kind: 'welcome', streaming: false });
+    aiBotHistory.push({ role: 'assistant', content: text, kind: 'welcome' });
+    session.updatedAt = aiNow();
+    aiSaveChatSessions();
+
+    if (el) {
+      el.innerHTML = renderMarkdown(text);
+      renderLatex(el);
+      highlightCode(el);
+    }
+    return;
+  }
 
   if (inp) {
     inp.value = '';
-    setAiInputLocked(true);
+    inp.disabled = true;
+    inp.style.opacity = '0.6';
+    inp.style.pointerEvents = 'none';
   }
+
+  // Welcome als Stream persistent machen
+  const assistantIndex = session.messages.length;
+  session.messages.push({
+    role: 'assistant',
+    content: '',
+    kind: 'welcome',
+    streaming: true
+  });
+  aiBotHistory.push({
+    role: 'assistant',
+    content: '',
+    kind: 'welcome'
+  });
+  session.streaming = {
+    active: true,
+    assistantIndex,
+    raw: ''
+  };
+  aiCurrentStream = {
+    sessionId: session.id,
+    assistantIndex,
+    raw: '',
+    requestId: aiUid('stream'),
+    loadingDiv: el
+  };
+  aiSaveChatSessions();
+
+  await streamText(el, text);
+
+  session.messages[assistantIndex].content = text;
+  session.messages[assistantIndex].streaming = false;
+  session.streaming = {
+    active: false,
+    assistantIndex: null,
+    raw: ''
+  };
+  aiCurrentStream = null;
+  aiSaveChatSessions();
+
+  if (inp) {
+    inp.disabled = false;
+    inp.style.opacity = '1';
+    inp.style.pointerEvents = 'auto';
+  }
+}
+
+/* =========================================================
+   SEND
+   ========================================================= */
+
+function aiBotSend(preset) {
+  const session = aiEnsureSession();
+  const inp = document.getElementById('aibot-inp');
+  const msg = (preset || (inp?.value || '')).trim();
+  if (!msg) return;
+
+  if (inp) inp.value = '';
+  setAiInputLocked(true);
 
   const msgs = document.getElementById('aibot-msgs');
   if (!msgs) return;
 
-  aiBotHistory.push({ role: 'user', content: msg });
+  if (document.getElementById('ai-suggests')) {
+    document.getElementById('ai-suggests').style.display = 'none';
+  }
+
+  // User message - add to both aiBotHistory and session.messages
+  const userMsg = { role: 'user', content: msg };
+  aiBotHistory.push(userMsg);
+  session.messages.push(userMsg);
+  aiTouchSession(session.id);
 
   const userDiv = document.createElement('div');
   userDiv.className = 'ai-msg user';
   userDiv.textContent = msg;
   msgs.appendChild(userDiv);
 
+  // Assistant placeholder
   const loadingDiv = document.createElement('div');
   loadingDiv.className = 'ai-msg bot';
   loadingDiv.innerHTML = makeLoadingHTML('KI generiert Antwort...', undefined, 'loading');
   msgs.appendChild(loadingDiv);
-
   msgs.scrollTop = msgs.scrollHeight;
-  const sug = document.getElementById('ai-suggests');
-  if (sug) sug.style.display = 'none';
 
+  const assistantIndex = session.messages.length;
+  const assistantMsg = {
+    role: 'assistant',
+    content: '',
+    streaming: true
+  };
+  aiBotHistory.push(assistantMsg);
+  session.messages.push(assistantMsg);
+
+  session.streaming = {
+    active: true,
+    assistantIndex,
+    raw: ''
+  };
+
+  aiCurrentStream = {
+    sessionId: session.id,
+    assistantIndex,
+    raw: '',
+    requestId: aiUid('stream'),
+    loadingDiv
+  };
+
+  aiSaveChatSessions();
   fetchAiReply(loadingDiv);
 }
 
+/* =========================================================
+   STREAM / FETCH
+   ========================================================= */
+
 async function fetchAiReply(loadingDiv) {
   console.log('[AI] 🚀 fetchAiReply gestartet');
+
   const msgs = document.getElementById('aibot-msgs');
   const inp = document.getElementById('aibot-inp');
+  const session = aiGetActiveSession();
 
-  if (!msgs) {
-    console.warn('[AI] ❌ msgs container fehlt');
+  if (!msgs || !session) {
+    console.warn('[AI] ❌ msgs/session fehlt');
+    setAiInputLocked(false);
     return;
   }
 
-  // 👇 Hilfsfunktion zum Extrahieren von Vokabel-Info aus UNVOLLSTÄNDIGEM JSON
   function extractVocabInfo(rawText) {
     if (!rawText) return null;
+
     try {
-      // 🔥 NEU: Entferne Störzeichen (z. B. ">", "{", Leerzeichen) am Anfang
       let cleanedText = rawText.trim();
-      while (cleanedText && !cleanedText.startsWith('{') && !cleanedText.startsWith('[')) {
+
+      while (
+        cleanedText &&
+        !cleanedText.startsWith('{') &&
+        !cleanedText.startsWith('[')
+      ) {
         cleanedText = cleanedText.slice(1).trim();
       }
+
       if (!cleanedText) return null;
 
       let name = null;
       let pairCount = 0;
       let totalPairs = 0;
 
-      // Name extrahieren
       const nameMatch = cleanedText.match(/"name"\s*:\s*"([^"]*)"/);
       if (nameMatch) name = nameMatch[1];
 
-      // Total Pairs extrahieren
       const totalMatch = cleanedText.match(/"length"\s*:\s*(\d+)/);
-      if (totalMatch) totalPairs = parseInt(totalMatch[1]);
+      if (totalMatch) totalPairs = parseInt(totalMatch[1], 10);
 
-      // 🔥 NEU: Zähle ALLE {}-Objekte im "pairs"-Array (auch unvollständige)
       const pairsMatch = cleanedText.match(/"pairs"\s*:\s*\[([\s\S]*)/);
+
       if (pairsMatch) {
         const pairsContent = pairsMatch[1];
-        // Zähle alle {, die den Start eines neuen Paars markieren
         pairCount = (pairsContent.match(/\{[^}]*"/g) || []).length;
       }
 
       return { name, pairCount, totalPairs };
-    } catch (e) {
+    } catch {
       return null;
     }
   }
 
   let fullText = '';
-  let vocabRawBuffer = '';   // Buffer für den JSON-Inhalt zwischen <vocab_list> und </vocab_list>
+  let vocabRawBuffer = '';
   let inVocabBlock = false;
-  let vocabDiv = null;
   let vocabLoaderDiv = null;
   let hasRenderedVocab = false;
   let rafPending = false;
   let buffer = '';
+
+  const persistStreamState = () => {
+    const active = aiGetActiveSession();
+
+    if (!active || !aiCurrentStream) return;
+
+    const idx = aiCurrentStream.assistantIndex;
+
+    if (active.messages[idx]) {
+      active.messages[idx].content = aiCurrentStream.raw;
+      active.messages[idx].streaming = true;
+    }
+
+    if (aiBotHistory[idx]) {
+      aiBotHistory[idx].content = aiCurrentStream.raw;
+    }
+
+    active.streaming = {
+      active: true,
+      assistantIndex: idx,
+      raw: aiCurrentStream.raw
+    };
+
+    aiSaveChatSessions();
+  };
 
   const render = (text) => {
     if (!text) return;
 
     fullText += text;
 
-    // 🔥 1. Vocab Block Start/Ende erkennen
     const startTag = '<vocab_list>';
     const endTag = '</vocab_list>';
 
-    if (fullText.includes(startTag)) inVocabBlock = true;
-    if (inVocabBlock && loadingDiv._streamState) {
+    if (fullText.includes(startTag)) {
+      inVocabBlock = true;
+    }
 
+    if (inVocabBlock && loadingDiv._streamState) {
       const cleaned = loadingDiv._streamState.fullText
-        .replace(/<vocab_list[\s\S]*$/i, '') // kompletter Tag + Rest
-        .replace(/<vocab[\s\S]*$/i, '')      // fallback
-        .replace(/<voc[\s\S]*$/i, '')        // fallback
-        .replace(/<vo[\s\S]*$/i, '')         // fallback
-        .replace(/<v[\s\S]*$/i, '')          // fallback
-        .replace(/<[\s\S]*$/i, '');          // letzter safety net
+        .replace(/<vocab_list[\s\S]*$/i, '')
+        .replace(/<vocab[\s\S]*$/i, '')
+        .replace(/<voc[\s\S]*$/i, '')
+        .replace(/<vo[\s\S]*$/i, '')
+        .replace(/<v[\s\S]*$/i, '')
+        .replace(/<[\s\S]*$/i, '');
 
       loadingDiv._streamState.fullText = cleaned;
       loadingDiv._streamState.renderedLength = cleaned.length;
 
       loadingDiv.innerHTML = renderMarkdown(cleaned);
+
       renderLatex(loadingDiv);
       highlightCode(loadingDiv);
     }
@@ -2679,23 +3796,18 @@ async function fetchAiReply(loadingDiv) {
       const endIndex = fullText.indexOf(endTag, startIndex);
 
       if (startIndex !== -1) {
-        // Extrahiere den Inhalt NACH dem Start-Tag
         let jsonStart = startIndex + startTag.length;
         let jsonContent = fullText.slice(jsonStart);
 
-        // 🔥 NEU: Entferne ">" am Anfang, falls vorhanden
         if (jsonContent.startsWith('>')) {
           jsonContent = jsonContent.slice(1);
         }
 
         if (endIndex === -1) {
-          // Noch kein Ende: Sammle den JSON-Inhalt
           vocabRawBuffer = jsonContent;
         } else {
-          // Ende gefunden: Nimm nur den JSON-Inhalt zwischen den Tags
           vocabRawBuffer = fullText.slice(jsonStart, endIndex);
 
-          // 🔥 NEU: Entferne ">" am Anfang, falls vorhanden
           if (vocabRawBuffer.startsWith('>')) {
             vocabRawBuffer = vocabRawBuffer.slice(1);
           }
@@ -2703,101 +3815,126 @@ async function fetchAiReply(loadingDiv) {
       }
     }
 
-    // Normale Antwort (Text VOR dem Vocab-Block)
     const displayText = inVocabBlock
       ? fullText.slice(0, fullText.indexOf(startTag))
       : fullText;
 
     if (displayText.trim()) {
-      const alreadyRendered =
-        loadingDiv._streamState?.fullText || '';
+      const alreadyRendered = loadingDiv._streamState?.fullText || '';
       const newChunk = displayText.slice(alreadyRendered.length);
+
       if (newChunk) {
         streamText(loadingDiv, newChunk);
       }
     }
 
-    // 🔥 2. Loader erstellen
     if (inVocabBlock && !vocabLoaderDiv) {
       vocabLoaderDiv = document.createElement('div');
       vocabLoaderDiv.className = 'ai-msg bot ai-vocab-loader';
+
       vocabLoaderDiv.innerHTML = makeLoadingHTML(
         'KI generiert Vokabelliste...',
         undefined,
         'loading'
       );
+
       msgs.appendChild(vocabLoaderDiv);
       msgs.scrollTop = msgs.scrollHeight;
     }
 
-    // 🔥 3. LIVE UPDATE (jetzt stabil!)
     if (inVocabBlock && vocabLoaderDiv) {
       try {
         const labelEl = document.getElementById('loading-label');
         const barEl = document.getElementById('loading-bar');
 
         const vocabInfo = extractVocabInfo(vocabRawBuffer);
-        if (vocabInfo && vocabInfo.pairCount > 0) {
-          
-          const name = vocabInfo.name || 'Unbenannt';
-          const wordLabel = vocabInfo.totalPairs === 1 ? "Wort" : "Wörter";
 
-          const text = `Vokabelliste: "${name}" (${vocabInfo.pairCount} ${wordLabel})`
+        if (vocabInfo && vocabInfo.pairCount > 0) {
+          const name = vocabInfo.name || 'Unbenannt';
+
+          const wordLabel =
+            vocabInfo.totalPairs === 1
+              ? 'Wort'
+              : 'Wörter';
+
+          const text = `Vokabelliste: "${name}" (${vocabInfo.pairCount} ${wordLabel})`;
 
           const progress = vocabInfo.totalPairs
-            ? Math.min(100, Math.round((vocabInfo.pairCount / vocabInfo.totalPairs) * 100))
+            ? Math.min(
+                100,
+                Math.round(
+                  (vocabInfo.pairCount / vocabInfo.totalPairs) * 100
+                )
+              )
             : undefined;
 
-          if (!barEl) vocabLoaderDiv.innerHTML = makeLoadingHTML(
-            `Vokabelliste: "${vocabInfo.name || 'Unbenannt'}" (${vocabInfo.pairCount} Wörter)`,
-            progress,
-            'loading'
-          );
-           else {
-          labelEl.textContent = text;
-          barEl.style.width = progress + "%";
-           }
+          if (!barEl) {
+            vocabLoaderDiv.innerHTML = makeLoadingHTML(
+              text,
+              progress,
+              'loading'
+            );
+          } else {
+            if (labelEl) {
+              labelEl.textContent = text;
+            }
+
+            barEl.style.width = progress + '%';
+          }
         }
       } catch (e) {
-        // Ignoriere Fehler bei partialem JSON
         console.log('[AI] Partial JSON (ignored):', e.message);
       }
     }
 
-    // 🔥 4. FINAL STATE
-    if (inVocabBlock && fullText.includes(endTag) && !hasRenderedVocab) {
+    if (
+      inVocabBlock &&
+      fullText.includes(endTag) &&
+      !hasRenderedVocab
+    ) {
       hasRenderedVocab = true;
 
       try {
         const vocabData = JSON.parse(vocabRawBuffer);
-        const importEnc = encodeURIComponent(JSON.stringify(vocabData));
+
+        const importEnc = encodeURIComponent(
+          JSON.stringify(vocabData)
+        );
 
         const div = document.createElement('div');
         div.className = 'ai-msg bot ai-vocab-result';
 
-        const label = `Vokabelliste: "${vocabData.name || 'Unbenannt'}" (${vocabData.pairs?.length || 0} Wörter)`;
+        const label =
+          `Vokabelliste: "${vocabData.name || 'Unbenannt'}" ` +
+          `(${vocabData.pairs?.length || 0} Wörter)`;
 
         div.innerHTML = makeLoadingHTML(
           label,
           100,
           'done',
           `
-          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
-            <button class="btn btn-lime btn-sm"
-              onclick="importAiList('${importEnc}')">
-              📥 Direkt importieren
-            </button>
-          </div>`
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
+              <button class="btn btn-lime btn-sm"
+                      onclick="importAiList('${importEnc}')">
+                📥 Direkt importieren
+              </button>
+            </div>
+          `
         );
 
-        if (vocabLoaderDiv) vocabLoaderDiv.replaceWith(div);
-        else msgs.appendChild(div);
-
+        if (vocabLoaderDiv) {
+          vocabLoaderDiv.replaceWith(div);
+        } else {
+          msgs.appendChild(div);
+        }
       } catch (e) {
         console.error('[AI] JSON error:', e);
+
         if (vocabLoaderDiv) {
           const errorDiv = document.createElement('div');
+
           errorDiv.className = 'ai-msg bot ai-vocab-result';
+
           errorDiv.innerHTML = makeLoadingHTML(
             'Fehler beim Verarbeiten der Vokabelliste',
             0,
@@ -2805,6 +3942,7 @@ async function fetchAiReply(loadingDiv) {
             '',
             e.message
           );
+
           vocabLoaderDiv.replaceWith(errorDiv);
         }
       }
@@ -2813,39 +3951,31 @@ async function fetchAiReply(loadingDiv) {
     msgs.scrollTop = msgs.scrollHeight;
   };
 
-  const extractText = (json) => {
-    if (!json) return '';
-    const choice = json?.choices?.[0];
-    return choice?.delta?.content ?? choice?.message?.content ?? '';
-  };
-
   const processStream = (chunk) => {
     if (!chunk) return;
 
-    // Chunk nur puffern
     buffer += chunk;
 
-    // Maximal 1 Render pro Frame
     if (!rafPending) {
       rafPending = true;
 
       requestAnimationFrame(() => {
-
         const currentChunk = buffer;
 
         buffer = '';
         rafPending = false;
 
-        // EINMAL rendern
+        if (!aiCurrentStream) return;
+
+        aiCurrentStream.raw += currentChunk;
+
+        persistStreamState();
         render(currentChunk);
 
-        // LIVE-UPDATE-Logs
         if (inVocabBlock) {
-
           const vocabInfo = extractVocabInfo(vocabRawBuffer);
 
           if (vocabInfo) {
-
             const name = vocabInfo.name || 'Unbenannt';
 
             const progressText = vocabInfo.totalPairs
@@ -2853,11 +3983,8 @@ async function fetchAiReply(loadingDiv) {
               : `[LIVE UPDATE] Vokabelliste: "${name}" (${vocabInfo.pairCount} Wörter)`;
 
             console.log(progressText);
-
           } else {
-
             console.log('[LIVE UPDATE] Warte auf gültigen JSON-Inhalt...');
-
           }
         }
       });
@@ -2866,35 +3993,175 @@ async function fetchAiReply(loadingDiv) {
 
   try {
     console.log('[AI] 📡 sending request...');
-    const resp = await fetch(SUPABASE_URL + '/functions/v1/kivo-ai', {
-      method: 'POST',
-      headers: await edgeHeaders(),
-      body: JSON.stringify({
-        mode: 'chat',
-        system: AI_SYS,
-        messages: aiBotHistory,
-      }),
-    });
 
-    if (!resp.ok || !resp.body) throw new Error('No stream response');
+    const resp = await fetch(
+      SUPABASE_URL + '/functions/v1/kivo-ai',
+      {
+        method: 'POST',
+        headers: await edgeHeaders(),
+        body: JSON.stringify({
+          mode: 'chat',
+          system: AI_SYS,
+          messages: aiBotHistory
+        })
+      }
+    );
+
+    if (!resp.ok || !resp.body) {
+      throw new Error('No stream response');
+    }
 
     const reader = resp.body.getReader();
     const decoder = new TextDecoder();
 
     while (true) {
       const { done, value } = await reader.read();
+
       if (done) break;
+
       const chunk = decoder.decode(value, { stream: true });
+
       processStream(chunk);
     }
+
     const tail = decoder.decode();
-    if (tail) processStream(tail);
+
+    if (tail) {
+      processStream(tail);
+    }
+
+    // Stream finalisieren
+    const active = aiGetActiveSession();
+
+    if (active && aiCurrentStream) {
+      const idx = aiCurrentStream.assistantIndex;
+
+      if (active.messages[idx]) {
+        active.messages[idx].content = aiCurrentStream.raw;
+        active.messages[idx].streaming = false;
+      }
+
+      if (aiBotHistory[idx]) {
+        aiBotHistory[idx].content = aiCurrentStream.raw;
+      }
+
+      active.streaming = {
+        active: false,
+        assistantIndex: null,
+        raw: ''
+      };
+
+      aiSaveChatSessions();
+    }
   } catch (e) {
     console.error('[AI] 💥 ERROR:', e);
-    loadingDiv.innerHTML = makeLoadingHTML('Fehler', 0, 'error', '', e.message);
+
+    loadingDiv.innerHTML = makeLoadingHTML(
+      'Fehler',
+      0,
+      'error',
+      '',
+      e.message
+    );
   } finally {
+    aiCurrentStream = null;
+
+    if (inp) {
+      inp.disabled = false;
+      inp.style.opacity = '1';
+      inp.style.pointerEvents = 'auto';
+      inp.focus();
+    }
+
     setAiInputLocked(false);
+
+    aiSaveChatSessions();
+
+    renderAiSessionMessages(aiGetActiveSession());
   }
+}
+
+/* =========================================================
+   HELPER FUNCTIONS FOR AI CHAT
+   ========================================================= */
+
+function makeLoadingHTML(label = 'Lädt...', progress = undefined, status = 'loading', buttons = '', errorMsg = '') {
+  let barHtml = '';
+  if (progress !== undefined) {
+    barHtml = `<div class="loading-bar-container" style="width:100%;height:6px;background:var(--panel-2);border-radius:3px;margin:8px 0;overflow:hidden"><div id="loading-bar" class="loading-bar" style="height:100%;background:var(--lime);width:${Math.max(0, Math.min(100, progress))}%;transition:width 0.3s ease"></div></div>`;
+  }
+
+  let statusIcon = '⏳';
+  let statusColor = 'var(--muted)';
+
+  if (status === 'done') {
+    statusIcon = '✓';
+    statusColor = 'var(--lime)';
+  } else if (status === 'error') {
+    statusIcon = '✕';
+    statusColor = 'var(--danger)';
+  } else if (status === 'loading') {
+    statusIcon = '<span class="kivo-spinner"></span>';
+    statusColor = 'var(--lime)';
+  }
+
+  const errorHtml = errorMsg ? `<div style="margin-top:8px;padding:8px;background:var(--danger);color:white;border-radius:4px;font-size:11px">${escapeHtml(errorMsg)}</div>` : '';
+
+  return `
+    <div style="display:flex;flex-direction:column;align-items:flex-start;width:100%">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <span style="color:${statusColor};display:flex;align-items:center">${statusIcon}</span>
+        <span id="loading-label" style="font-size:13px;font-weight:600">${escapeHtml(label)}</span>
+      </div>
+      ${barHtml}
+      ${buttons ? `<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">${buttons}</div>` : ''}
+      ${errorHtml}
+    </div>
+  `;
+}
+
+async function streamText(el, text) {
+  if (!el) return;
+
+  // Initialize stream state if not already done
+  if (!el._streamState) {
+    el._streamState = {
+      fullText: '',
+      renderedLength: 0
+    };
+  }
+
+  const chunkSize = 8;
+  const delay = 15;
+
+  for (let i = 0; i < text.length; i += chunkSize) {
+    const chunk = text.slice(i, Math.min(i + chunkSize, text.length));
+    el._streamState.fullText += chunk;
+
+    const displayed = el._streamState.fullText.slice(0, el._streamState.renderedLength + chunk.length);
+    el._streamState.renderedLength = displayed.length;
+
+    el.innerHTML = renderMarkdown(displayed);
+    renderLatex(el);
+    highlightCode(el);
+
+    if (el.parentElement) {
+      el.parentElement.scrollTop = el.parentElement.scrollHeight;
+    }
+
+    await new Promise(resolve => setTimeout(resolve, delay));
+  }
+}
+
+/* =========================================================
+   INIT
+   ========================================================= */
+
+function initAiChatPersistence() {
+  aiLoadChatSessions();
+  window.addEventListener('beforeunload', () => {
+    aiSaveChatSessions();
+  });
 }
 
 async function importAiList(encOrRaw) {
@@ -3012,17 +4279,27 @@ function getPassState(){
   if(typeof raw.proOwned!=='boolean') raw.proOwned=false;
   return raw;
 }
-function savePassState(s){ lsSet('kivo_pass',s); }
-function buyProPass(){
+function savePassState(s){ lsSet('kivo_pass',s); syncProfile(); }
+async function buyProPass(){
   const s=getPassState();
   if(s.proOwned){toast('Pro Pass ist bereits aktiv');return;}
   if(userCurrency<PASS_PRO_PRICE){toast('Nicht genug Münzen ('+PASS_PRO_PRICE+' nötig)');return;}
-  confirm2('Pro Pass kaufen?','Pro Pass für '+PASS_PRO_PRICE+' Münzen freischalten? Du erhältst dann auf jedem Level eine Belohnung.',()=>{
-    userCurrency-=PASS_PRO_PRICE; lsSet('kivo_currency',userCurrency);
-    s.proOwned=true; savePassState(s);
-    toast('Pro Pass aktiviert!');
-    renderPass(); updateCurrencyDisplay();
-  });
+    const ok = await confirm2(
+      'Pro Pass kaufen?',
+      'Pro Pass für '+PASS_PRO_PRICE+' Münzen freischalten? Du erhältst dann auf jedem Level eine Belohnung.'
+    );
+
+    if(ok){
+      userCurrency -= PASS_PRO_PRICE;
+      lsSet('kivo_currency', userCurrency); syncProfile();
+
+      s.proOwned = true;
+      savePassState(s);
+
+      toast('Pro Pass aktiviert!');
+      renderPass();
+      updateCurrencyDisplay();
+    }
 }
 function claimPass(track, lvl){
   const s=getPassState();
@@ -3034,15 +4311,16 @@ function claimPass(track, lvl){
   const reward = track==='free' ? _passItemFor(lvl,'free') : _passItemFor(lvl,'pro');
   if(!reward) return;
   // Item gewähren (auch wenn schon im Inventar - dann +50 Münzen statt Duplikat)
-  userItems = JSON.parse(localStorage.getItem('kivo_items')||'[]');
+  userItems = lsGet('kivo_items','[]');
   if(userItems.includes(reward.id)){
     userCurrency += 50; lsSet('kivo_currency',userCurrency);
     toast(reward.name+' bereits besessen — +50 Münzen!');
   } else {
     userItems.push(reward.id);
-    localStorage.setItem('kivo_items',JSON.stringify(userItems));
+    lsSet('kivo_items',userItems);
     toast(reward.name+' freigeschaltet!');
   }
+  syncProfile();
   claimed.push(lvl); s.claimed[track]=claimed; savePassState(s);
   renderPass(); updateCurrencyDisplay();
 }
@@ -3058,7 +4336,7 @@ function renderPass(){
   const levels=passLevels();
   const nextXp=lvl*500; const lvlStart=(lvl-1)*500;
   const lvlPct=Math.round((xp-lvlStart)/(nextXp-lvlStart)*100);
-  const userOwnedItems=JSON.parse(localStorage.getItem('kivo_items')||'[]');
+  const userOwnedItems=lsGet('kivo_items','[]');
 
   const headerHtml=`
     <div class="k-card" style="margin-bottom:16px;background:linear-gradient(135deg,var(--lime-d2),var(--panel))">
@@ -3164,7 +4442,7 @@ let _abState = {...AB_DEFAULT};
 // Devs (is_dev) erhalten automatisch ALLE Items dieser Kategorie ohne Kauf.
 function abAvailable(cat){
   const isDev=!!currentUser?.is_dev;
-  const owned=isDev?SHOP_ITEMS.map(i=>i.id):JSON.parse(localStorage.getItem('kivo_items')||'[]');
+  const owned=isDev?SHOP_ITEMS.map(i=>i.id):lsGet('kivo_items','[]');
   const fromShop=SHOP_ITEMS.filter(it=>it.cat===cat && owned.includes(it.id)).map(it=>it.value);
   return [...(AB_OPTS[cat]||[]), ...fromShop];
 }
@@ -3245,6 +4523,7 @@ function openAvatarBuilder(){
   _abRender();
   openModal('avatar-builder-modal');
 }
+
 function _abRender(){
   document.getElementById('ab-preview').innerHTML = renderCustomAvatar(_abState, 180);
   const ctrls = document.getElementById('ab-controls');
@@ -3287,9 +4566,9 @@ async function saveAvatarBuilder(){
   const msg=document.getElementById('ab-msg');
   msg.textContent='Speichere...';
   try{
-    const {error}=await sb.from('profiles').update({avatar_data:_abState}).eq('id',currentUser.id);
-    if(error)throw error;
     currentUser.avatar_data=_abState;
+    lsSet('kivo_avatar_data', _abState);
+    syncProfile();
     msg.textContent='✓ Gespeichert';
     toast('✓ Avatar gespeichert');
     // Dashboard- + Header-Avatar sofort aktualisieren
@@ -3313,9 +4592,9 @@ function renderProfile(targetUser=null) {
     return;
   }
   const xp=currentUser?getTotalXp():0, streak=currentUser?calcStreak():0;
-  const av=localStorage.getItem('kivo_avatar_'+(user?.username||''))||'';
-  const items=currentUser?JSON.parse(localStorage.getItem('kivo_items')||'[]'):[];
-  const equipped=JSON.parse(localStorage.getItem('kivo_equipped')||'[]');
+  const av=getScopedString('kivo_avatar_'+(user?.username||''),'')||getScopedString('kivo_avatar_url','');
+  const items=currentUser?lsGet('kivo_items','[]'):[];
+  const equipped=lsGet('kivo_equipped','[]');
   el.innerHTML=`
     <div class="profile-hero">
       <div class="profile-av" id="prof-av">${getUserAvatar(user, 64)}</div>
@@ -3335,7 +4614,7 @@ function renderProfile(targetUser=null) {
     <div class="k-card-sm" style="margin-bottom:12px">
       <div class="k-section-title">Avatar-Items</div>
       <div class="profile-items-row" id="equipped-row">
-        ${(()=>{const owned=JSON.parse(localStorage.getItem('kivo_items')||'[]');const its=SHOP_ITEMS.filter(i=>owned.includes(i.id));return its.length?its.map(it=>`<div class="profile-item-badge" title="${it.name}">${it.icon}</div>`).join(''):'<div style="font-size:11px;color:var(--muted)">Noch keine Items — kaufe welche im Shop und gestalte deinen Avatar!</div>'})()}
+        ${(()=>{const owned=lsGet('kivo_items','[]');const its=SHOP_ITEMS.filter(i=>owned.includes(i.id));return its.length?its.map(it=>`<div class="profile-item-badge" title="${it.name}">${it.icon}</div>`).join(''):'<div style="font-size:11px;color:var(--muted)">Noch keine Items — kaufe welche im Shop und gestalte deinen Avatar!</div>'})()}
       </div>
       ${currentUser?`<button class="btn btn-sm btn-lime" style="margin-top:8px" onclick="openAvatarBuilder()">🎨 Avatar gestalten</button>`:''}
     </div>
@@ -3347,16 +4626,85 @@ function renderProfile(targetUser=null) {
       ${renderStatsVs(null)}
     </div>`:'' }
 
-    ${currentUser?`
-    <div class="k-card-sm">
+${currentUser ? `
+    <div class="k-card-sm" role="region" aria-label="Benutzereinstellungen">
       <div class="k-section-title">Einstellungen</div>
-      <div class="k-group"><label class="k-label">Nutzername ändern</label>
-        <div style="display:flex;gap:6px"><input class="k-input" id="prof-uname" value="${currentUser?.username||''}" style="flex:1"><button class="btn btn-ok btn-sm" onclick="changeUsername()">Speichern</button></div>
-        <div id="uname-msg" style="font-size:9px;margin-top:4px;color:var(--muted)"></div>
+      <div class="k-group">
+        <label class="k-label" for="prof-uname">Nutzername ändern</label>
+        <div style="display:flex;gap:6px">
+          <input
+            class="k-input"
+            id="prof-uname"
+            value="${currentUser?.username || ''}"
+            aria-label="Neuer Nutzername"
+            style="flex:1"
+          >
+          <button
+            class="btn btn-ok btn-sm"
+            onclick="changeUsername()"
+            aria-label="Nutzername speichern"
+          >Speichern</button>
+        </div>
+        <label class="k-label" for="sett-pw">Passwort ändern</label>
+        <div style="display:flex;gap:6px">
+          <input
+            class="k-input"
+            id="sett-pw"
+            type="password"
+            placeholder="Neues Passwort"
+            aria-label="Neues Passwort"
+            style="flex:1"
+          >
+          <button
+            class="btn btn-ok btn-sm"
+            onclick="changePw()"
+            aria-label="Passwort speichern"
+          >Speichern</button>
+        </div>
       </div>
-      <button class="btn btn-danger btn-sm" onclick="doLogout()">↩ Abmelden</button>
-    </div>`:''}`;
+      <button
+        class="btn btn-danger btn-sm"
+        onclick="doLogout()"
+        aria-label="Abmelden"
+      >↩ Abmelden</button>
+    </div>
+
+    <!-- Spacer -->
+    <div style="height: 12px;"></div>
+
+    <div class="k-card-sm" style="margin-bottom:12px;position:relative;overflow:hidden;border:1px solid color-mix(in srgb,#6AC28A 22%,transparent);background:linear-gradient(135deg,color-mix(in srgb,#1F2521 92%,#000 8%),color-mix(in srgb,#262D28 96%,#6AC28A 4%))">
+      <div style="position:absolute;inset:auto -30px -30px auto;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle, color-mix(in srgb,#6AC28A 28%,transparent) 0%, transparent 70%);pointer-events:none"></div>
+      <div class="k-section-title">GitHub</div>
+      <div style="display:flex;gap:14px;align-items:flex-start">
+        <div style="width:46px;height:46px;border-radius:14px;background:var(--panel-2);border:1px solid var(--line);display:grid;place-items:center;flex-shrink:0;box-shadow:0 10px 24px color-mix(in srgb,#000 26%,transparent)">
+          <img src="assets/GitHub_Logos/SVG/GitHub_Invertocat_White_Clearspace.svg" alt="GitHub" width="24" height="24">
+        </div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:15px;font-weight:800;margin-bottom:4px">GitHub &amp; What's New</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:10px">
+            Hier kannst du Fehler melden, Ideen teilen und die neuesten Release-Notizen im
+            eigenen What's-New-Bereich ansehen.
+          </div>
+          <div class="btn-row" style="margin-top:0">
+            <button class="btn btn-ghost btn-sm mobile-only" onclick="openFeedbackIssues()">Feedback abgeben</button>
+            <button class="btn btn-blue btn-sm" onclick="openWhatsNewPanel()">What's New</button>
+          </div>
+        </div>
+      </div>
+  ` : ''}
+  `;
 }
+
+// ── SETTINGS ──────────────────────────────────────────────────
+
+    
+async function changePw(){
+  const pw=document.getElementById('sett-pw')?.value;
+  if(!pw||pw.length<6){toast('Mind. 6 Zeichen');return;}
+  try{await sb.auth.updateUser({password:pw});toast('✓ Passwort geändert');}catch(e){toast('Fehler: '+e.message);}
+}
+function saveNvKey(){ toast('KI-Schlüssel werden serverseitig verwaltet'); }
+
 
 function getUserAvatar(user, size = 24) {
   const defaultIcon = `
@@ -3366,16 +4714,11 @@ function getUserAvatar(user, size = 24) {
     </svg>
   `;
 
-  const avatarKey = user?.username ? `kivo_avatar_${user.username}` : '';
-  const savedAvatar = avatarKey ? localStorage.getItem(avatarKey) : '';
+  const avatarData = user?.avatar_data || lsGet('kivo_avatar_data', 'null');
+  const savedAvatar = user?.avatar_url || getScopedString(`kivo_avatar_${user?.username || ''}`, '') || lsGet('kivo_avatar_url', '""');
 
-  if (user?.avatar_data) {
-    return renderCustomAvatar(user.avatar_data, size);
-  }
-
-  if (savedAvatar) {
-    return `<img src="${savedAvatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" alt="Profilbild">`;
-  }
+  if (avatarData) return renderCustomAvatar(avatarData, size);
+  if (savedAvatar) return `<img src="${savedAvatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" alt="Profilbild">`;
 
   return defaultIcon;
 }
@@ -3410,13 +4753,14 @@ async function uploadAvatar(inp) {
   const reader=new FileReader();
   reader.onload=async e=>{
     const url=e.target.result;
-    localStorage.setItem('kivo_avatar_'+(currentUser?.username||''),url);
+    lsSet('kivo_avatar_url', url);
+    currentUser.avatar_url = url;
+    syncProfile();
     document.getElementById('prof-av').innerHTML = getUserAvatar(currentUser, 64);
     const imgHtml = getUserAvatar(currentUser, 32);
     document.getElementById('avatar-btn').innerHTML = imgHtml;
     const dashAv = document.getElementById('dash-avatar-btn'); if(dashAv) dashAv.innerHTML = imgHtml;
     updateNavIcons();
-    if(currentUser){try{await sb.from('profiles').update({avatar_url:url}).eq('id',currentUser.id);}catch(e){}}
     toast('✓ Profilbild gespeichert');
   };
   reader.readAsDataURL(file);
@@ -3432,8 +4776,9 @@ async function changeUsername() {
   try {
     const {data:ex}=await sb.from('profiles').select('id').eq('username',newName).neq('id',currentUser.id).maybeSingle();
     if(ex){if(msg)msg.textContent='Bereits vergeben';return;}
-    await sb.from('profiles').update({username:newName}).eq('id',currentUser.id);
     currentUser.username=newName;
+    lsSet('kivo_username', newName);
+    syncProfile();
     document.getElementById('um-name').textContent=newName;
     if(msg)msg.textContent='✓ Gespeichert!';
     toast('✓ Nutzername geändert');
@@ -3462,7 +4807,7 @@ function renderShop() {
   }
 
   userCurrency=parseInt(lsGet('kivo_currency','0'))||0;
-  userItems=JSON.parse(localStorage.getItem('kivo_items')||'[]');
+  userItems=lsGet('kivo_items','[]');
   const dailyItems = getDailyShopItems(6);
   el.innerHTML=`
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap">
@@ -3492,30 +4837,44 @@ function renderShop() {
     </div>`;
 }
 
-function buyItem(id) {
+async function buyItem(id) {
   if(!currentUser){toast('Bitte zuerst anmelden');return;}
   const it=SHOP_ITEMS.find(i=>i.id===id); if(!it)return;
   if(userItems.includes(id)){toast('Bereits im Besitz');return;}
   if(userCurrency<it.price){toast('Nicht genug Münzen! ('+it.price+' benötigt)');return;}
-  confirm2('Item kaufen?',it.name+' für '+it.price+' Münzen kaufen?',()=>{
-    userCurrency-=it.price; lsSet('kivo_currency',userCurrency);
-    userItems.push(id); localStorage.setItem('kivo_items',JSON.stringify(userItems));
+  const ok = await confirm2(
+    'Item kaufen?',
+    it.name+' für '+it.price+' Münzen kaufen?'
+  );
+
+  if(ok){
+    userCurrency -= it.price;
+    lsSet('kivo_currency', userCurrency);
+
+    userItems.push(id);
+    lsSet('kivo_items', userItems);
+    syncProfile();
+
     toast(it.name+' gekauft! Verfügbar im Avatar-Builder.');
-    renderShop(); updateCurrencyDisplay();
-  });
+
+    renderShop();
+    updateCurrencyDisplay();
+  }
 }
 
 // ── FRIEND PANEL ──────────────────────────────────────────────
-function openFriendPanel() {
+function openFriendPanel(tab = 'board') {
+  closeWhatsNewPanel();
   document.getElementById('fp-overlay').classList.add('open');
   document.getElementById('fp-panel').classList.add('open');
   loadFriendPanel();
+  switchFpTab(tab);
 }
 function closeFriendPanel() {
   document.getElementById('fp-overlay').classList.remove('open');
   document.getElementById('fp-panel').classList.remove('open');
 }
-function switchFpTab(tab) {
+function switchFpTab(tab, opts = {}) {
   fpTab=tab;
   document.querySelectorAll('.fp-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('fpt-'+tab)?.classList.add('active');
@@ -3785,11 +5144,11 @@ async function viewFriendProfile(uid,username){
     const el=document.getElementById('profile-content');
     const av=p?.avatar_url?`<img src="${p.avatar_url}">`:(username||'?')[0].toUpperCase();
     el.innerHTML=`
-      <button class="btn btn-sm btn-ghost" onclick="renderProfile()" style="margin-bottom:12px">← Zurück</button>
+      <button class="btn btn-sm btn-ghost" onclick="loadFriendPanel()" style="margin-bottom:12px">← Zurück</button>
       <div class="profile-hero">
         <div class="profile-av">${av}</div>
         <div style="flex:1">
-          <div style="font-size:20px;font-weight:800;margin-bottom:4px">${p?.username||username}</div>
+          <div style="font-size:20px;font-weight:8C00;margin-bottom:4px">${p?.username||username}</div>
           <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px">
             <div style="text-align:center"><div style="font-size:18px;font-weight:700;color:var(--lime)">${(p?.xp_total||0).toLocaleString()}</div><div style="font-size:9px;color:var(--muted)">XP</div></div>
             <div style="text-align:center"><div style="font-size:18px;font-weight:700;color:var(--orange)">${p?.streak||0}</div><div style="font-size:9px;color:var(--muted)">Streak</div></div>
@@ -3819,11 +5178,13 @@ function handlePhotoFile(inp){
   };
   reader.readAsDataURL(file);
 }
+
 function handlePhotoDrop(e){
   e.preventDefault(); document.getElementById('drop-zone').classList.remove('drag-over');
   const file=e.dataTransfer.files[0]; if(!file)return;
   const inp=document.getElementById('photo-file-inp'); const dt=new DataTransfer(); dt.items.add(file); inp.files=dt.files; handlePhotoFile(inp);
 }
+
 async function doPhotoScan(){
   if(!photoBase64){toast('Bitte zuerst ein Bild hochladen');return;}
   const poolName=(document.getElementById('photo-pool-name')?.value||'Foto-Import').trim();
@@ -3846,58 +5207,6 @@ async function doPhotoScan(){
   }catch(e){status.textContent='⚠ Fehler: '+e.message; status.style.color='var(--danger)';}
   btn.disabled=false; btn.textContent='🔍 KI scannen';
 }
-
-// ── SETTINGS ──────────────────────────────────────────────────
-function openSettings(){
-  const el=document.getElementById('settings-content'); if(!el)return;
-  el.innerHTML=`
-    <div class="auth-tabs" style="margin-bottom:14px">
-      <button class="auth-tab active" onclick="this.parentElement.querySelectorAll('.auth-tab').forEach(b=>b.classList.remove('active'));this.classList.add('active');document.getElementById('sett-account').style.display='block';document.getElementById('sett-cl').style.display='none'">Konto</button>
-      <button class="auth-tab" onclick="this.parentElement.querySelectorAll('.auth-tab').forEach(b=>b.classList.remove('active'));this.classList.add('active');document.getElementById('sett-account').style.display='none';document.getElementById('sett-cl').style.display='block';loadChangelog()">Versions-Log</button>
-    </div>
-    <div id="sett-account">
-      ${currentUser?`
-      <div class="k-group"><label class="k-label">Angemeldet als</label><div style="padding:8px 12px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--r-sm);font-size:12px;color:var(--text)">${currentUser.email}</div></div>
-      <div class="k-group"><label class="k-label">Passwort ändern</label><input class="k-input" id="sett-pw" type="password" placeholder="Neues Passwort"><button class="btn btn-sm btn-ok" style="margin-top:6px" onclick="changePw()">Speichern</button></div>`:'<div style="font-size:11px;color:var(--muted);margin-bottom:12px">Nicht angemeldet</div>'}
-      
-      <div class="k-group"><label class="k-label">Tägliche Ziele</label><div style="font-size:11px;color:var(--muted);line-height:1.5">Statt eines XP-Ziels gibt es nun <strong>Daily Quests</strong> mit konkreten Aufgaben und automatischen Belohnungen. <a onclick="closeModal('settings-modal');goTo('challenges')" style="color:var(--lime);cursor:pointer;text-decoration:underline">Quests ansehen →</a></div></div>
-      ${currentUser?`<div style="display:flex;gap:8px;margin-top:10px"><button class="btn btn-danger btn-sm" onclick="doLogout();closeModal('settings-modal')">↩ Abmelden</button></div>`:''}
-    </div>
-    <div id="sett-cl" style="display:none">
-      <div id="cl-list" style="font-size:12px;color:var(--muted);text-align:center;padding:20px">Lade Versions-Log…</div>
-    </div>`;
-  openModal('settings-modal');
-}
-
-async function loadChangelog(){
-  const list=document.getElementById('cl-list'); if(!list)return;
-  try{
-    const {data,error}=await sb.from('changelog').select('*').order('released_at',{ascending:false}).order('sort_order',{ascending:true}).limit(200);
-    if(error)throw error;
-    if(!data||!data.length){list.innerHTML='<div style="font-size:11px;color:var(--muted);text-align:center;padding:20px">Noch keine Einträge</div>';return;}
-    // Gruppieren nach Version
-    const groups={};
-    const order=[];
-    data.forEach(row=>{
-      const key=row.version+'|'+(row.label||'');
-      if(!groups[key]){groups[key]={version:row.version,label:row.label,items:[]};order.push(key);}
-      groups[key].items.push(row);
-    });
-    list.innerHTML=order.map(k=>{
-      const g=groups[k];
-      return `<div class="cl-entry"><div class="cl-ver"><span class="cl-ver-num">v${g.version}</span>${g.label?`<span class="cl-badge">${g.label}</span>`:''}</div>${g.items.map(it=>`<div class="cl-item"><div class="cl-dot ${it.entry_type==='fix'?'fix':it.entry_type==='remove'?'remove':''}"></div><span>${it.text}</span></div>`).join('')}</div>`;
-    }).join('');
-  }catch(e){
-    list.innerHTML='<div style="font-size:11px;color:var(--danger);text-align:center;padding:20px">Fehler beim Laden: '+(e.message||e)+'</div>';
-  }
-}
-
-async function changePw(){
-  const pw=document.getElementById('sett-pw')?.value;
-  if(!pw||pw.length<6){toast('Mind. 6 Zeichen');return;}
-  try{await sb.auth.updateUser({password:pw});toast('✓ Passwort geändert');}catch(e){toast('Fehler: '+e.message);}
-}
-function saveNvKey(){ toast('KI-Schlüssel werden serverseitig verwaltet'); }
 
 // ── AUTH ──────────────────────────────────────────────────────
 function _authShow(which){
@@ -4017,7 +5326,12 @@ async function doForgotPw(){
   try{await sb.auth.resetPasswordForEmail(email,{redirectTo:location.href});authMsg('✓ Reset-Link gesendet!',true);}catch(e){authMsg('Fehler: '+e.message);}
 }
 async function doLogout(){
-  await sb.auth.signOut(); currentUser=null; updateUserUi(null); toast('Abgemeldet');
+  await flushLocalSync({force:true});
+  await sb.auth.signOut();
+  currentUser=null;
+  updateUserUi(null);
+  loadState();
+  toast('Abgemeldet');
 }
 function updateUserUi(user){
   const loggedIn=!!user;
@@ -4038,7 +5352,23 @@ async function hydrateSession(session){
     currentUser={id:uid,email:session.user.email,username:prof?.username||session.user.user_metadata?.username||session.user.email?.split('@')[0]||'User',is_dev:!!prof?.is_dev,avatar_data:prof?.avatar_data||null};
     if(prof?.xp_data){const local=lsGet('kivo_xp','{}');const merged={...(prof.xp_data||{})};for(const[d,p] of Object.entries(local))merged[d]=Math.max(merged[d]||0,p);lsSet('kivo_xp',merged);}
     if(prof?.is_dev){document.getElementById('rb-coding')?.style.setProperty('display','flex');}
-    if(prof?.avatar_url){localStorage.setItem('kivo_avatar_'+currentUser.username,prof.avatar_url);}
+    if(prof?.avatar_url){lsSet('kivo_avatar_url', prof.avatar_url);}
+    // Münzen / Items / Pass aus DB übernehmen (Server gewinnt, mit lokalem Fallback bei Differenz)
+    {
+      const localCoins = parseInt(lsGet('kivo_currency','0'))||0;
+      const serverCoins = parseInt(prof?.currency||0)||0;
+      userCurrency = Math.max(serverCoins, localCoins);
+      lsSet('kivo_currency', userCurrency);
+      const serverItems = Array.isArray(prof?.items) ? prof.items : [];
+      let localItems = lsGet('kivo_items','[]');
+      const mergedItems = Array.from(new Set([...(serverItems||[]), ...(localItems||[])]));
+      userItems = mergedItems;
+      lsSet('kivo_items', mergedItems);
+      const serverPass = (prof?.pass_data && typeof prof.pass_data==='object') ? prof.pass_data : null;
+      if(serverPass){ lsSet('kivo_pass', serverPass); }
+      // Falls lokale Werte größer waren oder Items zusätzlich vorhanden, wieder nach oben syncen
+      if(userCurrency!==serverCoins || mergedItems.length!==(serverItems||[]).length) syncProfile();
+    }
     const{data:poolRows}=await sb.from('pools').select('*').eq('user_id',uid);
     const customFromServer={};
     (poolRows||[]).forEach(row=>{if(row.lang&&row.name&&row.data){if(!customFromServer[row.lang])customFromServer[row.lang]={};customFromServer[row.lang][row.name]=row.data;}});
@@ -4050,6 +5380,103 @@ async function hydrateSession(session){
     currentUser=null; updateUserUi(null); loadState();
   }
 }
+async function hydrateSession(session){
+  if(session?.user){
+    const uid=session.user.id;
+    const{data:prof}=await sb.from('profiles').select('*').eq('id',uid).maybeSingle();
+
+    const serverXp = prof?.xp_data && typeof prof.xp_data==='object' ? prof.xp_data : {};
+    const localXp = lsGet('kivo_xp','{}');
+    const mergedXp = mergeMaxMap(localXp, serverXp);
+    lsSet('kivo_xp', mergedXp);
+
+    const serverCoins = parseInt(prof?.currency||0)||0;
+    const localCoins = parseInt(lsGet('kivo_currency','0'))||0;
+    const mergedCoins = Math.max(serverCoins, localCoins);
+    lsSet('kivo_currency', mergedCoins);
+    userCurrency = mergedCoins;
+
+    const serverItems = Array.isArray(prof?.items) ? prof.items : [];
+    const localItems = lsGet('kivo_items','[]');
+    const mergedItems = mergeUniqueList(localItems, serverItems);
+    lsSet('kivo_items', mergedItems);
+    userItems = mergedItems;
+
+    const serverPass = (prof?.pass_data && typeof prof.pass_data==='object') ? prof.pass_data : {};
+    const localPass = lsGet('kivo_pass','{}');
+    const mergedPass = mergePassState(serverPass, localPass);
+    lsSet('kivo_pass', mergedPass);
+
+    const mergedUsername = lsGet('kivo_username','""') || prof?.username || session.user.user_metadata?.username || session.user.email?.split('@')[0] || 'User';
+    lsSet('kivo_username', mergedUsername);
+
+    const mergedAvatarData = lsGet('kivo_avatar_data','null') || prof?.avatar_data || null;
+    if(mergedAvatarData) lsSet('kivo_avatar_data', mergedAvatarData);
+    const mergedAvatarUrl = getScopedString('kivo_avatar_url','') || prof?.avatar_url || '';
+    if(mergedAvatarUrl) lsSet('kivo_avatar_url', mergedAvatarUrl);
+
+    const mergedReleaseSeenTag = prof?.release_seen_tag || '';
+
+    currentUser={id:uid,email:session.user.email,username:mergedUsername,is_dev:!!prof?.is_dev,avatar_data:mergedAvatarData||null,avatar_url:mergedAvatarUrl||null,release_seen_tag:mergedReleaseSeenTag||null};
+    if(prof?.is_dev){document.getElementById('rb-coding')?.style.setProperty('display','flex');}
+
+    const{data:poolRows}=await sb.from('pools').select('*').eq('user_id',uid);
+    const customFromServer={};
+    (poolRows||[]).forEach(row=>{if(row.lang&&row.name&&row.data){if(!customFromServer[row.lang])customFromServer[row.lang]={};customFromServer[row.lang][row.name]=row.data;}});
+    const localCustom = lsGet('kivo_custom','{}') || {};
+    const mergedCustom = JSON.parse(JSON.stringify(customFromServer));
+    for(const [lang,pools] of Object.entries(localCustom)){
+      if(!mergedCustom[lang]) mergedCustom[lang]={};
+      for(const [name,obj] of Object.entries(pools||{})) mergedCustom[lang][name]=obj;
+    }
+    lsSet('kivo_custom', mergedCustom);
+    if(JSON.stringify(mergedCustom)!==JSON.stringify(customFromServer)) syncPools();
+
+    const{data:progRows}=await sb.from('progress').select('*').eq('user_id',uid);
+    const mergedProgress={};
+    (progRows||[]).forEach(row=>{ if(row.pool_key) mergedProgress[row.pool_key]=Array.isArray(row.known_ids)?row.known_ids:[]; });
+    for(let i=0;i<localStorage.length;i++){
+      const key=localStorage.key(i);
+      if(!key||!key.startsWith('kivo_kn_')) continue;
+      const raw=localStorage.getItem(key);
+      if(raw===null) continue;
+      const val=safeJsonParse(raw, null);
+      if(val===null) continue;
+      const poolKey=key.slice('kivo_kn_'.length);
+      mergedProgress[poolKey]=_mergeUnique(mergedProgress[poolKey]||[], val);
+    }
+    Object.entries(mergedProgress).forEach(([poolKey,ids])=>lsSet('kivo_kn_'+poolKey,ids));
+    if(JSON.stringify(mergedProgress)!==JSON.stringify(Object.fromEntries((progRows||[]).map(r=>[r.pool_key,Array.isArray(r.known_ids)?r.known_ids:[]])))) syncProgress();
+
+    const{data:chatProf}=await sb.from('profiles').select('chat_data').eq('id',uid).maybeSingle();
+    const localChats = lsGet(AI_CHAT_STORAGE_KEY,'{}') || {};
+    const serverChats = chatProf?.chat_data && typeof chatProf.chat_data==='object' ? chatProf.chat_data : {};
+    const mergedChats = _mergeChatPayload(serverChats, localChats);
+    lsSet(AI_CHAT_STORAGE_KEY, mergedChats);
+    lsSet(AI_CHAT_ACTIVE_KEY, mergedChats.activeId || '');
+    if(JSON.stringify(mergedChats)!==JSON.stringify(serverChats)) syncChats();
+
+    const profileChanged =
+      mergedCoins !== serverCoins ||
+      JSON.stringify(mergedItems) !== JSON.stringify(serverItems) ||
+      JSON.stringify(mergedPass) !== JSON.stringify(serverPass) ||
+      JSON.stringify(mergedXp) !== JSON.stringify(serverXp) ||
+      mergedUsername !== (prof?.username || session.user.user_metadata?.username || session.user.email?.split('@')[0] || 'User') ||
+      mergedAvatarUrl !== (prof?.avatar_url || '') ||
+      JSON.stringify(mergedAvatarData || null) !== JSON.stringify(prof?.avatar_data || null) ||
+      mergedReleaseSeenTag !== (prof?.release_seen_tag || '');
+    if(profileChanged) syncProfile();
+
+    loadState();
+    updateUserUi(currentUser);
+    checkPendingFriendReqs();
+  } else {
+    currentUser=null;
+    updateUserUi(null);
+    loadState();
+  }
+}
+
 async function initAuth(){
   const{data:{session}}=await sb.auth.getSession();
   await hydrateSession(session);
@@ -4082,7 +5509,9 @@ loadState();
 initAuth();
 checkShareUrl();
 updateNavIcons();
+initAiChatPersistence();
+
 </script>
 
 
-</body></html>
+</body></html
