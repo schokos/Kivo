@@ -1,9 +1,19 @@
 ﻿{
-  "id": "deutsch-grundlagen",
+  "id": "deutsch",
   "title": "Deutsch",
-  "description": "Beispielstruktur fuer Deutsch-Inhalte in Kivo.",
+  "description": "Deutsch-Lektionen mit getrennten Lernmodulen.",
   "lessons": [
-    "lektionen/definitionen.json",
-    "lektionen/wortarten.json"
+    {
+      "id": "vokabeltrainer",
+      "title": "Vokabeltrainer",
+      "type": "standalone-html",
+      "path": "src/data/courses/deutsch/lektionen/vokabeltrainer/index.html"
+    },
+    {
+      "id": "grammatik",
+      "title": "Grammatik",
+      "type": "standalone-html",
+      "path": "src/data/courses/deutsch/lektionen/grammatik/index.html"
+    }
   ]
 }

@@ -1,38 +1,22 @@
 ﻿# Kivo Struktur-Mapping
 
-## Was schon umgesetzt ist
-- `index.html` ist der Einstiegspunkt.
-- `src/styles/main.css` enthaelt das globale Styling.
-- `src/js/app.js` enthaelt aktuell noch die zentrale Laufzeitlogik.
-- `src/js/screens/*` sind die vorgesehenen Zielmodule fuer die vorhandenen Screens.
-- `src/js/services/*` sind die vorgesehenen Zielmodule fuer Technik-Bausteine.
-- `src/data/courses/*` ist die neue Struktur fuer redaktionelle Kursdaten.
+## Aktueller Stand
+- `index.html` ist die Einstiegsseite.
+- `app.html` ist die eigentliche Kivo-App.
+- `src/styles/main.css` enthaelt das globale App-Styling.
+- `src/js/...` enthaelt die globale App-Logik fuer Dashboard, Community, Profil, Kurse und Lernmodi.
+- `src/data/courses/*/course.json` enthaelt Kurs-Metadaten.
+- `src/data/courses/*/lektionen/*/index.html` ist fuer eigenstaendige Lernmodule gedacht.
 
-## Aktuelle Screens aus der App
-- `home`
-- `courses`
-- `challenges`
-- `community`
-- `cards`
-- `quiz`
-- `typing`
-- `matching`
-- `overview`
-- `stats`
-- `gap`
-- `aibot`
-- `profile`
-- `shop`
-- `pass`
+## Architekturidee
+- Haupt-App: Navigation, Login, Dashboard, Community, Profil
+- Standalone-Lektionen: eigene HTML-, CSS- und JS-Dateien pro grossem Modul
 
-## Empfohlene Team-Aufteilung
-- Person 1: `src/js/screens/home.js`, `src/js/screens/challenges.js`
-- Person 2: `src/js/screens/courses.js`, `src/js/screens/overview.js`
-- Person 3: `src/js/screens/community.js`, `src/js/screens/profile.js`
-- Person 4: `src/js/screens/learn/*`
-- Person 5: `src/js/services/auth.js`, `src/js/services/sync.js`, `src/js/utils/storage.js`
-- Content-Team: `src/data/courses/*`
+## Team-Aufteilung
+- App-Team: `app.html`, `src/js/*`, `src/styles/*`
+- Content-/Modul-Team: `src/data/courses/*/lektionen/*`
 
-## Wichtiger Hinweis
-Die neuen Dateien sind als stabile Zielstruktur angelegt. Damit die App nicht auf einmal bricht, bleibt die bestehende Gesamtlogik vorerst in `src/js/app.js`.
-Der naechste technische Schritt ist, die Funktionen schrittweise aus `app.js` in die neuen Dateien zu verschieben.
+## Beispiel
+- Die Haupt-App verlinkt auf oder oeffnet ein Modul wie:
+  - `src/data/courses/mathe/lektionen/geogebra/index.html`
+- Das Modul kann komplett eigenstaendig weiterentwickelt werden.

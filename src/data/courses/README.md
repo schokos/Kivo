@@ -1,18 +1,21 @@
 ﻿# Kursdaten
 
-Dieser Ordner ist die neue Heimat fuer redaktionelle Kursinhalte.
-Die aktuelle App liest ihre Pools noch aus Local Storage und Supabase.
+Dieser Ordner trennt jetzt klar zwischen:
+- Haupt-App in `app.html`
+- Kurs-Metadaten in `course.json`
+- eigenstaendigen Lernmodulen in `lektionen/...`
 
-Empfohlenes Format pro Fach:
-- `course.json` fuer Metadaten
-- `lektionen/*.json` fuer Inhalte
+## Strukturidee
+- `course.json` beschreibt den Kurs und listet Lektionen auf.
+- Jede groessere Lektion kann einen eigenen Ordner bekommen.
+- Ein Lektionen-Ordner darf komplett fuer sich stehen, inklusive eigener `index.html`, `style.css` und `script.js`.
 
-Beispiel fuer eine Lektion:
-```json
-[
-  ["Begriff auf Deutsch", "Antwort / Loesung"],
-  ["Zweiter Begriff", "Zweite Antwort"]
-]
-```
+## Typische Beispiele
+- GeoGebra
+- Funktionen-Plotter
+- Grammatiktrainer
+- Vokabeltrainer
+- kleine Spiele oder Simulationen
 
-Das passt spaeter gut zur bestehenden Pool-Struktur in `app.js` (`subcats`).
+## Vorteil
+So bleibt die Hauptplattform sauber, waehrend Spezialmodule unabhaengig entwickelt werden koennen.

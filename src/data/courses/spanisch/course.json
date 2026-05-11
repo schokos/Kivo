@@ -1,9 +1,19 @@
 ﻿{
-  "id": "spanisch-grundlagen",
+  "id": "spanisch",
   "title": "Spanisch",
-  "description": "Beispielstruktur fuer Spanisch-Inhalte in Kivo.",
+  "description": "Spanisch-Lektionen mit eigenstaendigen Untermodulen.",
   "lessons": [
-    "lektionen/definitionen.json",
-    "lektionen/vokabeln.json"
+    {
+      "id": "vokabeln-a1",
+      "title": "Vokabeln A1",
+      "type": "standalone-html",
+      "path": "src/data/courses/spanisch/lektionen/vokabeln-a1/index.html"
+    },
+    {
+      "id": "verben",
+      "title": "Verben",
+      "type": "standalone-html",
+      "path": "src/data/courses/spanisch/lektionen/verben/index.html"
+    }
   ]
 }

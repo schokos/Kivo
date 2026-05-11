@@ -1,0 +1,6 @@
+﻿{
+  "id": "geogebra",
+  "title": "GeoGebra",
+  "description": "Eigenstaendiges Mathemodul fuer interaktive Geometrie.",
+  "type": "standalone-html"
+}
