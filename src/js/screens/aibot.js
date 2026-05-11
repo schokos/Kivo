@@ -1,19 +1,19 @@
-﻿// â”€â”€ AI CHATBOT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+﻿// ── AI CHATBOT ───────────────────────────────────────────────
 let aiBotHistory = [];
 
-const AI_SYS = `Du bist der Kivo-Assistent â€” ein freundlicher Sprachlern-Helfer.
+const AI_SYS = `Du bist der Kivo-Assistent — ein freundlicher Sprachlern-Helfer.
 Du hilfst beim Vokabellernen und beantwortest Fragen. Dein Benutzer ist ${currentUser?.username}.
 
-Wenn der Benutzer eine Vokabelliste anfordert, beginne deine Antwort mit einer freundlichen, kurzen BestÃ¤tigung, gefolgt von einem Block, der die Vokabeln im JSON-Format enthÃ¤lt.
-Das JSON-Format muss immer am Ende sein und muss folgendermaÃŸen formatiert sein: <vocab_list>{"lang":"Englisch","name":"Listenname","length":0,"pairs":[{"de":"Wort","en":"Translation"}]}</vocab_list>.
-Verwende dieses JSON-Format immer, um die tatsÃ¤chliche Liste zu Ã¼bermitteln. Wenn der Benutzer kein feste Anzahl von Vokabeln angibt, gib immer 20 zurÃ¼ck.
+Wenn der Benutzer eine Vokabelliste anfordert, beginne deine Antwort mit einer freundlichen, kurzen Bestätigung, gefolgt von einem Block, der die Vokabeln im JSON-Format enthält.
+Das JSON-Format muss immer am Ende sein und muss folgendermaßen formatiert sein: <vocab_list>{"lang":"Englisch","name":"Listenname","length":0,"pairs":[{"de":"Wort","en":"Translation"}]}</vocab_list>.
+Verwende dieses JSON-Format immer, um die tatsächliche Liste zu übermitteln. Wenn der Benutzer kein feste Anzahl von Vokabeln angibt, gib immer 20 zurück.
 
-Tabellen mÃ¼ssen nicht automatisch in Vokabellisten umgewandelt werden es kommt auf die Anfrage an. Wenn der Benutzer beispielsweise nach "Vokabeln zum Thema Essen" fragt, solltest du eine Vokabelliste zurÃ¼ckgeben. Wenn er jedoch nach einer "Tabelle zur Stadt Essen" fragt, kannst du die Informationen in einer einfachen Tabelle zurÃ¼ckgeben, ohne sie in das JSON-Format zu packen.
+Tabellen müssen nicht automatisch in Vokabellisten umgewandelt werden es kommt auf die Anfrage an. Wenn der Benutzer beispielsweise nach "Vokabeln zum Thema Essen" fragt, solltest du eine Vokabelliste zurückgeben. Wenn er jedoch nach einer "Tabelle zur Stadt Essen" fragt, kannst du die Informationen in einer einfachen Tabelle zurückgeben, ohne sie in das JSON-Format zu packen.
 
-Bei Mathefragen erklÃ¤re die Konzepte so einfach wie mÃ¶glich und verwende LaTeX, um Formeln darzustellen. Alle ErklÃ¤rungen sollten kurz und auf den Punkt gebracht sein.
+Bei Mathefragen erkläre die Konzepte so einfach wie möglich und verwende LaTeX, um Formeln darzustellen. Alle Erklärungen sollten kurz und auf den Punkt gebracht sein.
 
 Bei allen anderen Fragen antwirst du auf Deutsch, kurz und freundlich.`;
-const AI_TIPS = ['ðŸ“š 20 Vokabeln zum Thema Essen', 'ðŸŽ¨ Farben auf Spanisch', 'âœˆï¸ Reise-Vokabeln', 'ðŸ’¼ Business-Englisch Basics', 'ðŸ  Zimmer & MÃ¶bel'];
+const AI_TIPS = ['📚 20 Vokabeln zum Thema Essen', '🎨 Farben auf Spanisch', '✈️ Reise-Vokabeln', '💼 Business-Englisch Basics', '🏠 Zimmer & Möbel'];
 
 function escapeHtml(str = '') {
   return String(str)
@@ -111,14 +111,14 @@ function aiNow() {
 
 function aiWelcomeText() {
   return `
-# ðŸ‘‹ Willkommen ${currentUser?.username || ''}
+# 👋 Willkommen ${currentUser?.username || ''}
 Ich bin der **Kivo-Assistent**.
 
 Ich kann:
-- ðŸ“š Vokabellisten erstellen
-- ðŸ§  Beim Lernen helfen
-- âœï¸ Texte erklÃ¤ren
-- âž— Mathe mit LaTeX darstellen
+- 📚 Vokabellisten erstellen
+- 🧠 Beim Lernen helfen
+- ✍️ Texte erklären
+- ➗ Mathe mit LaTeX darstellen
 
 Zum Beispiel:
 
@@ -283,7 +283,7 @@ function aiSessionPreview(session) {
     .replace(/\s+/g, ' ')
     .trim();
 
-  return text.length > 72 ? text.slice(0, 72) + 'â€¦' : text;
+  return text.length > 72 ? text.slice(0, 72) + '…' : text;
 }
 
 function aiFormatSessionTime(ts) {
@@ -313,7 +313,7 @@ function aiEnsureChatModal() {
   panel.innerHTML = `
     <div class="fp-head">
       <div style="font-size:13px;font-weight:800;">Chats</div>
-      <button class="btn btn-sm" onclick="closeChatModal()">âœ•</button>
+      <button class="btn btn-sm" onclick="closeChatModal()">✕</button>
     </div>
     <div class="fp-body" id="chat-modal-body"></div>
   `;
@@ -333,7 +333,7 @@ function openChatModal() {
 
   body.innerHTML = `
     <div style="display:flex;gap:8px;margin-bottom:12px;">
-      <button class="btn btn-lime btn-sm" onclick="aiCreateAndOpenNewChat()">ï¼‹ Neuer Chat</button>
+      <button class="btn btn-lime btn-sm" onclick="aiCreateAndOpenNewChat()">＋ Neuer Chat</button>
     </div>
 
     <div style="display:flex;flex-direction:column;gap:8px;">
@@ -370,7 +370,7 @@ function openChatModal() {
                     </button>
                     <button class="btn btn-sm btn-danger"
                             onclick='event.stopPropagation();aiConfirmDeleteChat("${id}")'>
-                      LÃ¶schen
+                      Löschen
                     </button>
                   </div>
                 </div>
@@ -435,7 +435,7 @@ async function aiConfirmDeleteChat(id) {
   if (!s) return;
 
   const ok = await Promise.resolve(
-    confirm2(`Chat "${s.title || 'Unbenannt'}" wirklich lÃ¶schen?`)
+    confirm2(`Chat "${s.title || 'Unbenannt'}" wirklich löschen?`)
   );
 
   if (!ok) return;
@@ -460,7 +460,7 @@ function setAiInputLocked(locked) {
     btn.disabled = locked;
     btn.innerHTML = locked
       ? `<div class="kivo-spinner"></div>`
-      : `âž¤`;
+      : `➤`;
   }
 }
 
@@ -478,10 +478,10 @@ function aiRecoverStaleStreaming(session) {
     msg.content = msg.content || session.streaming.raw || '';
     msg.streaming = false;
 
-    // PrÃ¼fe, ob die Nachricht eine Vokabelliste enthÃ¤lt
+    // Prüfe, ob die Nachricht eine Vokabelliste enthält
     const vocabBlock = stripVocabBlock(msg.content);
     if (vocabBlock.hasVocab && vocabBlock.complete) {
-      msg.vocabData = vocabBlock.vocabRaw; // Speichere die JSON-Daten fÃ¼r die Wiederherstellung
+      msg.vocabData = vocabBlock.vocabRaw; // Speichere die JSON-Daten für die Wiederherstellung
     }
   }
 
@@ -535,7 +535,7 @@ function renderAiBot() {
         style="flex:1"
         onkeydown="if(event.key==='Enter' && !this.disabled) aiBotSend()"
       >
-      <button class="btn btn-lime btn-sm" id="aibot-send-btn" onclick="aiBotSend()">âž¤</button>
+      <button class="btn btn-lime btn-sm" id="aibot-send-btn" onclick="aiBotSend()">➤</button>
     </div>
   `;
 
@@ -574,7 +574,7 @@ function renderAiSessionMessages(session) {
     if (m.role === 'user') {
       div.textContent = m.content || '';
     } else {
-      // PrÃ¼fe, ob die Nachricht eine Vokabelliste enthÃ¤lt
+      // Prüfe, ob die Nachricht eine Vokabelliste enthält
       const vocabBlock = stripVocabBlock(m.content);
       if (vocabBlock.hasVocab && vocabBlock.complete) {
         try {
@@ -595,12 +595,12 @@ function renderAiSessionMessages(session) {
           cardDiv.className = 'ai-msg bot ai-vocab-result';
           const importBtnId = aiUid('import');
           cardDiv.innerHTML = makeLoadingHTML(
-            `Vokabelliste: "${vocabData.name || 'Unbenannt'}" (${vocabData.pairs?.length || 0} WÃ¶rter)`,
+            `Vokabelliste: "${vocabData.name || 'Unbenannt'}" (${vocabData.pairs?.length || 0} Wörter)`,
             undefined,
             'done',
             `
               <button class="btn btn-lime btn-sm" data-import-btn="${importBtnId}">
-                ðŸ“¥ Direkt importieren
+                📥 Direkt importieren
               </button>
             `
           );
@@ -629,7 +629,7 @@ function renderAiSessionMessages(session) {
         badge.className = 'streaming-badge';
         badge.style.cssText =
           'margin-top:8px;font-size:11px;opacity:.7;display:flex;align-items:center;gap:8px;';
-        badge.innerHTML = `<div class="kivo-spinner"></div><span>Wird wiederhergestelltâ€¦</span>`;
+        badge.innerHTML = `<div class="kivo-spinner"></div><span>Wird wiederhergestellt…</span>`;
         div.appendChild(badge);
       }
     }
@@ -796,14 +796,14 @@ function aiBotSend(preset) {
    ========================================================= */
 
 async function fetchAiReply(loadingDiv) {
-  console.log('[AI] ðŸš€ fetchAiReply gestartet');
+  console.log('[AI] 🚀 fetchAiReply gestartet');
 
   const msgs = document.getElementById('aibot-msgs');
   const inp = document.getElementById('aibot-inp');
   const session = aiGetActiveSession();
 
   if (!msgs || !session) {
-    console.warn('[AI] âŒ msgs/session fehlt');
+    console.warn('[AI] ❌ msgs/session fehlt');
     setAiInputLocked(false);
     return;
   }
@@ -974,7 +974,7 @@ async function fetchAiReply(loadingDiv) {
           const wordLabel =
             vocabInfo.totalPairs === 1
               ? 'Wort'
-              : 'WÃ¶rter';
+              : 'Wörter';
 
           const text = `Vokabelliste: "${name}" (${vocabInfo.pairCount} ${wordLabel})`;
 
@@ -1025,7 +1025,7 @@ async function fetchAiReply(loadingDiv) {
 
         const label =
           `Vokabelliste: "${vocabData.name || 'Unbenannt'}" ` +
-          `(${vocabData.pairs?.length || 0} WÃ¶rter)`;
+          `(${vocabData.pairs?.length || 0} Wörter)`;
 
         div.innerHTML = makeLoadingHTML(
           label,
@@ -1035,7 +1035,7 @@ async function fetchAiReply(loadingDiv) {
             <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
               <button class="btn btn-lime btn-sm"
                       onclick="importAiList('${importEnc}')">
-                ðŸ“¥ Direkt importieren
+                📥 Direkt importieren
               </button>
             </div>
           `
@@ -1098,12 +1098,12 @@ async function fetchAiReply(loadingDiv) {
             const name = vocabInfo.name || 'Unbenannt';
 
             const progressText = vocabInfo.totalPairs
-              ? `[LIVE UPDATE] Vokabelliste: "${name}" (${vocabInfo.pairCount}/${vocabInfo.totalPairs} WÃ¶rter - ${Math.round((vocabInfo.pairCount / vocabInfo.totalPairs) * 100)}%)`
-              : `[LIVE UPDATE] Vokabelliste: "${name}" (${vocabInfo.pairCount} WÃ¶rter)`;
+              ? `[LIVE UPDATE] Vokabelliste: "${name}" (${vocabInfo.pairCount}/${vocabInfo.totalPairs} Wörter - ${Math.round((vocabInfo.pairCount / vocabInfo.totalPairs) * 100)}%)`
+              : `[LIVE UPDATE] Vokabelliste: "${name}" (${vocabInfo.pairCount} Wörter)`;
 
             console.log(progressText);
           } else {
-            console.log('[LIVE UPDATE] Warte auf gÃ¼ltigen JSON-Inhalt...');
+            console.log('[LIVE UPDATE] Warte auf gültigen JSON-Inhalt...');
           }
         }
       });
@@ -1111,7 +1111,7 @@ async function fetchAiReply(loadingDiv) {
   };
 
   try {
-    console.log('[AI] ðŸ“¡ sending request...');
+    console.log('[AI] 📡 sending request...');
 
     const resp = await fetch(
       SUPABASE_URL + '/functions/v1/kivo-ai',
@@ -1173,7 +1173,7 @@ async function fetchAiReply(loadingDiv) {
       aiSaveChatSessions();
     }
   } catch (e) {
-    console.error('[AI] ðŸ’¥ ERROR:', e);
+    console.error('[AI] 💥 ERROR:', e);
 
     loadingDiv.innerHTML = makeLoadingHTML(
       'Fehler',
@@ -1204,20 +1204,20 @@ async function fetchAiReply(loadingDiv) {
    HELPER FUNCTIONS FOR AI CHAT
    ========================================================= */
 
-function makeLoadingHTML(label = 'LÃ¤dt...', progress = undefined, status = 'loading', buttons = '', errorMsg = '') {
+function makeLoadingHTML(label = 'Lädt...', progress = undefined, status = 'loading', buttons = '', errorMsg = '') {
   let barHtml = '';
   if (progress !== undefined) {
     barHtml = `<div class="loading-bar-container" style="width:100%;height:6px;background:var(--panel-2);border-radius:3px;margin:8px 0;overflow:hidden"><div id="loading-bar" class="loading-bar" style="height:100%;background:var(--lime);width:${Math.max(0, Math.min(100, progress))}%;transition:width 0.3s ease"></div></div>`;
   }
 
-  let statusIcon = 'â³';
+  let statusIcon = '⏳';
   let statusColor = 'var(--muted)';
 
   if (status === 'done') {
-    statusIcon = 'âœ“';
+    statusIcon = '✓';
     statusColor = 'var(--lime)';
   } else if (status === 'error') {
-    statusIcon = 'âœ•';
+    statusIcon = '✕';
     statusColor = 'var(--danger)';
   } else if (status === 'loading') {
     statusIcon = '<span class="kivo-spinner"></span>';
@@ -1311,7 +1311,7 @@ async function importAiList(encOrRaw) {
       await syncPoolToServer(lang, name);
     }
     loadState();
-    toast(`âœ“ "${name}" mit ${pairs.length} WÃ¶rtern importiert!`);
+    toast(`✓ "${name}" mit ${pairs.length} Wörtern importiert!`);
     confirm2(
       'Pool wechseln?',
       `Zu "${name}" wechseln und lernen?`,
@@ -1324,5 +1324,6 @@ async function importAiList(encOrRaw) {
     toast('Fehler: ' + e.message);
   }
 }
+
 
 

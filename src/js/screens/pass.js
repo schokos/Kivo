@@ -1,6 +1,6 @@
-﻿// â”€â”€ PASS SYSTEM â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+﻿// ── PASS SYSTEM ──────────────────────────────────────────────
 // Free Pass: alle 5 Level 1 Item, festgelegt.
-// Pro Pass: jedes Level 1 Item. Kostet einmalig 1000 MÃ¼nzen.
+// Pro Pass: jedes Level 1 Item. Kostet einmalig 1000 Münzen.
 // Belohnungen werden manuell beansprucht.
 const PASS_MAX_LEVEL = 50;
 const PASS_PRO_PRICE = 1000;
@@ -31,10 +31,10 @@ function savePassState(s){ lsSet('kivo_pass',s); syncProfile(); }
 async function buyProPass(){
   const s=getPassState();
   if(s.proOwned){toast('Pro Pass ist bereits aktiv');return;}
-  if(userCurrency<PASS_PRO_PRICE){toast('Nicht genug MÃ¼nzen ('+PASS_PRO_PRICE+' nÃ¶tig)');return;}
+  if(userCurrency<PASS_PRO_PRICE){toast('Nicht genug Münzen ('+PASS_PRO_PRICE+' nötig)');return;}
     const ok = await confirm2(
       'Pro Pass kaufen?',
-      'Pro Pass fÃ¼r '+PASS_PRO_PRICE+' MÃ¼nzen freischalten? Du erhÃ¤ltst dann auf jedem Level eine Belohnung.'
+      'Pro Pass für '+PASS_PRO_PRICE+' Münzen freischalten? Du erhältst dann auf jedem Level eine Belohnung.'
     );
 
     if(ok){
@@ -58,11 +58,11 @@ function claimPass(track, lvl){
   if(claimed.includes(lvl)){toast('Bereits beansprucht');return;}
   const reward = track==='free' ? _passItemFor(lvl,'free') : _passItemFor(lvl,'pro');
   if(!reward) return;
-  // Item gewÃ¤hren (auch wenn schon im Inventar - dann +50 MÃ¼nzen statt Duplikat)
+  // Item gewähren (auch wenn schon im Inventar - dann +50 Münzen statt Duplikat)
   userItems = lsGet('kivo_items','[]');
   if(userItems.includes(reward.id)){
     userCurrency += 50; lsSet('kivo_currency',userCurrency);
-    toast(reward.name+' bereits besessen â€” +50 MÃ¼nzen!');
+    toast(reward.name+' bereits besessen — +50 Münzen!');
   } else {
     userItems.push(reward.id);
     lsSet('kivo_items',userItems);
@@ -92,14 +92,14 @@ function renderPass(){
         <div style="color:var(--lime)">${ic('shield',38)}</div>
         <div style="flex:1;min-width:160px">
           <div style="font-size:18px;font-weight:900">Lern-Pass</div>
-          <div style="font-size:11px;color:var(--muted)">Level ${lvl} Â· ${xp.toLocaleString()} / ${nextXp.toLocaleString()} XP</div>
+          <div style="font-size:11px;color:var(--muted)">Level ${lvl} · ${xp.toLocaleString()} / ${nextXp.toLocaleString()} XP</div>
           <div class="daily-goal-bar" style="margin-top:8px"><div class="daily-goal-fill" style="width:${Math.max(4,lvlPct)}%"></div></div>
         </div>
         <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
           <div class="currency-pill" style="display:inline-flex;align-items:center;gap:6px">${ic('coin',13)} ${userCurrency}</div>
           ${s.proOwned
             ? `<span class="tag lime" style="display:inline-flex;align-items:center;gap:4px">${ic('crown',11)} Pro aktiv</span>`
-            : `<button class="btn btn-sm btn-lime" style="display:inline-flex;align-items:center;gap:6px" onclick="buyProPass()">${ic('crown',12)} Pro Pass Â· ${PASS_PRO_PRICE} ${ic('coin',11)}</button>`}
+            : `<button class="btn btn-sm btn-lime" style="display:inline-flex;align-items:center;gap:6px" onclick="buyProPass()">${ic('crown',12)} Pro Pass · ${PASS_PRO_PRICE} ${ic('coin',11)}</button>`}
         </div>
       </div>
     </div>
@@ -109,7 +109,7 @@ function renderPass(){
   const rowHtml=levels.map(({lvl:L,free,pro})=>{
     const reached = L<=lvl;
     const renderTier=(item,track)=>{
-      if(!item) return `<div class="pass-tier empty"><span style="opacity:.3">â€”</span></div>`;
+      if(!item) return `<div class="pass-tier empty"><span style="opacity:.3">—</span></div>`;
       const claimed = (s.claimed[track]||[]).includes(L);
       const owned = userOwnedItems.includes(item.id);
       const locked = !reached || (track==='pro' && !s.proOwned);
@@ -136,4 +136,5 @@ function renderPass(){
 
   el.innerHTML = headerHtml + `<div class="pass-track-head"><div></div><div style="display:flex;gap:10px;font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px"><div style="flex:1;text-align:center">Free</div><div style="flex:1;text-align:center;color:${s.proOwned?'var(--lime)':'var(--muted)'}">Pro</div></div></div><div class="pass-list">${rowHtml}</div>`;
 }
+
 

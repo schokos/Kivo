@@ -1,4 +1,4 @@
-﻿// â”€â”€ SPACED REPETITION (SM-2) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+﻿// ── SPACED REPETITION (SM-2) ─────────────────────────────────
 const srKey=(pk,id)=>'kivo_sr_'+esc(pk)+'_'+id;
 function srGet(pk,id) { return lsGet(srKey(pk,id),'{"ef":2.5,"interval":1,"due":0,"reps":0}'); }
 function srUpdate(pk,id,quality,awardXp=true) {
@@ -14,7 +14,7 @@ function srDueCount(pk) {
   return flat.filter((_,i)=>srGet(pk,i).due<=Date.now()).length;
 }
 
-// â”€â”€ FLASHCARDS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── FLASHCARDS ────────────────────────────────────────────────
 function initCards() {
   const skip=document.getElementById('skip-known')?.checked;
   cDeck=shuf(vocab.filter(v=>!skip||!v.known));
@@ -45,9 +45,10 @@ function navCard(dir) {
 function setKnown(val) {
   if(!cDeck.length) return;
   const cur=cDeck[cIdx]; cur.known=val; vocab[cur.id].known=val;
-  saveKnown(); updateHomeStats(); toast(val?'âœ“ Gekonnt!':'âœ— Nicht gekonnt');
+  saveKnown(); updateHomeStats(); toast(val?'✓ Gekonnt!':'✗ Nicht gekonnt');
   srUpdate(activeKey,cur.id,val?4:1,false); // no XP for flashcards
   if(cIdx<cDeck.length-1) { cIdx++; renderCard(); }
-  else toast('ðŸŽ‰ Alle Karten durch!');
+  else toast('🎉 Alle Karten durch!');
 }
+
 

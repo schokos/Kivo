@@ -20,7 +20,7 @@
 <link rel="stylesheet" href="src/styles/main.css">
 <body>
 
-<!-- â”€â”€ SHELL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+<!-- ── SHELL ─────────────────────────────────────────────────────── -->
 <div class="shell">
 
   <!-- RAIL (desktop sidebar icons) -->
@@ -38,8 +38,8 @@
       <button class="rail-btn" id="rb-github" data-s="github"
       onclick="(async()=>{ 
         const ok = await confirm2(
-          'URL Ã¶ffnen?',
-          'MÃ¶chten Sie https://github.com/schokos/Kivo/issues wirklich Ã¶ffnen?'
+          'URL öffnen?',
+          'Möchten Sie https://github.com/schokos/Kivo/issues wirklich öffnen?'
         );
         if(ok){
           window.open('https://github.com/schokos/Kivo/issues', '_blank');
@@ -74,41 +74,56 @@
       <div class="um-sep"></div>
       <div class="um-item" id="um-logout" style="display:none;color:var(--danger)" onclick="doLogout()"><svg class="um-ico" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg><span>Abmelden</span></div>
     </div>
-    <div style="display:none">
-      <span id="tb-title">Dashboard</span>
-      <span id="active-pool-lbl">Pool wÃ¤hlen</span>
-      <span id="currency-val">0</span>
-      <span id="friend-notif"></span>
-      <span id="avatar-btn"></span>
+    <div class="topbar">
+      <div class="tb-left">
+        <div class="tb-title" id="tb-title">Dashboard</div>
+        <button class="pool-pill" onclick="openModal('pool-modal')" title="Pool wählen">
+          <span class="dot lime"></span>
+          <span id="active-pool-lbl">Pool wählen</span>
+        </button>
+      </div>
+      <div class="tb-right">
+        <div class="pool-pill" id="currency-pill" style="display:none">
+          <span class="dot lime"></span>
+          <span id="currency-val">0</span>
+          <span>Münzen</span>
+        </div>
+        <button class="friend-btn" onclick="openFriendPanel()" title="Freunde">
+          <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"></circle><circle cx="17" cy="9.5" r="2.4"></circle><path d="M3 19c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"></path><path d="M15 19c0-2.3 1.6-4 3.5-4s2.5 1.3 2.5 3"></path></svg>
+          <span class="friend-notif" id="friend-notif"></span>
+        </button>
+        <div class="avatar-btn" id="avatar-btn" onclick="event.stopPropagation();toggleUserMenu()" title="Profilmenü"></div>
+        <img class="topbar-logo" src="assets/logo.png" alt="Kivo Logo">
+      </div>
     </div>
 
     <!-- SCREENS -->
     <div class="screens">
 
-      <!-- HOME â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+      <!-- HOME ─────────────────────────────────── -->
       <div class="screen active" id="screen-home">
         <div class="home-welcome">
           <div>
             <div class="home-title">Hallo, <span id="home-user-name">Lerner</span>!</div>
-            <div class="home-kicker">Weiter so! Dein Wissen wÃ¤chst.</div>
+            <div class="home-kicker">Weiter so! Dein Wissen wächst.</div>
           </div>
           <div class="home-metrics">
             <div class="metric-chip"><span class="dash-ico" style="color:#6AC28A"><svg viewBox="0 0 24 24"><path d="M12 2c1 4 5 5 5 10a5 5 0 1 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3 1-6 1-9z"></path></svg></span> <span id="hm-streak-top">0</span></div>
             <div class="metric-chip"><span class="dash-ico gem"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 6v12M9 9h4.5a2 2 0 0 1 0 4H9.5a2 2 0 0 0 0 4H15"/></svg></span> <span id="currency-val-home">0</span></div>
-            <div class="avatar-btn" id="dash-avatar-btn" onclick="event.stopPropagation();toggleUserMenu()" title="ProfilmenÃ¼"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-7 8-7s8 3 8 7"></path></svg></div>
+            <div class="avatar-btn" id="dash-avatar-btn" onclick="event.stopPropagation();toggleUserMenu()" title="Profilmenü"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-7 8-7s8 3 8 7"></path></svg></div>
           </div>
         </div>
 
         <div class="dashboard-grid">
           <div class="k-card dash-card progress-card">
-            <div style="font-size:17px;font-weight:850">FortschrittsÃ¼bersicht</div>
+            <div style="font-size:17px;font-weight:850">Fortschrittsübersicht</div>
             <div class="progress-ring-wrap">
               <div><div style="font-size:13px;margin-bottom:8px;color:color-mix(in srgb,#E6E6E6 78%,transparent)">Level</div><div class="level-num" id="hm-level">1</div><div style="font-size:13px;margin-top:8px;color:color-mix(in srgb,#E6E6E6 78%,transparent)"><span id="hm-xp">0</span> / <span id="hm-next-xp">500</span> XP</div></div>
               <div class="ring" id="hm-ring"></div>
             </div>
           </div>
           <div class="k-card dash-card challenge-card">
-            <div style="font-size:17px;font-weight:850;margin-bottom:8px">TÃ¤gliche Quests</div>
+            <div style="font-size:17px;font-weight:850;margin-bottom:8px">Tägliche Quests</div>
             <div style="font-size:12px;color:var(--muted);margin-bottom:14px">Erledige alle 3, um deine Belohnungen einzusacken.</div>
             <div style="font-size:30px;font-weight:900;margin-bottom:6px"><span id="hm-k">0</span> / <span id="hm-t">3</span></div>
             <div style="font-size:11px;color:var(--muted);margin-bottom:10px">Quests heute erledigt</div>
@@ -118,8 +133,8 @@
           <div class="k-card dash-card">
             <div style="font-size:17px;font-weight:850">Empfohlener Kurs</div>
             <div class="course-visual"></div>
-            <div style="font-size:13px;font-weight:850" id="home-pool-name">â€“</div>
-            <button class="course-link btn btn-ghost" style="width:100%;margin-top:8px" onclick="goTo('courses')"><span>Weiterlernen â¯</span><span>â€º</span></button>
+            <div style="font-size:13px;font-weight:850" id="home-pool-name">–</div>
+            <button class="course-link btn btn-ghost" style="width:100%;margin-top:8px" onclick="goTo('courses')"><span>Weiterlernen ❯</span><span>›</span></button>
           </div>
         </div>
 
@@ -137,48 +152,48 @@
         <div class="k-grid" style="margin-top:18px">
           <div class="k-card full">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
-              <div><div class="k-section-title">Aktueller Pool</div><div style="font-size:13px;color:var(--muted)"><span id="hm-sr">0</span> Wiederholungen fÃ¤llig Â· <span id="hm-goal-lbl">0 XP heute</span></div></div>
-              <div class="btn-row" style="margin-top:0"><button class="btn btn-sm" onclick="openModal('pool-modal')">Pool wÃ¤hlen</button><button class="btn btn-sm" onclick="openModal('photo-modal')">Foto-Import</button></div>
+              <div><div class="k-section-title">Aktueller Pool</div><div style="font-size:13px;color:var(--muted)"><span id="hm-sr">0</span> Wiederholungen fällig · <span id="hm-goal-lbl">0 XP heute</span></div></div>
+              <div class="btn-row" style="margin-top:0"><button class="btn btn-sm" onclick="openModal('pool-modal')">Pool wählen</button><button class="btn btn-sm" onclick="openModal('photo-modal')">Foto-Import</button></div>
             </div>
             <div class="daily-goal-bar" style="margin-top:12px"><div class="daily-goal-fill" id="daily-goal-fill" style="width:0%"></div></div>
-            <div id="hm-sessions" style="font-size:10px;color:var(--muted);margin-top:10px">â€“</div>
+            <div id="hm-sessions" style="font-size:10px;color:var(--muted);margin-top:10px">–</div>
           </div>
         </div>
       </div>
 
-      <!-- KURSE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+      <!-- KURSE ─────────────────────────────────── -->
       <div class="screen" id="screen-courses">
         <div class="app-page-head">
-          <div><div class="app-page-title">Kurse</div><div class="app-page-sub">WÃ¤hle eine Sprache und danach, was du lernen willst.</div></div>
+          <div><div class="app-page-title">Kurse</div><div class="app-page-sub">Wähle eine Sprache und danach, was du lernen willst.</div></div>
           <button class="btn btn-lime btn-sm" onclick="openNewPoolModal()">+ Eigener Kurs</button>
         </div>
         <div id="courses-content"></div>
       </div>
 
-      <!-- CHALLENGES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+      <!-- CHALLENGES ────────────────────────────── -->
       <div class="screen" id="screen-challenges">
         <div class="app-page-head">
-          <div><div class="app-page-title">Challenges</div><div class="app-page-sub">Daily &amp; Weekly Quests â€” Belohnungen werden automatisch ausgezahlt.</div></div>
+          <div><div class="app-page-title">Challenges</div><div class="app-page-sub">Daily &amp; Weekly Quests — Belohnungen werden automatisch ausgezahlt.</div></div>
         </div>
         <div id="challenges-content"></div>
       </div>
 
-      <!-- COMMUNITY â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+      <!-- COMMUNITY ─────────────────────────────── -->
       <div class="screen" id="screen-community">
         <div class="app-page-head">
           <div><div class="app-page-title">Community</div><div class="app-page-sub">Freunde, Global Leaderboard und Team-Vorschau.</div></div>
-          <button class="btn btn-lime btn-sm" onclick="openFriendPanel()">Freund hinzufÃ¼gen</button>
+          <button class="btn btn-lime btn-sm" onclick="openFriendPanel()">Freund hinzufügen</button>
         </div>
         <div id="community-content"></div>
       </div>
 
-      <!-- KARTEIKARTEN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+      <!-- KARTEIKARTEN ─────────────────────────── -->
       <div class="screen" id="screen-cards">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
           <div style="font-size:18px;font-weight:800">Karteikarten</div>
           <div style="display:flex;gap:6px;align-items:center">
             <label style="font-size:10px;color:var(--muted);display:flex;align-items:center;gap:5px;cursor:pointer">
-              <input type="checkbox" id="skip-known" onchange="initCards()"> Bekannte Ã¼berspringen
+              <input type="checkbox" id="skip-known" onchange="initCards()"> Bekannte überspringen
             </label>
           </div>
         </div>
@@ -187,47 +202,47 @@
         <div class="fc-wrap" onclick="flipCard()">
           <div class="fc" id="fc">
             <div class="fc-face fc-front">
-              <div class="fc-word" id="fc-front-word">â€“</div>
+              <div class="fc-word" id="fc-front-word">–</div>
               <div class="fc-hint">Tippe um umzudrehen</div>
             </div>
             <div class="fc-face fc-back">
-              <div class="fc-word" id="fc-back-word">â€“</div>
+              <div class="fc-word" id="fc-back-word">–</div>
               <div class="fc-hint" id="fc-cat-hint"></div>
             </div>
           </div>
         </div>
         <div class="fc-actions" id="fc-btns" style="display:none">
-          <button class="btn btn-danger btn-sm" onclick="setKnown(false)">âœ— Nicht gekonnt</button>
-          <button class="btn btn-ok btn-sm" onclick="setKnown(true)">âœ“ Gekonnt</button>
+          <button class="btn btn-danger btn-sm" onclick="setKnown(false)">✗ Nicht gekonnt</button>
+          <button class="btn btn-ok btn-sm" onclick="setKnown(true)">✓ Gekonnt</button>
         </div>
         <div class="fc-nav">
-          <button class="btn btn-sm" onclick="navCard(-1)">â† ZurÃ¼ck</button>
-          <button class="btn btn-sm" onclick="flipCard()">â†© Umdrehen</button>
-          <button class="btn btn-sm" onclick="navCard(1)">Weiter â†’</button>
+          <button class="btn btn-sm" onclick="navCard(-1)">← Zurück</button>
+          <button class="btn btn-sm" onclick="flipCard()">↩ Umdrehen</button>
+          <button class="btn btn-sm" onclick="navCard(1)">Weiter →</button>
         </div>
-        <div style="text-align:center;margin-top:14px;font-size:10px;color:var(--muted)">Kein XP fÃ¼r Karteikarten â€” nutze Quiz oder Tippen fÃ¼r XP</div>
+        <div style="text-align:center;margin-top:14px;font-size:10px;color:var(--muted)">Kein XP für Karteikarten — nutze Quiz oder Tippen für XP</div>
       </div>
 
-      <!-- QUIZ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+      <!-- QUIZ ─────────────────────────────────── -->
       <div class="screen" id="screen-quiz">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
           <div style="font-size:18px;font-weight:800">Quiz</div>
           <div style="display:flex;gap:6px;align-items:center">
             <label style="font-size:10px;color:var(--muted);display:flex;align-items:center;gap:5px;cursor:pointer">
-              <input type="checkbox" id="quiz-d2e"> Ãœbersetzungsrichtung â†”
+              <input type="checkbox" id="quiz-d2e"> Übersetzungsrichtung ↔
             </label>
           </div>
         </div>
         <div id="quiz-area"></div>
       </div>
 
-      <!-- TIPPEN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+      <!-- TIPPEN ──────────────────────────────── -->
       <div class="screen" id="screen-typing">
         <div style="font-size:18px;font-weight:800;margin-bottom:14px">Tippen</div>
         <div id="typing-area"></div>
       </div>
 
-      <!-- ZUORDNEN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+      <!-- ZUORDNEN ────────────────────────────── -->
       <div class="screen" id="screen-matching">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
           <div style="font-size:18px;font-weight:800">Zuordnen</div>
@@ -236,33 +251,33 @@
         <div id="matching-area"></div>
       </div>
 
-      <!-- ÃœBERSICHT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+      <!-- ÜBERSICHT ────────────────────────────── -->
       <div class="screen" id="screen-overview">
         <div class="app-page-head">
           <div><div class="app-page-title">Meine Pools</div><div class="app-page-sub">Verwalte deine Vokabel-Pools.</div></div>
           <div style="display:flex;gap:6px">
             <button class="btn btn-sm btn-lime" onclick="openNewPoolModal()">+ Neuer Pool</button>
             <button class="btn btn-sm" onclick="openModal('photo-modal')">Foto-Import</button>
-            <button class="btn btn-sm" onclick="goTo('courses')">â† ZurÃ¼ck</button>
+            <button class="btn btn-sm" onclick="goTo('courses')">← Zurück</button>
           </div>
         </div>
         <div id="overview-content"></div>
       </div>
 
-      <!-- STATISTIKEN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+      <!-- STATISTIKEN ─────────────────────────── -->
       <div class="screen" id="screen-stats">
         <div style="font-size:18px;font-weight:800;margin-bottom:14px">Statistiken</div>
         <div id="stats-content"></div>
       </div>
 
-      <!-- KI-LÃœCKENTEXT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+      <!-- KI-LÜCKENTEXT ───────────────────────── -->
       <div class="screen" id="screen-gap">
-        <div style="font-size:18px;font-weight:800;margin-bottom:6px">KI-LÃ¼ckentext</div>
-        <div style="font-size:11px;color:var(--muted);margin-bottom:14px">KI generiert einen Text passend zu deinem Pool â€” fÃ¼ll die LÃ¼cken aus</div>
+        <div style="font-size:18px;font-weight:800;margin-bottom:6px">KI-Lückentext</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:14px">KI generiert einen Text passend zu deinem Pool — füll die Lücken aus</div>
         <div id="gap-content"></div>
       </div>
 
-      <!-- KI-ASSISTENT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+      <!-- KI-ASSISTENT ────────────────────────── -->
       <div class="screen" id="screen-aibot">
         <div class="app-page-head">
           <div>
@@ -274,19 +289,19 @@
         <div class="aibot-wrap" id="aibot-wrap"></div>
       </div>
 
-      <!-- PROFIL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+      <!-- PROFIL ──────────────────────────────── -->
       <div class="screen" id="screen-profile">
         <div class="app-page-head"><div><div class="app-page-title">Mein Profil</div><div class="app-page-sub">Deine Statistiken, Avatar und Account-Einstellungen.</div></div></div>
         <div id="profile-content"></div>
       </div>
 
-      <!-- SHOP â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+      <!-- SHOP ────────────────────────────────── -->
       <div class="screen" id="screen-shop">
-        <div class="app-page-head"><div><div class="app-page-title">Belohnungen</div><div class="app-page-sub">Ein Shop fÃ¼r Items, Badges und kosmetische Belohnungen.</div></div></div>
+        <div class="app-page-head"><div><div class="app-page-title">Belohnungen</div><div class="app-page-sub">Ein Shop für Items, Badges und kosmetische Belohnungen.</div></div></div>
         <div id="shop-content"></div>
       </div>
 
-      <!-- PASS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+      <!-- PASS ────────────────────────────────── -->
       <div class="screen" id="screen-pass">
         <div class="app-page-head"><div><div class="app-page-title">Lern-Pass</div><div class="app-page-sub">Schalte Avatar-Items frei, indem du Level aufsteigst.</div></div></div>
         <div id="pass-content"></div>
@@ -311,7 +326,7 @@
 <!-- CONFIRM DIALOG -->
 <div class="confirm-overlay" id="confirm-overlay">
   <div class="confirm-box">
-    <div class="confirm-title" id="confirm-title">BestÃ¤tigen</div>
+    <div class="confirm-title" id="confirm-title">Bestätigen</div>
     <div class="confirm-msg" id="confirm-msg"></div>
     <div style="display:flex;gap:8px">
       <button class="btn btn-sm" onclick="document.getElementById('confirm-overlay').classList.remove('open')">Abbrechen</button>
@@ -323,11 +338,11 @@
 <!-- AUTH MODAL -->
 <div class="modal-overlay" id="auth-modal" onclick="if(event.target===this)closeModal('auth-modal')">
   <div class="modal auth-modal">
-    <button class="auth-close" onclick="closeModal('auth-modal')" aria-label="SchlieÃŸen">âœ•</button>
+    <button class="auth-close" onclick="closeModal('auth-modal')" aria-label="Schließen">✕</button>
     <div class="auth-split" id="auth-split">
       <!-- AVATAR SIDE -->
       <div class="auth-side">
-        <h2 id="as-title">Willkommen zurÃ¼ck</h2>
+        <h2 id="as-title">Willkommen zurück</h2>
         <div class="as-sub" id="as-sub">Noch kein Konto?</div>
         <button class="as-switch" id="as-switch" onclick="authSwitchMode()">Registrieren</button>
         <div class="av-stage" id="av-stage">
@@ -400,7 +415,7 @@
             </span>
           </div>
           <div class="af-input">
-            <input id="reg-pw2" type="password" placeholder="Passwort bestÃ¤tigen" autocomplete="new-password">
+            <input id="reg-pw2" type="password" placeholder="Passwort bestätigen" autocomplete="new-password">
             <span class="af-icon btn" onclick="authTogglePw('reg-pw2',this)">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"></path><circle cx="12" cy="12" r="3"></circle></svg>
             </span>
@@ -410,14 +425,14 @@
         </div>
         <!-- FORGOT -->
         <div id="auth-forgot-form" style="display: none;">
-          <h1>Passwort zurÃ¼cksetzen</h1>
+          <h1>Passwort zurücksetzen</h1>
           <div class="af-sub">Wir senden dir einen Link</div>
           <div class="af-input">
             <input id="forgot-email" type="email" placeholder="E-Mail">
             <span class="af-icon"><svg viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg></span>
           </div>
           <button class="af-primary" onclick="doForgotPw()">Reset-Link senden</button>
-          <div class="af-foot"><a onclick="authShowLogin()">â† ZurÃ¼ck zum Login</a></div>
+          <div class="af-foot"><a onclick="authShowLogin()">← Zurück zum Login</a></div>
         </div>
         <div class="af-msg err" id="auth-msg">Fehler: can't access property "split", k is null</div>
       </div>
@@ -428,7 +443,7 @@
 <!-- POOL MODAL -->
 <div class="modal-overlay" id="pool-modal" onclick="if(event.target===this)closeModal('pool-modal')">
   <div class="modal">
-    <div class="modal-head"><div class="modal-title">Pool wÃ¤hlen / erstellen</div><button class="modal-close" onclick="closeModal('pool-modal')">âœ•</button></div>
+    <div class="modal-head"><div class="modal-title">Pool wählen / erstellen</div><button class="modal-close" onclick="closeModal('pool-modal')">✕</button></div>
     <div id="pool-modal-content"></div>
   </div>
 </div>
@@ -436,7 +451,7 @@
 <!-- NEW POOL MODAL -->
 <div class="modal-overlay" id="new-pool-modal" onclick="if(event.target===this)closeModal('new-pool-modal')">
   <div class="modal">
-    <div class="modal-head"><div class="modal-title" id="npm-title">Neuer Pool</div><button class="modal-close" onclick="closeModal('new-pool-modal')">âœ•</button></div>
+    <div class="modal-head"><div class="modal-title" id="npm-title">Neuer Pool</div><button class="modal-close" onclick="closeModal('new-pool-modal')">✕</button></div>
     <div id="new-pool-content"></div>
   </div>
 </div>
@@ -444,17 +459,17 @@
 <!-- PHOTO IMPORT MODAL -->
 <div class="modal-overlay" id="photo-modal" onclick="if(event.target===this)closeModal('photo-modal')">
   <div class="modal">
-    <div class="modal-head"><div class="modal-title">ðŸ“· Foto-Import</div><button class="modal-close" onclick="closeModal('photo-modal')">âœ•</button></div>
+    <div class="modal-head"><div class="modal-title">📷 Foto-Import</div><button class="modal-close" onclick="closeModal('photo-modal')">✕</button></div>
     <div id="photo-content">
       <div class="drop-zone" id="drop-zone" onclick="document.getElementById('photo-file-inp').click()" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="handlePhotoDrop(event)">
-        <div style="font-size:36px;margin-bottom:10px">ðŸ“·</div>
+        <div style="font-size:36px;margin-bottom:10px">📷</div>
         <div style="font-size:13px;font-weight:600;margin-bottom:6px">Bild hochladen</div>
         <div style="font-size:10px;color:var(--muted)">Klicke oder ziehe ein Bild hierher</div>
         <img id="photo-preview" style="display:none">
       </div>
       <input type="file" id="photo-file-inp" accept="image/*" style="display:none" onchange="handlePhotoFile(this)">
-      <div class="k-group"><label class="k-label">Pool-Name fÃ¼r Import</label><input class="k-input" id="photo-pool-name" placeholder="z.B. Meine WÃ¶rterliste"></div>
-      <button class="btn btn-lime" id="photo-scan-btn" style="width:100%" onclick="doPhotoScan()">ðŸ” KI scannen</button>
+      <div class="k-group"><label class="k-label">Pool-Name für Import</label><input class="k-input" id="photo-pool-name" placeholder="z.B. Meine Wörterliste"></div>
+      <button class="btn btn-lime" id="photo-scan-btn" style="width:100%" onclick="doPhotoScan()">🔍 KI scannen</button>
       <div id="photo-status" style="margin-top:10px;font-size:11px;color:var(--muted)"></div>
     </div>
   </div>
@@ -465,7 +480,7 @@
   <div class="modal" style="max-width:560px">
     <div class="modal-head">
       <div class="modal-title">Avatar gestalten</div>
-      <button class="modal-close" onclick="closeModal('avatar-builder-modal')">âœ•</button>
+      <button class="modal-close" onclick="closeModal('avatar-builder-modal')">✕</button>
     </div>
     <div id="ab-content">
       <div class="ab-preview-wrap">
@@ -474,7 +489,7 @@
       </div>
       <div id="ab-controls"></div>
       <div style="display:flex;gap:8px;margin-top:14px">
-        <button class="btn btn-ghost btn-sm" style="flex:1" onclick="abRandomize()">ðŸŽ² ZufÃ¤llig</button>
+        <button class="btn btn-ghost btn-sm" style="flex:1" onclick="abRandomize()">🎲 Zufällig</button>
         <button class="btn btn-lime" style="flex:2" onclick="saveAvatarBuilder()">Speichern</button>
       </div>
       <div id="ab-msg" style="font-size:10px;color:var(--muted);margin-top:8px;text-align:center"></div>
@@ -486,15 +501,15 @@
 <div class="fp-overlay" id="fp-overlay" onclick="closeFriendPanel()"></div>
 <div class="fp-panel" id="fp-panel">
   <div class="fp-head">
-    <div style="font-size:14px;font-weight:700">ðŸ† Freunde &amp; Leaderboard</div>
-    <button class="modal-close" onclick="closeFriendPanel()">âœ•</button>
+    <div style="font-size:14px;font-weight:700">🏆 Freunde &amp; Leaderboard</div>
+    <button class="modal-close" onclick="closeFriendPanel()">✕</button>
   </div>
   <div class="fp-body">
     <div class="fp-tabs">
-      <button class="fp-tab active" id="fpt-board" onclick="switchFpTab('board')">ðŸ‘¥ Freunde</button>
-      <button class="fp-tab" id="fpt-global" onclick="switchFpTab('global')">ðŸŒ Global</button>
-      <button class="fp-tab" id="fpt-social" onclick="switchFpTab('social')">âž• Anfragen <span id="fp-req-badge" style="display:none" class="req-badge">0</span></button>
-      <button class="fp-tab" id="fpt-pools" onclick="switchFpTab('pools')">ðŸ“¤ Pools</button>
+      <button class="fp-tab active" id="fpt-board" onclick="switchFpTab('board')">👥 Freunde</button>
+      <button class="fp-tab" id="fpt-global" onclick="switchFpTab('global')">🌍 Global</button>
+      <button class="fp-tab" id="fpt-social" onclick="switchFpTab('social')">➕ Anfragen <span id="fp-req-badge" style="display:none" class="req-badge">0</span></button>
+      <button class="fp-tab" id="fpt-pools" onclick="switchFpTab('pools')">📤 Pools</button>
     </div>
     <div id="fp-board-content"></div>
     <div id="fp-global-content" style="display:none"></div>
@@ -503,7 +518,7 @@
   </div>
 </div>
 
-<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• SCRIPT â•â•â•â•â•â• -->
+<!-- ═══════════════════════════════════════════ SCRIPT ══════ -->
 <script src="src/js/services/supabase.js"></script>
 <script src="src/js/utils/storage.js"></script>
 <script src="src/js/app.js"></script>
@@ -525,5 +540,6 @@
 <script src="src/js/screens/shop.js"></script>
 <script src="src/js/services/auth.js"></script>
 
-</body></html
+</body></html>
+
 

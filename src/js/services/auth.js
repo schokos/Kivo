@@ -1,4 +1,4 @@
-﻿// â”€â”€ AUTH â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+﻿// ── AUTH ──────────────────────────────────────────────────────
 function _authShow(which){
   ['login','register','forgot'].forEach(t=>{
     const el=document.getElementById('auth-'+t+'-form'); if(el) el.style.display=t===which?'block':'none';
@@ -14,7 +14,7 @@ function _authShow(which){
     if(sw)sw.textContent='Anmelden';
   } else {
     split?.classList.remove('swap');
-    if(title)title.textContent='Willkommen zurÃ¼ck';
+    if(title)title.textContent='Willkommen zurück';
     if(sub)sub.textContent='Noch kein Konto?';
     if(sw)sw.textContent='Registrieren';
   }
@@ -46,7 +46,7 @@ function _authHands(up){
   h.classList.toggle('hidden', !up);
 }
 
-// Eye tracking â€” pupils follow cursor
+// Eye tracking — pupils follow cursor
 let _authEyeBound=false;
 function _authBindEyes(){
   if(_authEyeBound) return;
@@ -81,13 +81,13 @@ window.openModal=function(id){
 async function doLogin(){
   const email=document.getElementById('login-email')?.value.trim();
   const pw=document.getElementById('login-pw')?.value;
-  if(!email||!pw){authMsg('Bitte alle Felder ausfÃ¼llen');return;}
+  if(!email||!pw){authMsg('Bitte alle Felder ausfüllen');return;}
   authMsg('Anmelden...');
   try{
     const{data,error}=await sb.auth.signInWithPassword({email,password:pw});
     if(error)throw error;
     await hydrateSession(data.session);
-    closeModal('auth-modal'); toast('âœ“ Willkommen zurÃ¼ck!');
+    closeModal('auth-modal'); toast('✓ Willkommen zurück!');
   }catch(e){authMsg('Fehler: '+e.message);}
 }
 async function doRegister(){
@@ -95,25 +95,25 @@ async function doRegister(){
   const email=document.getElementById('reg-email')?.value.trim();
   const pw=document.getElementById('reg-pw')?.value;
   const pw2=document.getElementById('reg-pw2')?.value;
-  if(!username||!email||!pw){authMsg('Bitte alle Felder ausfÃ¼llen');return;}
+  if(!username||!email||!pw){authMsg('Bitte alle Felder ausfüllen');return;}
   if(pw.length<6){authMsg('Passwort mind. 6 Zeichen');return;}
-  if(pw2!==undefined && pw2!==pw){authMsg('PasswÃ¶rter stimmen nicht Ã¼berein');return;}
+  if(pw2!==undefined && pw2!==pw){authMsg('Passwörter stimmen nicht überein');return;}
   authMsg('Registrieren...',true);
   try{
     const{data,error}=await sb.auth.signUp({email,password:pw,options:{data:{username},emailRedirectTo:window.location.origin}});
     if(error)throw error;
-    authMsg('âœ“ Konto erstellt! Bitte E-Mail bestÃ¤tigen.',true);
+    authMsg('✓ Konto erstellt! Bitte E-Mail bestätigen.',true);
   }catch(e){authMsg('Fehler: '+e.message);}
 }
 async function doMagicLink(){
   const email=document.getElementById('magic-email')?.value.trim();
   if(!email){authMsg('E-Mail eingeben');return;}
-  try{await sb.auth.signInWithOtp({email});authMsg('âœ“ Magic Link gesendet!',true);}catch(e){authMsg('Fehler: '+e.message);}
+  try{await sb.auth.signInWithOtp({email});authMsg('✓ Magic Link gesendet!',true);}catch(e){authMsg('Fehler: '+e.message);}
 }
 async function doForgotPw(){
   const email=document.getElementById('forgot-email')?.value.trim();
   if(!email){authMsg('E-Mail eingeben');return;}
-  try{await sb.auth.resetPasswordForEmail(email,{redirectTo:location.href});authMsg('âœ“ Reset-Link gesendet!',true);}catch(e){authMsg('Fehler: '+e.message);}
+  try{await sb.auth.resetPasswordForEmail(email,{redirectTo:location.href});authMsg('✓ Reset-Link gesendet!',true);}catch(e){authMsg('Fehler: '+e.message);}
 }
 async function doLogout(){
   await flushLocalSync({force:true});
@@ -239,4 +239,5 @@ async function checkPendingFriendReqs(){
   if(!currentUser)return;
   try{const{data}=await sb.from('friendships').select('id').eq('friend_id',currentUser.id).eq('status','pending');document.getElementById('friend-notif').classList.toggle('show',(data||[]).length>0);}catch(e){}
 }
+
 

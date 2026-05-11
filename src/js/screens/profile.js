@@ -1,61 +1,61 @@
-﻿// â”€â”€ PROFILE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+﻿// ── PROFILE ───────────────────────────────────────────────────
 // =================== AVATAR-ITEMS / SHOP ===================
 // Items werden auf den Avatar angewendet. Jedes Item hat eine Kategorie und einen "value"
 // der dann im Avatar-State (z.B. hair, glasses, hat, beard, outfit, bg) gesetzt wird.
 const SHOP_ITEMS = [
   // FRISUREN (zusaetzlich zu den Standard-Frisuren)
-  {id:'hair_long',  cat:'hair',    value:'long',    icon:'ðŸ’‡',  name:'Lange Haare',     price:40, desc:'Schulterlange Haare'},
-  {id:'hair_curly', cat:'hair',    value:'curly',   icon:'ðŸ¦±',  name:'Locken',          price:45, desc:'Lockige MÃ¤hne'},
-  {id:'hair_buzz',  cat:'hair',    value:'buzz',    icon:'ðŸ‘¨',  name:'Buzzcut',         price:25, desc:'Sehr kurzer Schnitt'},
-  {id:'hair_mohawk',cat:'hair',    value:'mohawk',  icon:'ðŸ¤˜',  name:'Mohawk',          price:60, desc:'Punk-Style'},
-  {id:'hair_bald',  cat:'hair',    value:'bald',   icon:'ðŸ¥š',  name:'Glatze',          price:15, desc:'Klar im Kopf'},
+  {id:'hair_long',  cat:'hair',    value:'long',    icon:'💇',  name:'Lange Haare',     price:40, desc:'Schulterlange Haare'},
+  {id:'hair_curly', cat:'hair',    value:'curly',   icon:'🦱',  name:'Locken',          price:45, desc:'Lockige Mähne'},
+  {id:'hair_buzz',  cat:'hair',    value:'buzz',    icon:'👨',  name:'Buzzcut',         price:25, desc:'Sehr kurzer Schnitt'},
+  {id:'hair_mohawk',cat:'hair',    value:'mohawk',  icon:'🤘',  name:'Mohawk',          price:60, desc:'Punk-Style'},
+  {id:'hair_bald',  cat:'hair',    value:'bald',   icon:'🥚',  name:'Glatze',          price:15, desc:'Klar im Kopf'},
 
   // BRILLEN
-  {id:'gl_round',   cat:'glasses', value:'round',   icon:'ðŸ‘“',  name:'Runde Brille',    price:35, desc:'Klassisch rund'},
-  {id:'gl_square',  cat:'glasses', value:'square',  icon:'ðŸ¤“',  name:'Eckige Brille',   price:35, desc:'Nerdy chic'},
-  {id:'gl_sun',     cat:'glasses', value:'sun',     icon:'ðŸ•¶ï¸',  name:'Sonnenbrille',    price:55, desc:'Cool bleiben'},
-  {id:'gl_visor',   cat:'glasses', value:'visor',   icon:'ðŸ¥½',  name:'Visor',           price:75, desc:'Cyberpunk-Style'},
+  {id:'gl_round',   cat:'glasses', value:'round',   icon:'👓',  name:'Runde Brille',    price:35, desc:'Klassisch rund'},
+  {id:'gl_square',  cat:'glasses', value:'square',  icon:'🤓',  name:'Eckige Brille',   price:35, desc:'Nerdy chic'},
+  {id:'gl_sun',     cat:'glasses', value:'sun',     icon:'🕶️',  name:'Sonnenbrille',    price:55, desc:'Cool bleiben'},
+  {id:'gl_visor',   cat:'glasses', value:'visor',   icon:'🥽',  name:'Visor',           price:75, desc:'Cyberpunk-Style'},
 
   // KOPFBEDECKUNGEN
-  {id:'hat_cap',    cat:'hat',     value:'cap',     icon:'ðŸ§¢',  name:'Cap',             price:30, desc:'LÃ¤ssige Kappe'},
-  {id:'hat_beanie', cat:'hat',     value:'beanie',  icon:'ðŸŽ©',  name:'Beanie',          price:35, desc:'Warme MÃ¼tze'},
-  {id:'hat_crown',  cat:'hat',     value:'crown',   icon:'ðŸ‘‘',  name:'Krone',           price:120,desc:'KÃ¶niglich'},
-  {id:'hat_top',    cat:'hat',     value:'top',     icon:'ðŸŽ©',  name:'Zylinder',        price:90, desc:'Sehr fein'},
+  {id:'hat_cap',    cat:'hat',     value:'cap',     icon:'🧢',  name:'Cap',             price:30, desc:'Lässige Kappe'},
+  {id:'hat_beanie', cat:'hat',     value:'beanie',  icon:'🎩',  name:'Beanie',          price:35, desc:'Warme Mütze'},
+  {id:'hat_crown',  cat:'hat',     value:'crown',   icon:'👑',  name:'Krone',           price:120,desc:'Königlich'},
+  {id:'hat_top',    cat:'hat',     value:'top',     icon:'🎩',  name:'Zylinder',        price:90, desc:'Sehr fein'},
 
   // BART
-  {id:'bd_stub',    cat:'beard',   value:'stub',    icon:'ðŸ§”',  name:'Stoppelbart',     price:20, desc:'Drei-Tage-Bart'},
-  {id:'bd_full',    cat:'beard',   value:'full',    icon:'ðŸ§”â€â™‚ï¸', name:'Vollbart',        price:40, desc:'Buschig'},
-  {id:'bd_mous',    cat:'beard',   value:'mous',    icon:'ðŸ‘¨â€ðŸ¦°', name:'Schnurrbart',     price:30, desc:'Klassisch'},
+  {id:'bd_stub',    cat:'beard',   value:'stub',    icon:'🧔',  name:'Stoppelbart',     price:20, desc:'Drei-Tage-Bart'},
+  {id:'bd_full',    cat:'beard',   value:'full',    icon:'🧔‍♂️', name:'Vollbart',        price:40, desc:'Buschig'},
+  {id:'bd_mous',    cat:'beard',   value:'mous',    icon:'👨‍🦰', name:'Schnurrbart',     price:30, desc:'Klassisch'},
 
   // OUTFITS (Farben fuer das Hemd)
-  {id:'out_red',    cat:'outfit',  value:'#A33B2E', icon:'ðŸŸ¥',  name:'Rotes Outfit',    price:25, desc:'AuffÃ¤llig'},
-  {id:'out_purple', cat:'outfit',  value:'#7A4FB0', icon:'ðŸŸª',  name:'Lila Outfit',     price:30, desc:'KÃ¶niglich'},
-  {id:'out_gold',   cat:'outfit',  value:'#C9892F', icon:'ðŸŸ¨',  name:'Goldenes Outfit', price:50, desc:'Champion'},
-  {id:'out_white',  cat:'outfit',  value:'#E8E1D3', icon:'â¬œ',  name:'WeiÃŸes Outfit',   price:35, desc:'Elegant'},
+  {id:'out_red',    cat:'outfit',  value:'#A33B2E', icon:'🟥',  name:'Rotes Outfit',    price:25, desc:'Auffällig'},
+  {id:'out_purple', cat:'outfit',  value:'#7A4FB0', icon:'🟪',  name:'Lila Outfit',     price:30, desc:'Königlich'},
+  {id:'out_gold',   cat:'outfit',  value:'#C9892F', icon:'🟨',  name:'Goldenes Outfit', price:50, desc:'Champion'},
+  {id:'out_white',  cat:'outfit',  value:'#E8E1D3', icon:'⬜',  name:'Weißes Outfit',   price:35, desc:'Elegant'},
 
   // HINTERGRUENDE
-  {id:'bg_sunset',  cat:'bg',      value:'#4a3a26', icon:'ðŸŒ…',  name:'Sonnenuntergang', price:40, desc:'Warmer Hintergrund'},
-  {id:'bg_purple',  cat:'bg',      value:'#3a2645', icon:'ðŸŒŒ',  name:'Galaxie',         price:40, desc:'Lila Nacht'},
-  {id:'bg_ocean',   cat:'bg',      value:'#26454a', icon:'ðŸŒŠ',  name:'Ozean',           price:40, desc:'Tiefes Blau'},
-  {id:'bg_rose',    cat:'bg',      value:'#4a2638', icon:'ðŸŒ¹',  name:'RosÃ©',            price:40, desc:'Romantisch'},
-  {id:'bg_night',   cat:'bg',      value:'#2D2D2D', icon:'ðŸŒ‘',  name:'Mitternacht',     price:30, desc:'Dunkel & edel'},
+  {id:'bg_sunset',  cat:'bg',      value:'#4a3a26', icon:'🌅',  name:'Sonnenuntergang', price:40, desc:'Warmer Hintergrund'},
+  {id:'bg_purple',  cat:'bg',      value:'#3a2645', icon:'🌌',  name:'Galaxie',         price:40, desc:'Lila Nacht'},
+  {id:'bg_ocean',   cat:'bg',      value:'#26454a', icon:'🌊',  name:'Ozean',           price:40, desc:'Tiefes Blau'},
+  {id:'bg_rose',    cat:'bg',      value:'#4a2638', icon:'🌹',  name:'Rosé',            price:40, desc:'Romantisch'},
+  {id:'bg_night',   cat:'bg',      value:'#2D2D2D', icon:'🌑',  name:'Mitternacht',     price:30, desc:'Dunkel & edel'},
 ];
 
 
 // =================== AVATAR BUILDER ===================
 const AB_OPTS = {
-  bg:        ['#264a3a','#1b3528','#3a6b54'],         // Standard-Hintergruende (frei)
+  bg:        ['#19201C','#293D35','#121712'],         // Standard-Hintergruende (frei)
   skin:      ['#F2C9A0','#E5B48C','#C99A75','#A77A5A','#7B5237','#4F3322'],
   hair_color:['#2B1B12','#5C3A21','#8B5A2B','#C9892F','#D9B382','#E8E1D3','#3A3A3A','#A33B2E','#4A2E5A'],
   hair:      ['short'],                               // Standard-Frisur (frei)
   eyes:      ['normal','happy','wink','sleepy','star'],
   mouth:     ['smile','grin','neutral','smirk','open'],
-  outfit:    ['#3B7AB0','#6AC28A','#2D2D2D'],         // Standard-Outfits (frei)
+  outfit:    ['#36544A','#6BB592','#262E2A'],         // Standard-Outfits (frei)
   glasses:   ['none'],
   hat:       ['none'],
   beard:     ['none'],
 };
-const AB_DEFAULT = {bg:'#264a3a',skin:'#E5B48C',hair_color:'#2B1B12',hair:'short',eyes:'normal',mouth:'smile',outfit:'#3B7AB0',glasses:'none',hat:'none',beard:'none'};
+const AB_DEFAULT = {bg:'#19201C',skin:'#E5B48C',hair_color:'#2B1B12',hair:'short',eyes:'normal',mouth:'smile',outfit:'#36544A',glasses:'none',hat:'none',beard:'none'};
 let _abState = {...AB_DEFAULT};
 
 // Liefert die fuer den User verfuegbaren Optionen einer Kategorie
@@ -190,8 +190,8 @@ async function saveAvatarBuilder(){
     currentUser.avatar_data=_abState;
     lsSet('kivo_avatar_data', _abState);
     syncProfile();
-    msg.textContent='âœ“ Gespeichert';
-    toast('âœ“ Avatar gespeichert');
+    msg.textContent='✓ Gespeichert';
+    toast('✓ Avatar gespeichert');
     // Dashboard- + Header-Avatar sofort aktualisieren
     const html = getUserAvatar(currentUser, 40);
     const ab = document.getElementById('avatar-btn'); if(ab) ab.innerHTML = html;
@@ -206,7 +206,7 @@ function renderProfile(targetUser=null) {
   const user=targetUser||currentUser;
   if(!user&&!targetUser){
     el.innerHTML=`<div class="k-card" style="text-align:center;padding:40px">
-      <div style="font-size:40px;margin-bottom:12px">${'ðŸ‘¤'}</div>
+      <div style="font-size:40px;margin-bottom:12px">${'👤'}</div>
       <div style="font-size:14px;margin-bottom:8px">Noch nicht angemeldet</div>
       <button class="btn btn-lime" onclick="openModal('auth-modal')">Jetzt anmelden</button>
     </div>`;
@@ -228,16 +228,16 @@ function renderProfile(targetUser=null) {
           <div style="text-align:center"><div style="font-size:18px;font-weight:700">${sessions.length}</div><div style="font-size:9px;color:var(--muted)">Sessions</div></div>
         </div>
       </div>
-      ${currentUser?`<button class="btn btn-sm" onclick="document.getElementById('avatar-inp').click()">ðŸ“·</button><input type="file" id="avatar-inp" accept="image/*" style="display:none" onchange="uploadAvatar(this)">`:'' }
+      ${currentUser?`<button class="btn btn-sm" onclick="document.getElementById('avatar-inp').click()">📷</button><input type="file" id="avatar-inp" accept="image/*" style="display:none" onchange="uploadAvatar(this)">`:'' }
     </div>
 
     <!-- Gekaufte Avatar-Items -->
     <div class="k-card-sm" style="margin-bottom:12px">
       <div class="k-section-title">Avatar-Items</div>
       <div class="profile-items-row" id="equipped-row">
-        ${(()=>{const owned=lsGet('kivo_items','[]');const its=SHOP_ITEMS.filter(i=>owned.includes(i.id));return its.length?its.map(it=>`<div class="profile-item-badge" title="${it.name}">${it.icon}</div>`).join(''):'<div style="font-size:11px;color:var(--muted)">Noch keine Items â€” kaufe welche im Shop und gestalte deinen Avatar!</div>'})()}
+        ${(()=>{const owned=lsGet('kivo_items','[]');const its=SHOP_ITEMS.filter(i=>owned.includes(i.id));return its.length?its.map(it=>`<div class="profile-item-badge" title="${it.name}">${it.icon}</div>`).join(''):'<div style="font-size:11px;color:var(--muted)">Noch keine Items — kaufe welche im Shop und gestalte deinen Avatar!</div>'})()}
       </div>
-      ${currentUser?`<button class="btn btn-sm btn-lime" style="margin-top:8px" onclick="openAvatarBuilder()">ðŸŽ¨ Avatar gestalten</button>`:''}
+      ${currentUser?`<button class="btn btn-sm btn-lime" style="margin-top:8px" onclick="openAvatarBuilder()">🎨 Avatar gestalten</button>`:''}
     </div>
 
     <!-- Stats Vergleich (wenn eigenes Profil oder Freundesprofil) -->
@@ -251,7 +251,7 @@ function renderProfile(targetUser=null) {
     <div class="k-card-sm" role="region" aria-label="Benutzereinstellungen">
       <div class="k-section-title">Einstellungen</div>
       <div class="k-group">
-        <label class="k-label" for="prof-uname">Nutzername Ã¤ndern</label>
+        <label class="k-label" for="prof-uname">Nutzername ändern</label>
         <div style="display:flex;gap:6px">
           <input
             class="k-input"
@@ -266,7 +266,7 @@ function renderProfile(targetUser=null) {
             aria-label="Nutzername speichern"
           >Speichern</button>
         </div>
-        <label class="k-label" for="sett-pw">Passwort Ã¤ndern</label>
+        <label class="k-label" for="sett-pw">Passwort ändern</label>
         <div style="display:flex;gap:6px">
           <input
             class="k-input"
@@ -287,21 +287,21 @@ function renderProfile(targetUser=null) {
         class="btn btn-danger btn-sm"
         onclick="doLogout()"
         aria-label="Abmelden"
-      >â†© Abmelden</button>
+      >↩ Abmelden</button>
     </div>
   ` : ''}
   `;
 }
 
-// â”€â”€ SETTINGS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── SETTINGS ──────────────────────────────────────────────────
 
     
 async function changePw(){
   const pw=document.getElementById('sett-pw')?.value;
   if(!pw||pw.length<6){toast('Mind. 6 Zeichen');return;}
-  try{await sb.auth.updateUser({password:pw});toast('âœ“ Passwort geÃ¤ndert');}catch(e){toast('Fehler: '+e.message);}
+  try{await sb.auth.updateUser({password:pw});toast('✓ Passwort geändert');}catch(e){toast('Fehler: '+e.message);}
 }
-function saveNvKey(){ toast('KI-SchlÃ¼ssel werden serverseitig verwaltet'); }
+function saveNvKey(){ toast('KI-Schlüssel werden serverseitig verwaltet'); }
 
 
 function getUserAvatar(user, size = 24) {
@@ -341,7 +341,7 @@ function renderStatsVs(otherProfile) {
   const theirXp=otherProfile.xp_total||0, theirStreak=otherProfile.streak||0;
   const maxXp=Math.max(myXp,theirXp,1), maxS=Math.max(myStreak,theirStreak,1);
   return `
-    <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:9px;color:var(--muted)"><span style="color:var(--lime)">â— Du</span><span style="color:var(--blue)">â— ${otherProfile.username}</span></div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:9px;color:var(--muted)"><span style="color:var(--lime)">● Du</span><span style="color:var(--blue)">● ${otherProfile.username}</span></div>
     <div class="vs-bar"><div class="vs-lbl">XP</div><div class="vs-bars"><div class="vs-bar-me" style="width:${Math.round(myXp/maxXp*120)}px"></div><div class="vs-bar-them" style="width:${Math.round(theirXp/maxXp*120)}px"></div></div><div style="font-size:9px;color:var(--muted);min-width:60px;text-align:right">${myXp} / ${theirXp}</div></div>
     <div class="vs-bar"><div class="vs-lbl">Streak</div><div class="vs-bars"><div class="vs-bar-me" style="width:${Math.round(myStreak/maxS*120)}px"></div><div class="vs-bar-them" style="width:${Math.round(theirStreak/maxS*120)}px"></div></div><div style="font-size:9px;color:var(--muted);min-width:60px;text-align:right">${myStreak}d / ${theirStreak}d</div></div>`;
 }
@@ -359,7 +359,7 @@ async function uploadAvatar(inp) {
     document.getElementById('avatar-btn').innerHTML = imgHtml;
     const dashAv = document.getElementById('dash-avatar-btn'); if(dashAv) dashAv.innerHTML = imgHtml;
     updateNavIcons();
-    toast('âœ“ Profilbild gespeichert');
+    toast('✓ Profilbild gespeichert');
   };
   reader.readAsDataURL(file);
 }
@@ -370,7 +370,7 @@ async function changeUsername() {
   const msg=document.getElementById('uname-msg');
   if(!newName||newName.length<3){if(msg)msg.textContent='Mind. 3 Zeichen';return;}
   if(!/^[a-zA-Z0-9_.-]+$/.test(newName)){if(msg)msg.textContent='Nur a-z 0-9 _ . -';return;}
-  if(msg)msg.textContent='PrÃ¼fe...';
+  if(msg)msg.textContent='Prüfe...';
   try {
     const {data:ex}=await sb.from('profiles').select('id').eq('username',newName).neq('id',currentUser.id).maybeSingle();
     if(ex){if(msg)msg.textContent='Bereits vergeben';return;}
@@ -378,8 +378,10 @@ async function changeUsername() {
     lsSet('kivo_username', newName);
     syncProfile();
     document.getElementById('um-name').textContent=newName;
-    if(msg)msg.textContent='âœ“ Gespeichert!';
-    toast('âœ“ Nutzername geÃ¤ndert');
+    if(msg)msg.textContent='✓ Gespeichert!';
+    toast('✓ Nutzername geändert');
   } catch(e){if(msg)msg.textContent='Fehler: '+e.message;}
 }
+
+
 

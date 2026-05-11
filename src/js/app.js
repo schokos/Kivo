@@ -1,11 +1,11 @@
-﻿// â”€â”€ CONFIG â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+﻿// ── CONFIG ──────────────────────────────────────────────────
 // Shared bootstrap modules are loaded before app.js from index.html.
 const { SUPABASE_URL, SUPABASE_ANON_KEY, sb, edgeHeaders } = window.KivoSupabase;
 
-// â”€â”€ POOLS (empty â€” custom pools loaded from server after login) â”€â”€
+// ── POOLS (empty — custom pools loaded from server after login) ──
 const BUILTIN = {};
 
-// â”€â”€ STATE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── STATE ────────────────────────────────────────────────────
 let POOLS = {};
 let activeKey = null;
 let vocab = [];
@@ -26,7 +26,7 @@ let userItems = [];
 let equippedItems = [];
 let selectedCourseLang = null;
 
-// â”€â”€ ICON LIBRARY (Lucide-style inline SVGs) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── ICON LIBRARY (Lucide-style inline SVGs) ──────────────────
 // Ersetzt alle Emojis durch konsistente Stroke-Icons.
 const ICONS = {
   coin:    '<circle cx="12" cy="12" r="9"/><path d="M12 6v12M9 9h4.5a2 2 0 0 1 0 4H9.5a2 2 0 0 0 0 4H15"/>',
@@ -53,7 +53,7 @@ const ICONS = {
   party:   '<path d="M3 21l4-12 9 9-13 3z"/><path d="M14 3l1 2M19 4l-1 2M21 9l-2 1M16 12l2 2"/>',
   fire:    '<path d="M12 2c1 4 5 5 5 10a5 5 0 1 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3 1-6 1-9z"/>',
 };
-// Render Lucide-Style SVG. Inline fÃ¼r use-anywhere im innerHTML.
+// Render Lucide-Style SVG. Inline für use-anywhere im innerHTML.
 function ic(name, size=14, extra=''){
   const p=ICONS[name]||ICONS.star;
   return `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;${extra}">${p}</svg>`;
@@ -61,12 +61,12 @@ function ic(name, size=14, extra=''){
 // Pass-Helfer
 function levelUpReward(){ return 10; }
 
-// â”€â”€ STORAGE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── STORAGE ──────────────────────────────────────────────────
 const { lsGet, lsSet, getScopedString } = window.KivoStorage;
 
 
-// â”€â”€ SCREEN ROUTER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-const SCREEN_TITLES = { home:'Dashboard', courses:'Kurse', challenges:'Challenges', community:'Community', cards:'Karteikarten', quiz:'Quiz', typing:'Tippen', matching:'Zuordnen', overview:'Pool-Verwaltung', stats:'Statistiken', gap:'KI-LÃ¼ckentext', aibot:'KI-Assistent', profile:'Profil', shop:'Belohnungen', pass:'Lern-Pass' };
+// ── SCREEN ROUTER ────────────────────────────────────────────
+const SCREEN_TITLES = { home:'Dashboard', courses:'Kurse', challenges:'Challenges', community:'Community', cards:'Karteikarten', quiz:'Quiz', typing:'Tippen', matching:'Zuordnen', overview:'Pool-Verwaltung', stats:'Statistiken', gap:'KI-Lückentext', aibot:'KI-Assistent', profile:'Profil', shop:'Belohnungen', pass:'Lern-Pass' };
 
 function goTo(name, opts={}) {
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -94,7 +94,7 @@ function goTo(name, opts={}) {
   else if(name==='home')    updateHomeStats();
 }
 
-// â”€â”€ TOAST & CONFIRM â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── TOAST & CONFIRM ──────────────────────────────────────────
 function toast(msg) {
   const wrap=document.getElementById('toast-wrap');
   const el=document.createElement('div'); el.className='k-toast'; el.textContent=msg;
@@ -136,7 +136,7 @@ function confirm2(title, msg) {
 function openModal(id) { document.getElementById(id)?.classList.add('open'); }
 function closeModal(id) { document.getElementById(id)?.classList.remove('open'); }
 
-// â”€â”€ USER MENU â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── USER MENU ────────────────────────────────────────────────
 function toggleUserMenu() {
   document.getElementById('user-menu').classList.toggle('open');
 }
@@ -146,7 +146,7 @@ document.addEventListener('click', e => {
 });
 
 
-// â”€â”€ SHARE URL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── SHARE URL ─────────────────────────────────────────────────
 function checkShareUrl(){
   const params=new URLSearchParams(location.search);
   const shareKey=params.get('share');
@@ -155,7 +155,7 @@ function checkShareUrl(){
   if(POOLS[l]?.[p]){setActivePool(decodeURIComponent(shareKey));toast('Pool "'+p+'" aktiviert!');}
 }
 
-// â”€â”€ PWA MANIFEST â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── PWA MANIFEST ──────────────────────────────────────────────
 (function(){
   const manifest={name:'Kivo',short_name:'Kivo',description:'Kivo Lernplattform',start_url:'.',display:'standalone',background_color:'#1E1E1E',theme_color:'#1E1E1E',icons:[{src:'data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect width="192" height="192" rx="32" fill="#1E1E1E"/><circle cx="96" cy="88" r="44" fill="#6AC28A"/><text x="96" y="104" font-size="44" text-anchor="middle" fill="#1E1E1E" font-family="sans-serif" font-weight="900">K</text></svg>'),sizes:'192x192',type:'image/svg+xml'}]};
   const link=document.createElement('link');link.rel='manifest';link.href=URL.createObjectURL(new Blob([JSON.stringify(manifest)],{type:'application/json'}));document.head.appendChild(link);
@@ -170,3 +170,4 @@ window.addEventListener('DOMContentLoaded', () => {
   updateNavIcons();
   initAiChatPersistence();
 });
+

@@ -1,6 +1,6 @@
 ﻿function updateHomeStats() {
   const t=vocab.length, k=vocab.filter(v=>v.known).length;
-  // Daily-Quest-Fortschritt fÃ¼r Dashboard-Karte
+  // Daily-Quest-Fortschritt für Dashboard-Karte
   const dDone=dailyQuestsDone();
   const dTotal=DAILY_QUESTS.length;
   document.getElementById('hm-k').textContent=dDone;
@@ -28,8 +28,9 @@
   const poolBar=document.getElementById('daily-goal-fill'); if(poolBar) poolBar.style.width=poolPct+'%';
   // Sessions mini
   const rec=sessions.slice(-5);
-  document.getElementById('hm-sessions').innerHTML=rec.length?rec.map(s=>`<span style="margin-right:6px">${s.pct}% (${s.ok}âœ“)</span>`).join(''):'Noch keine Sessions';
+  document.getElementById('hm-sessions').innerHTML=rec.length?rec.map(s=>`<span style="margin-right:6px">${s.pct}% (${s.ok}✓)</span>`).join(''):'Noch keine Sessions';
 }
 
 function saveDailyGoal(){ /* deprecated */ }
+
 

@@ -1,4 +1,4 @@
-﻿// â”€â”€ MATCHING â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+﻿// ── MATCHING ──────────────────────────────────────────────────
 function startMatch() {
   mFound = 0; 
   mSel = null;
@@ -39,11 +39,12 @@ function pickMatch(i) {
     mFound++; document.getElementById('mc-cnt').textContent=mFound;
     addXp(5); srUpdate(activeKey,v.id,4);
     mSel=null;
-    if(mFound===mPairs.length/2) setTimeout(()=>{toast('ðŸŽ‰ Alle Paare! +'+mPairs.length/2*5+' XP');startMatch();},600);
+    if(mFound===mPairs.length/2) setTimeout(()=>{toast('🎉 Alle Paare! +'+mPairs.length/2*5+' XP');startMatch();},600);
   } else {
     el.classList.add('mw'); mSel.el.classList.add('mw');
     setTimeout(()=>{el.classList.remove('mw','ms');mSel.el.classList.remove('mw','ms');mSel=null;},600);
   }
 }
+
 
 

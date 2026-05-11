@@ -1,6 +1,6 @@
-﻿// â”€â”€ DAILY / WEEKLY QUESTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+﻿// ── DAILY / WEEKLY QUESTS ───────────────────────────────────
 // Trackt Lernfortschritt pro Tag/Woche. Quests sind feste Ziele, die durch
-// normale Lernaktionen erfÃ¼llt werden (kein extra Klick nÃ¶tig).
+// normale Lernaktionen erfüllt werden (kein extra Klick nötig).
 // Belohnungen werden EINMAL pro Quest-Periode automatisch ausgezahlt.
 const DAILY_QUESTS = [
   {id:'q_cards',  icon:'cards',  name:'10 Karten lernen',     target:10, metric:'cards',   xp:15, coins:5},
@@ -44,7 +44,7 @@ function trackQuest(metric, amount=1){
       claimed.push(q.id);
       if(scope==='weekly') s.weekly.claimed=claimed; else s.daily.claimed=claimed;
       saveQuestState(s);
-      // belohnen (XP via addXp, MÃ¼nzen direkt)
+      // belohnen (XP via addXp, Münzen direkt)
       if(q.coins){ userCurrency+=q.coins; lsSet('kivo_currency',userCurrency); syncProfile(); updateCurrencyDisplay(); }
       if(q.xp){ addXp(q.xp,'quest'); }
       toast(`${ic('check',13)} Quest: ${q.name} (+${q.xp} XP, +${q.coins} ${ic('coin',13)})`);
@@ -59,7 +59,7 @@ function dailyQuestsDone(){
 }
 
 
-// â”€â”€ CHALLENGE HUB â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── CHALLENGE HUB ──────────────────────────────────────────────
 function renderChallenges(){
   const el=document.getElementById('challenges-content'); if(!el)return;
   const renderQuest=(q,scope)=>{
@@ -70,7 +70,7 @@ function renderChallenges(){
       <div class="quest-icon" style="color:var(--lime)">${ic(q.icon,22)}</div>
       <div style="flex:1">
         <div class="f-name">${q.name}</div>
-        <div class="f-pts">${prog} / ${q.target} ${done?`Â· ${ic('check',11)} erledigt`:''}</div>
+        <div class="f-pts">${prog} / ${q.target} ${done?`· ${ic('check',11)} erledigt`:''}</div>
         <div class="daily-goal-bar" style="margin-top:6px"><div class="daily-goal-fill" style="width:${pct}%"></div></div>
       </div>
       <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end">
@@ -96,9 +96,10 @@ function renderChallenges(){
           <div style="font-size:17px;font-weight:850;display:flex;align-items:center;gap:8px;color:var(--text)"><span style="color:var(--orange)">${ic('trophy',18)}</span> Weekly Quests</div>
           <span class="tag">Diese Woche</span>
         </div>
-        <div style="font-size:11px;color:var(--muted);margin-bottom:10px">GrÃ¶ÃŸere Belohnungen â€” eine Woche Zeit.</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:10px">Größere Belohnungen — eine Woche Zeit.</div>
         ${WEEKLY_QUESTS.map(q=>renderQuest(q,'weekly')).join('')}
       </div>
     </div>`;
 }
+
 

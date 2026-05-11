@@ -1,4 +1,4 @@
-﻿// â”€â”€ PROFILE SYNC (currency / items / pass_data) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+﻿// ── PROFILE SYNC (currency / items / pass_data) ───────────────
 let _profileSyncTimer = null;
 let _profileSyncPending = false;
 async function _doProfileSync(){
@@ -287,8 +287,8 @@ function buildVocab() {
   vocab=flat.map((v,i)=>({...v,id:i,known:knIds.includes(i)}));
   updateHomeStats();
   const {l,p}=spKey(activeKey);
-  const lbl=l+' Â· '+p;
-  document.getElementById('active-pool-lbl').textContent=lbl.length>22?lbl.slice(0,22)+'â€¦':lbl;
+  const lbl=l+' · '+p;
+  document.getElementById('active-pool-lbl').textContent=lbl.length>22?lbl.slice(0,22)+'…':lbl;
   document.getElementById('home-pool-name').textContent=p;
 }
 
@@ -305,13 +305,13 @@ function setActivePool(key) {
 }
 
 
-// No longer doing health checks// â”€â”€ XP SYSTEM â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// MÃ¼nzen kommen NUR durch (a) abgeschlossene Quests und (b) Level-Ups (+10 pro Stufe).
-// XP selbst geben keine MÃ¼nzen mehr.
+// No longer doing health checks// ── XP SYSTEM ────────────────────────────────────────────────
+// Münzen kommen NUR durch (a) abgeschlossene Quests und (b) Level-Ups (+10 pro Stufe).
+// XP selbst geben keine Münzen mehr.
 function _xpToLevel(xp){ return Math.max(1, Math.floor((xp||0)/500)+1); }
 async function addXp(pts, reason='learn') {
   const prevLevel = _xpToLevel(getTotalXp());
-  // Quest-Tracking (auÃŸer wenn die XP selbst aus einer Quest stammen, sonst Endlos-Loop)
+  // Quest-Tracking (außer wenn die XP selbst aus einer Quest stammen, sonst Endlos-Loop)
   if(reason!=='quest'){
     const s=getQuestState(); s.daily.xp=(s.daily.xp||0)+pts; s.weekly.xp=(s.weekly.xp||0)+pts; saveQuestState(s);
   }
@@ -331,7 +331,7 @@ function _handleLevelUp(prev, now){
   userCurrency = (parseInt(lsGet('kivo_currency','0'))||0) + reward;
   lsSet('kivo_currency', userCurrency);
   syncProfile();
-  toast(`${ic('star',14)} Level ${now}! +${reward} MÃ¼nzen`);
+  toast(`${ic('star',14)} Level ${now}! +${reward} Münzen`);
   // Pass-Items neu anzeigen
   if(document.getElementById('screen-pass')?.classList.contains('active')) renderPass();
 }
@@ -350,4 +350,5 @@ function updateCurrencyDisplay() {
   if(homeVal) homeVal.textContent=userCurrency;
 }
 async function syncXpToServer() { return flushLocalSync(); }
+
 

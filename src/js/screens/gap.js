@@ -1,8 +1,8 @@
-﻿// â”€â”€ GAP FILL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+﻿// ── GAP FILL ──────────────────────────────────────────────────
 
 function renderOfflineGapText() {
   const fallback = gapVocab
-    .map(v => `Die Ãœbersetzung fÃ¼r "${v.en}" ist [[${v.de}]].`)
+    .map(v => `Die Übersetzung für "${v.en}" ist [[${v.de}]].`)
     .join(' ');
   renderGapUI(fallback);
 }
@@ -18,7 +18,7 @@ async function generateGapText() {
   gapVocab = shuf(flat).slice(0, Math.min(6, flat.length));
   const poolName = spKey(activeKey).p;
 
-  // 1ï¸âƒ£ Einmal HTML erstellen (mit IDs!)
+  // 1️⃣ Einmal HTML erstellen (mit IDs!)
   outEl.innerHTML = makeLoadingHTML('KI startet... (0%)', 0, 'loading');
 
   const updateProgress = (pct, phase) => {
@@ -122,7 +122,7 @@ async function generateGapText() {
           Offline-Modus starten
         </button>
         <button class="btn btn-ghost btn-sm" onclick="generateGapText()">
-          â†º Erneut generieren
+          ↺ Erneut generieren
         </button>
       `,
       errorMsg
@@ -141,10 +141,10 @@ function renderGapUI(raw) {
     return `<input class="gap-blank" id="gb-${i}" data-answer="${v.de}" size="${Math.max(8, word.length + 2)}" autocomplete="off" spellcheck="false" onkeyup="checkGapLive(this)">`;
   });
 
-  // StandardmÃ¤ÃŸig werden alle Buttons angezeigt
+  // Standardmäßig werden alle Buttons angezeigt
   let buttonsHtml = `
-    <button class="btn btn-lime btn-sm" onclick="checkAllGaps()">âœ“ ÃœberprÃ¼fen</button>
-    <button class="btn btn-ghost btn-sm" onclick="generateGapText()">â†º Neu</button>
+    <button class="btn btn-lime btn-sm" onclick="checkAllGaps()">✓ Überprüfen</button>
+    <button class="btn btn-ghost btn-sm" onclick="generateGapText()">↺ Neu</button>
   `;
 
   outEl.innerHTML = `
@@ -184,7 +184,7 @@ function checkAllGaps() {
   const pct = tot ? Math.round(ok / tot * 100) : 0;
   const res = document.getElementById('gap-result');
   if (res) {
-    res.innerHTML = `<div class="k-card-sm" style="margin-bottom:12px">${ok === tot ? 'ðŸŽ‰' : 'ðŸ“'} <strong>${ok}/${tot}</strong> richtig (${pct}%)${ok === tot ? ` <span style="color:var(--lime)">+${ok * 3} XP!</span>` : ''}</div>`;
+    res.innerHTML = `<div class="k-card-sm" style="margin-bottom:12px">${ok === tot ? '🎉' : '📝'} <strong>${ok}/${tot}</strong> richtig (${pct}%)${ok === tot ? ` <span style="color:var(--lime)">+${ok * 3} XP!</span>` : ''}</div>`;
   }
 
   // Buttons anpassen
@@ -192,13 +192,13 @@ function checkAllGaps() {
   if (buttonsContainer) {
     if (ok === tot) {
       buttonsContainer.innerHTML = `
-        <button class="btn btn-ghost btn-sm" onclick="generateGapText()">â†º Neu</button>
+        <button class="btn btn-ghost btn-sm" onclick="generateGapText()">↺ Neu</button>
       `;
     } else if (res) {
       buttonsContainer.innerHTML = `
-        <button class="btn btn-lime btn-sm" onclick="checkAllGaps()">âœ“ ÃœberprÃ¼fen</button>
-        <button class="btn btn-ghost btn-sm" onclick="revealGaps()">ðŸ‘ LÃ¶sung</button>
-        <button class="btn btn-ghost btn-sm" onclick="generateGapText()">â†º Neu</button>
+        <button class="btn btn-lime btn-sm" onclick="checkAllGaps()">✓ Überprüfen</button>
+        <button class="btn btn-ghost btn-sm" onclick="revealGaps()">👁 Lösung</button>
+        <button class="btn btn-ghost btn-sm" onclick="generateGapText()">↺ Neu</button>
       `;
     }
   }
@@ -218,7 +218,7 @@ function revealGaps() {
   const buttonsContainer = document.getElementById('gap-buttons');
   if (buttonsContainer) {
     buttonsContainer.innerHTML = `
-      <button class="btn btn-ghost btn-sm" onclick="generateGapText()">â†º Neu</button>
+      <button class="btn btn-ghost btn-sm" onclick="generateGapText()">↺ Neu</button>
     `;
   }
 }
@@ -230,6 +230,7 @@ function checkGapLive(inp) {
     inp.className='gap-blank gb-ok';
   }
 }
+
 
 
 

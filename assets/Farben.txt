@@ -1,0 +1,40 @@
+☀️ Light Mode
+Token	HSL	HEX
+background	150 8% 94%	#EFF1F0
+foreground	150 15% 10%	#161D1A
+card	0 0% 100%	#FFFFFF
+card-foreground	150 15% 10%	#161D1A
+popover	0 0% 100%	#FFFFFF
+popover-foreground	150 15% 10%	#161D1A
+primary	155 18% 26%	#36544A
+primary-foreground	150 8% 96%	#F4F6F5
+secondary	150 6% 88%	#DEE2E0
+secondary-foreground	150 15% 10%	#161D1A
+muted	150 6% 90%	#E3E7E5
+muted-foreground	150 8% 35%	#525C58
+accent	155 15% 85%	#CFDAD5
+accent-foreground	155 18% 22%	#2E483F
+destructive	0 62% 48%	#C42F2F
+success	145 50% 38%	#319152
+warning	35 80% 50%	#E69100
+border / input	150 8% 82%	#CED5D2
+ring	155 18% 26%	#36544A
+
+
+🌙 Dark Mode
+Token	HSL	HEX
+background	150 12% 8%	#121712
+foreground	100 10% 92%	#E8EBE3
+card / popover	150 10% 11%	#19201C
+primary	150 30% 55%	#6BB592
+primary-foreground	150 15% 8%	#121A16
+secondary / muted	150 8% 16%	#262E2A
+secondary-foreground	100 10% 92%	#E8EBE3
+muted-foreground	120 6% 60%	#969E96
+accent	150 20% 20%	#293D35
+accent-foreground	150 30% 70%	#9CCFB7
+destructive	0 55% 45%	#B33333
+success	145 45% 45%	#3FA666
+warning	35 70% 50%	#D98A1A
+border / input	150 10% 20%	#2E3A34
+ring	150 30% 55%	#6BB592

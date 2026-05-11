@@ -1,4 +1,4 @@
-﻿// â”€â”€ COMMUNITY HUB â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+﻿// ── COMMUNITY HUB ──────────────────────────────────────────────
 function withTimeout(promise, ms = 8000, label = 'Request timeout') {
   const timeout = new Promise((_, reject) =>
     setTimeout(() => reject(new Error(label)), ms)
@@ -14,7 +14,7 @@ async function renderCommunity() {
   if (!currentUser) {
     el.innerHTML = `
       <div class="k-card" style="text-align:center;padding:42px">
-        <div style="font-size:42px;margin-bottom:12px">ðŸ‘¥</div>
+        <div style="font-size:42px;margin-bottom:12px">👥</div>
         <div style="font-size:14px;font-weight:800;margin-bottom:8px">
           Anmeldung erforderlich
         </div>
@@ -99,8 +99,8 @@ async function renderCommunity() {
             <div class="f-name">${p.username || '?'}</div>
 
             <div class="f-pts">
-              âš¡ ${(p.xp_total || 0).toLocaleString()}
-              Â· ðŸ”¥ ${p.streak || 0}d
+              ⚡ ${(p.xp_total || 0).toLocaleString()}
+              · 🔥 ${p.streak || 0}d
             </div>
 
           </div>
@@ -114,7 +114,7 @@ async function renderCommunity() {
 
         <button class="btn btn-lime btn-sm"
                 onclick="openFriendPanel();switchFpTab('social')">
-          Freund hinzufÃ¼gen
+          Freund hinzufügen
         </button>
       `;
 
@@ -126,9 +126,9 @@ async function renderCommunity() {
           ${i === 1 ? 'rank-2' : ''}
           ${i === 2 ? 'rank-3' : ''}">
 
-          ${i === 0 ? 'ðŸ¥‡'
-            : i === 1 ? 'ðŸ¥ˆ'
-            : i === 2 ? 'ðŸ¥‰'
+          ${i === 0 ? '🥇'
+            : i === 1 ? '🥈'
+            : i === 2 ? '🥉'
             : '#' + (i + 1)
           }
 
@@ -150,7 +150,7 @@ async function renderCommunity() {
           </div>
 
           <div class="f-pts">
-            âš¡ ${(p.xp_total || 0).toLocaleString()}
+            ⚡ ${(p.xp_total || 0).toLocaleString()}
           </div>
 
         </div>
@@ -179,14 +179,14 @@ async function renderCommunity() {
 
           ${globalHtml || `
             <div style="font-size:11px;color:var(--muted)">
-              Noch keine EintrÃ¤ge.
+              Noch keine Einträge.
             </div>
           `}
 
           <button class="btn btn-ghost btn-sm"
                   style="margin-top:10px"
                   onclick="openFriendPanel();switchFpTab('global')">
-            Top 10 Ã¶ffnen
+            Top 10 öffnen
           </button>
 
         </div>
@@ -213,7 +213,7 @@ async function renderCommunity() {
 }
 
 
-// â”€â”€ FRIEND PANEL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── FRIEND PANEL ──────────────────────────────────────────────
 function openFriendPanel() {
   document.getElementById('fp-overlay').classList.add('open');
   document.getElementById('fp-panel').classList.add('open');
@@ -235,11 +235,11 @@ function switchFpTab(tab) {
 }
 
 async function loadFriendPanel() {
-  // PrÃ¼fung von currentUser ganz am Anfang
+  // Prüfung von currentUser ganz am Anfang
   if (!currentUser) {
     const authHtml = `
       <div style="text-align:center;padding:30px">
-        <div style="font-size:36px;margin-bottom:10px">ðŸ”’</div>
+        <div style="font-size:36px;margin-bottom:10px">🔒</div>
         <div style="font-size:12px;margin-bottom:12px">Anmeldung erforderlich</div>
         <button class="btn btn-lime btn-sm" onclick="closeFriendPanel();openModal('auth-modal')">Anmelden</button>
       </div>`;
@@ -265,7 +265,7 @@ async function loadFriendPanel() {
     const accepted = (links || []).filter(f => f.status === 'accepted');
     fpFriendIds = accepted.map(f => f.user_id === currentUser.id ? f.friend_id : f.user_id);
 
-    // Ausstehende Anfragen (fÃ¼r Badge)
+    // Ausstehende Anfragen (für Badge)
     const pendingIn = (links || []).filter(f => f.status === 'pending' && f.friend_id === currentUser.id);
     const badge = document.getElementById('fp-req-badge');
     if (badge) {
@@ -284,7 +284,7 @@ async function loadFriendPanel() {
     const myStreak = calcStreak();
 
     // Rang-Emoji und CSS-Klasse zuweisen
-    const rEmoji = i => i === 0 ? 'ðŸ¥‡' : i === 1 ? 'ðŸ¥ˆ' : i === 2 ? 'ðŸ¥‰' : '#' + (i + 1);
+    const rEmoji = i => i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '#' + (i + 1);
     const rClass = i => i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : '';
 
     // Board-HTML generieren (Freundesliste)
@@ -292,9 +292,9 @@ async function loadFriendPanel() {
     if (sorted.length <= 1) {
       boardHtml = `
         <div style="text-align:center;padding:24px">
-          <div style="font-size:32px;margin-bottom:10px">ðŸ‘¥</div>
+          <div style="font-size:32px;margin-bottom:10px">👥</div>
           <div style="font-size:12px;margin-bottom:10px">Noch keine Freunde</div>
-          <button class="btn btn-lime btn-sm" onclick="switchFpTab('social')">âž• Freund hinzufÃ¼gen</button>
+          <button class="btn btn-lime btn-sm" onclick="switchFpTab('social')">➕ Freund hinzufügen</button>
         </div>`;
     } else {
       boardHtml = sorted.map((p, i) => {
@@ -313,9 +313,9 @@ async function loadFriendPanel() {
             <div class="f-av ${!isMe ? 'profile-link' : ''}" ${profileAction}>${av}</div>
             <div class="f-info ${!isMe ? 'profile-link' : ''}" ${profileAction}>
               <div class="f-name">${p.username || '?'} ${isMe ? '<span class="tag lime">Du</span>' : ''}</div>
-              <div class="f-pts">âš¡ ${xp.toLocaleString()} Â· ${streak >= 2 ? 'ðŸ”¥' : 'ðŸ“…'} ${streak}d</div>
+              <div class="f-pts">⚡ ${xp.toLocaleString()} · ${streak >= 2 ? '🔥' : '📅'} ${streak}d</div>
             </div>
-            ${isFriend && !isMe ? `<button class="btn btn-danger btn-sm" onclick="fpRemove('${p.id}')">âœ—</button>` : ''}
+            ${isFriend && !isMe ? `<button class="btn btn-danger btn-sm" onclick="fpRemove('${p.id}')">✗</button>` : ''}
           </div>`;
       }).join('');
     }
@@ -334,8 +334,8 @@ async function loadFriendPanel() {
           <div class="friend-req-row" style="display:flex;align-items:center;gap:8px;padding:10px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--r-sm);margin-bottom:6px">
             <div class="f-av" style="width:28px;height:28px;font-size:10px">${(p.username || '?')[0].toUpperCase()}</div>
             <span style="flex:1;font-size:11px">${p.username}</span>
-            <button class="btn btn-ok btn-sm" onclick="fpAccept('${p.id}')">âœ“</button>
-            <button class="btn btn-danger btn-sm" onclick="fpDecline('${p.id}')">âœ—</button>
+            <button class="btn btn-ok btn-sm" onclick="fpAccept('${p.id}')">✓</button>
+            <button class="btn btn-danger btn-sm" onclick="fpDecline('${p.id}')">✗</button>
           </div>`).join('')}
         <div style="height:14px"></div>`;
     }
@@ -353,22 +353,22 @@ async function loadFriendPanel() {
         <div class="k-section-title" style="margin-bottom:8px">Pool-Einladungen</div>
         ${(poolInvs || []).map(inv => `
           <div class="pool-inv-row" style="display:flex;align-items:center;gap:8px;padding:10px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--r-sm);margin-bottom:6px">
-            <span style="font-size:16px">ðŸ“š</span>
+            <span style="font-size:16px">📚</span>
             <div style="flex:1">
               <div style="font-size:11px;font-weight:600">${inv.pool_name}</div>
               <div style="font-size:9px;color:var(--muted)">von ${inv.from_username}</div>
             </div>
-            <button class="btn btn-ok btn-sm" onclick="acceptPoolInv('${inv.id}','${inv.pool_name}',this)">âœ“</button>
-            <button class="btn btn-danger btn-sm" onclick="declinePoolInv('${inv.id}')">âœ—</button>
+            <button class="btn btn-ok btn-sm" onclick="acceptPoolInv('${inv.id}','${inv.pool_name}',this)">✓</button>
+            <button class="btn btn-danger btn-sm" onclick="declinePoolInv('${inv.id}')">✗</button>
           </div>`).join('')}
         <div style="height:14px"></div>`;
     } else {
       socialHtml += `<div style="font-size:11px;color:var(--muted);padding:20px;text-align:center">Keine neuen Einladungen</div>`;
     }
 
-    // Freund hinzufÃ¼gen-Formular
+    // Freund hinzufügen-Formular
     socialHtml += `
-      <div class="k-section-title" style="margin-bottom:8px">Freund hinzufÃ¼gen</div>
+      <div class="k-section-title" style="margin-bottom:8px">Freund hinzufügen</div>
       <div style="display:flex;gap:7px;margin-bottom:8px">
         <input class="k-input" id="fp-search" placeholder="Nutzername...">
         <button class="btn btn-lime btn-sm" onclick="fpAdd()">Senden</button>
@@ -380,7 +380,7 @@ async function loadFriendPanel() {
   } catch (e) {
     document.getElementById('fp-board-content').innerHTML = `
       <div style="font-size:11px;color:var(--danger);padding:20px;text-align:center">
-        âš  ${e.message}
+        ⚠ ${e.message}
       </div>`;
   }
 }
@@ -390,7 +390,7 @@ async function loadGlobalLb() {
   el.innerHTML = makeLoadingHTML('Lade...', undefined, 'loading');
   try {
     const{data:profs}=await sb.rpc('get_global_leaderboard',{_limit:10});
-    const rEmoji=i=>i===0?'ðŸ¥‡':i===1?'ðŸ¥ˆ':i===2?'ðŸ¥‰':'#'+(i+1);
+    const rEmoji=i=>i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1);
     const rClass=i=>i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'';
     el.innerHTML='<div class="k-section-title" style="margin-bottom:8px">Global Top 10</div>'
       +(profs||[]).map((p,i)=>{
@@ -400,7 +400,7 @@ async function loadGlobalLb() {
         return `<div class="friend-row ${isMe?'me':''}">
           <div class="f-rank ${rClass(i)}">${rEmoji(i)}</div>
           <div class="f-av ${!isMe?'profile-link':''}" ${profileAction}>${av}</div>
-          <div class="f-info ${!isMe?'profile-link':''}" ${profileAction}><div class="f-name">${p.username||'?'} ${isMe?'<span class="tag lime">Du</span>':''}</div><div class="f-pts">âš¡ ${(p.xp_total||0).toLocaleString()} Â· ${(p.streak||0)>=2?'ðŸ”¥':'ðŸ“…'} ${p.streak||0}d</div></div>
+          <div class="f-info ${!isMe?'profile-link':''}" ${profileAction}><div class="f-name">${p.username||'?'} ${isMe?'<span class="tag lime">Du</span>':''}</div><div class="f-pts">⚡ ${(p.xp_total||0).toLocaleString()} · ${(p.streak||0)>=2?'🔥':'📅'} ${p.streak||0}d</div></div>
         </div>`;
       }).join('');
   } catch(e){
@@ -410,19 +410,19 @@ async function loadGlobalLb() {
 
 async function loadFpPools() {
   const el=document.getElementById('fp-pools-content'); if(!el)return;
-  if(!currentUser){el.innerHTML=`<div style="text-align:center;padding:30px"><div style="font-size:36px;margin-bottom:10px">ðŸ”’</div><div style="font-size:12px;margin-bottom:12px">Anmeldung erforderlich</div><button class="btn btn-lime btn-sm" onclick="closeFriendPanel();openModal('auth-modal')">Anmelden</button></div>`;return;}
+  if(!currentUser){el.innerHTML=`<div style="text-align:center;padding:30px"><div style="font-size:36px;margin-bottom:10px">🔒</div><div style="font-size:12px;margin-bottom:12px">Anmeldung erforderlich</div><button class="btn btn-lime btn-sm" onclick="closeFriendPanel();openModal('auth-modal')">Anmelden</button></div>`;return;}
   if(!fpFriendIds.length){el.innerHTML='<div style="padding:20px;font-size:11px;color:var(--muted)">Keine Freunde vorhanden</div>';return;}
   const{data:fProfs}=await sb.rpc('get_public_profiles',{_ids:fpFriendIds});
   const friendMap=Object.fromEntries((fProfs||[]).map(p=>[p.id,p.username]));
-  let poolOpts='<option value="">Pool wÃ¤hlen...</option>';
+  let poolOpts='<option value="">Pool wählen...</option>';
   for(const[lang,pools] of Object.entries(POOLS))
     for(const[pname] of Object.entries(pools))
       poolOpts+=`<option value="${esc(mkKey(lang,pname))}" data-key="${mkKey(lang,pname)}" data-name="${pname}">${pname} (${lang})</option>`;
   el.innerHTML=`
     <div class="k-section-title" style="margin-bottom:8px">Pool an Freund senden</div>
     <div class="k-group"><select class="k-input" id="fp-pool-sel">${poolOpts}</select></div>
-    <div class="k-group"><select class="k-input" id="fp-friend-sel"><option value="">Freund wÃ¤hlen...</option>${Object.entries(friendMap).map(([id,n])=>`<option value="${id}">${n}</option>`).join('')}</select></div>
-    <button class="btn btn-lime" style="width:100%" onclick="sendPool()">ðŸ“¤ Pool senden</button>
+    <div class="k-group"><select class="k-input" id="fp-friend-sel"><option value="">Freund wählen...</option>${Object.entries(friendMap).map(([id,n])=>`<option value="${id}">${n}</option>`).join('')}</select></div>
+    <button class="btn btn-lime" style="width:100%" onclick="sendPool()">📤 Pool senden</button>
     <div id="fp-pool-res" style="margin-top:8px;font-size:10px"></div>`;
 }
 
@@ -430,22 +430,22 @@ async function fpAdd() {
   const uname=(document.getElementById('fp-search')?.value||'').trim();
   const res=document.getElementById('fp-add-res');
   if(!uname){if(res)res.innerHTML='<div style="color:var(--danger)">Nutzername eingeben</div>';return;}
-  if(uname===currentUser.username){if(res)res.innerHTML='<div style="color:var(--orange)">Das bist du ðŸ˜„</div>';return;}
+  if(uname===currentUser.username){if(res)res.innerHTML='<div style="color:var(--orange)">Das bist du 😄</div>';return;}
   if(res)res.innerHTML='<div style="color:var(--muted)">Suche...</div>';
   try {
     const{data:found}=await sb.rpc('search_public_profile',{_username:uname});
     const p=Array.isArray(found)?found[0]:found;
     if(!p){if(res)res.innerHTML=`<div style="color:var(--danger)">${uname} nicht gefunden</div>`;return;}
     const{data:ex}=await sb.from('friendships').select('id,status').or(`and(user_id.eq.${currentUser.id},friend_id.eq.${p.id}),and(user_id.eq.${p.id},friend_id.eq.${currentUser.id})`).maybeSingle();
-    if(ex){if(res)res.innerHTML=`<div style="color:var(--orange)">${ex.status==='pending'?'Anfrage gesendet â³':'Bereits befreundet âœ“'}</div>`;return;}
+    if(ex){if(res)res.innerHTML=`<div style="color:var(--orange)">${ex.status==='pending'?'Anfrage gesendet ⏳':'Bereits befreundet ✓'}</div>`;return;}
     await sb.from('friendships').insert({user_id:currentUser.id,friend_id:p.id,status:'pending'});
-    if(res)res.innerHTML=`<div style="color:var(--lime)">âœ“ Anfrage an ${uname} gesendet!</div>`;
+    if(res)res.innerHTML=`<div style="color:var(--lime)">✓ Anfrage an ${uname} gesendet!</div>`;
     document.getElementById('fp-search').value='';
   } catch(e){if(res)res.innerHTML=`<div style="color:var(--danger)">${e.message}</div>`;}
 }
 
 async function fpAccept(uid){
-  try{await sb.from('friendships').update({status:'accepted'}).eq('user_id',uid).eq('friend_id',currentUser.id);toast('âœ“ Freundschaft angenommen!');loadFriendPanel();}catch(e){toast(e.message);}
+  try{await sb.from('friendships').update({status:'accepted'}).eq('user_id',uid).eq('friend_id',currentUser.id);toast('✓ Freundschaft angenommen!');loadFriendPanel();}catch(e){toast(e.message);}
 }
 async function fpDecline(uid){
   try{await sb.from('friendships').delete().eq('user_id',uid).eq('friend_id',currentUser.id);toast('Abgelehnt');loadFriendPanel();}catch(e){toast(e.message);}
@@ -460,11 +460,11 @@ async function sendPool(){
   const sel=document.getElementById('fp-pool-sel'); const toId=document.getElementById('fp-friend-sel')?.value;
   const res=document.getElementById('fp-pool-res');
   const poolKey=sel?.options[sel.selectedIndex]?.dataset?.key||''; const poolName=sel?.options[sel.selectedIndex]?.dataset?.name||'';
-  if(!poolKey||!toId){if(res)res.innerHTML='<span style="color:var(--danger)">Bitte Pool und Freund wÃ¤hlen</span>';return;}
+  if(!poolKey||!toId){if(res)res.innerHTML='<span style="color:var(--danger)">Bitte Pool und Freund wählen</span>';return;}
   const pool=getPoolObj(poolKey);
   try{
     await sb.from('pool_shares').insert({from_user_id:currentUser.id,from_username:currentUser.username,to_user_id:toId,pool_key:esc(poolKey),pool_name:poolName,data:pool,accepted:false,created_at:new Date().toISOString()});
-    if(res)res.innerHTML='<span style="color:var(--lime)">âœ“ Pool gesendet!</span>'; toast('ðŸ“¤ Pool gesendet!');
+    if(res)res.innerHTML='<span style="color:var(--lime)">✓ Pool gesendet!</span>'; toast('📤 Pool gesendet!');
   }catch(e){if(res)res.innerHTML=`<span style="color:var(--danger)">${e.message}</span>`;}
 }
 
@@ -477,7 +477,7 @@ async function acceptPoolInv(invId,poolName,btn){
     POOLS[lang][name]=inv.data; saveCustom();
     if(currentUser)await syncPoolToServer(lang,name);
     await sb.from('pool_shares').update({accepted:true}).eq('id',invId);
-    loadState(); toast('âœ“ Pool "'+name+'" Ã¼bernommen!'); loadFriendPanel();
+    loadState(); toast('✓ Pool "'+name+'" übernommen!'); loadFriendPanel();
   }catch(e){toast(e.message);}
 }
 async function declinePoolInv(invId){
@@ -493,7 +493,7 @@ async function viewFriendProfile(uid,username){
     const el=document.getElementById('profile-content');
     const av=p?.avatar_url?`<img src="${p.avatar_url}">`:(username||'?')[0].toUpperCase();
     el.innerHTML=`
-      <button class="btn btn-sm btn-ghost" onclick="loadFriendPanel()" style="margin-bottom:12px">â† ZurÃ¼ck</button>
+      <button class="btn btn-sm btn-ghost" onclick="loadFriendPanel()" style="margin-bottom:12px">← Zurück</button>
       <div class="profile-hero">
         <div class="profile-av">${av}</div>
         <div style="flex:1">
@@ -508,4 +508,5 @@ async function viewFriendProfile(uid,username){
     goTo('profile',{keepProfileContent:true});
   }catch(e){toast('Fehler: '+e.message);}
 }
+
 

@@ -31,14 +31,14 @@ function getDailyShopItems(count=6){
 }
 
 
-// â”€â”€ SHOP â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── SHOP ──────────────────────────────────────────────────────
 const CAT_LABEL = {hair:'Frisur',glasses:'Brille',hat:'Kopfbedeckung',beard:'Bart',outfit:'Outfit',bg:'Hintergrund'};
 
 function _fmtRotation(){
   const t=getNextShopRotation();
   const h=String(t.getHours()).padStart(2,'0'), m=String(t.getMinutes()).padStart(2,'0');
   const d=t.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'});
-  // Ist die nÃ¤chste Rotation morgen oder heute?
+  // Ist die nächste Rotation morgen oder heute?
   const now=new Date();
   const sameDay=t.getDate()===now.getDate()&&t.getMonth()===now.getMonth();
   return (sameDay?'heute':'morgen')+' um '+h+':'+m;
@@ -57,8 +57,8 @@ function renderShop() {
   const dailyItems = getDailyShopItems(6);
   el.innerHTML=`
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap">
-      <div class="currency-pill" style="display:flex;align-items:center;gap:6px">${ic('coin',14)} ${userCurrency} MÃ¼nzen</div>
-      <div style="font-size:10px;color:var(--muted)">MÃ¼nzen verdienst du durch Quests &amp; Level-Ups.</div>
+      <div class="currency-pill" style="display:flex;align-items:center;gap:6px">${ic('coin',14)} ${userCurrency} Münzen</div>
+      <div style="font-size:10px;color:var(--muted)">Münzen verdienst du durch Quests &amp; Level-Ups.</div>
       ${currentUser?`<button class="btn btn-sm btn-lime" style="margin-left:auto;display:inline-flex;align-items:center;gap:6px" onclick="openAvatarBuilder()">${ic('pen',13)} Avatar gestalten</button>`:''}
     </div>
     <div class="k-card-sm" style="margin-bottom:14px;background:var(--lime-d2);border-color:color-mix(in srgb,#6AC28A 35%,transparent)">
@@ -87,10 +87,10 @@ async function buyItem(id) {
   if(!currentUser){toast('Bitte zuerst anmelden');return;}
   const it=SHOP_ITEMS.find(i=>i.id===id); if(!it)return;
   if(userItems.includes(id)){toast('Bereits im Besitz');return;}
-  if(userCurrency<it.price){toast('Nicht genug MÃ¼nzen! ('+it.price+' benÃ¶tigt)');return;}
+  if(userCurrency<it.price){toast('Nicht genug Münzen! ('+it.price+' benötigt)');return;}
   const ok = await confirm2(
     'Item kaufen?',
-    it.name+' fÃ¼r '+it.price+' MÃ¼nzen kaufen?'
+    it.name+' für '+it.price+' Münzen kaufen?'
   );
 
   if(ok){
@@ -101,10 +101,11 @@ async function buyItem(id) {
     lsSet('kivo_items', userItems);
     syncProfile();
 
-    toast(it.name+' gekauft! VerfÃ¼gbar im Avatar-Builder.');
+    toast(it.name+' gekauft! Verfügbar im Avatar-Builder.');
 
     renderShop();
     updateCurrencyDisplay();
   }
 }
+
 
