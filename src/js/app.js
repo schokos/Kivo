@@ -66,7 +66,7 @@ const { lsGet, lsSet, getScopedString } = window.KivoStorage;
 
 
 // ── SCREEN ROUTER ────────────────────────────────────────────
-const SCREEN_TITLES = { home:'Dashboard', courses:'Kurse', challenges:'Challenges', community:'Community', cards:'Karteikarten', quiz:'Quiz', typing:'Tippen', matching:'Zuordnen', overview:'Pool-Verwaltung', stats:'Statistiken', gap:'KI-Lückentext', aibot:'KI-Assistent', profile:'Profil', shop:'Belohnungen', pass:'Lern-Pass' };
+const SCREEN_TITLES = { home:'Dashboard', courses:'Fächer', challenges:'Challenges', community:'Community', cards:'Karteikarten', quiz:'Quiz', typing:'Tippen', matching:'Zuordnen', overview:'Pool-Verwaltung', stats:'Statistiken', gap:'KI-Lückentext', aibot:'KI-Assistent', profile:'Profil', shop:'Belohnungen', pass:'Lern-Pass' };
 
 function goTo(name, opts={}) {
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -170,4 +170,5 @@ window.addEventListener('DOMContentLoaded', () => {
   updateNavIcons();
   initAiChatPersistence();
 });
+
 

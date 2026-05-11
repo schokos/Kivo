@@ -28,7 +28,7 @@
     <div class="rail-top">
       <button class="brand-btn" onclick="goTo('home')" title="Kivo">K</button>
       <button class="rail-btn active" id="rb-home" data-s="home" onclick="goTo('home')" title="Dashboard"><span class="rail-ico"><svg viewBox="0 0 24 24"><path d="M3 12 12 3l9 9"></path><path d="M5 10v10h14V10"></path><path d="M10 20v-6h4v6"></path></svg></span><span class="rail-lbl">Dashboard</span></button>
-      <button class="rail-btn" id="rb-courses" data-s="courses" onclick="goTo('courses')" title="Kurse"><span class="rail-ico"><svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2V5z"></path><path d="M8 7h8M8 11h8M8 15h5"></path></svg></span><span class="rail-lbl">Kurse</span></button>
+      <button class="rail-btn" id="rb-courses" data-s="courses" onclick="goTo('courses')" title="Fächer"><span class="rail-ico"><svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2V5z"></path><path d="M8 7h8M8 11h8M8 15h5"></path></svg></span><span class="rail-lbl">Fächer</span></button>
       <button class="rail-btn" id="rb-challenges" data-s="challenges" onclick="goTo('challenges')" title="Challenges"><span class="rail-ico"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8.5-8 9-4.5-.5-8-4-8-9V6l8-3z"></path><path d="m9 12 2 2 4-4"></path></svg></span><span class="rail-lbl">Challenges</span></button>
       <button class="rail-btn" id="rb-community" data-s="community" onclick="goTo('community')" title="Community"><span class="rail-ico"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"></circle><circle cx="17" cy="9.5" r="2.4"></circle><path d="M3 19c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"></path><path d="M15 19c0-2.3 1.6-4 3.5-4s2.5 1.3 2.5 3"></path></svg></span><span class="rail-lbl">Community</span></button>
       <button class="rail-btn" id="rb-pass" data-s="pass" onclick="goTo('pass')" title="Lern-Pass"><span class="rail-ico"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8.5-8 9-4.5-.5-8-4-8-9V6l8-3z"></path><path d="m9 12 2 2 4-4"></path></svg></span><span class="rail-lbl">Lern-Pass</span></button>
@@ -131,7 +131,7 @@
             <button class="btn btn-lime" style="margin-top:22px" onclick="goTo('challenges')">Zu den Quests</button>
           </div>
           <div class="k-card dash-card">
-            <div style="font-size:17px;font-weight:850">Empfohlener Kurs</div>
+            <div style="font-size:17px;font-weight:850">Empfohlenes Fach</div>
             <div class="course-visual"></div>
             <div style="font-size:13px;font-weight:850" id="home-pool-name">–</div>
             <button class="course-link btn btn-ghost" style="width:100%;margin-top:8px" onclick="goTo('courses')"><span>Weiterlernen ❯</span><span>›</span></button>
@@ -139,7 +139,7 @@
         </div>
 
         <div class="course-grid-head">
-          <div style="font-size:18px;font-weight:900">Kurs-Empfehlungen</div>
+          <div style="font-size:18px;font-weight:900">Fächer entdecken</div>
           <button class="btn btn-ghost btn-sm" onclick="goTo('courses')">Alle anzeigen</button>
         </div>
         <div class="course-grid">
@@ -161,10 +161,10 @@
         </div>
       </div>
 
-      <!-- KURSE ─────────────────────────────────── -->
+      <!-- Fächer ─────────────────────────────────── -->
       <div class="screen" id="screen-courses">
         <div class="app-page-head">
-          <div><div class="app-page-title">Kurse</div><div class="app-page-sub">Wähle eine Sprache und danach, was du lernen willst.</div></div>
+          <div><div class="app-page-title">Fächer</div><div class="app-page-sub">Wähle zuerst ein Fach wie Spanisch oder Mathe und öffne darin Vokabeln, Grammatik oder eigenständige Lektionen.</div></div>
           <button class="btn btn-lime btn-sm" onclick="openNewPoolModal()">+ Eigener Kurs</button>
         </div>
         <div id="courses-content"></div>
@@ -314,7 +314,7 @@
 <!-- BOTTOM NAV (mobile) -->
 <nav class="bottom-nav" id="bottom-nav">
   <button class="bn-item active" data-s="home" onclick="goTo('home')"><span class="bn-icon"><svg viewBox="0 0 24 24"><path d="M3 12 12 3l9 9"></path><path d="M5 10v10h14V10"></path><path d="M10 20v-6h4v6"></path></svg></span>Dashboard</button>
-  <button class="bn-item" data-s="courses" onclick="goTo('courses')"><span class="bn-icon"><svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2V5z"></path><path d="M8 7h8M8 11h8M8 15h5"></path></svg></span>Kurse</button>
+  <button class="bn-item" data-s="courses" onclick="goTo('courses')"><span class="bn-icon"><svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2V5z"></path><path d="M8 7h8M8 11h8M8 15h5"></path></svg></span>Fächer</button>
   <button class="bn-item" data-s="aibot" onclick="goTo('aibot')"><span class="bn-icon"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H8l-4 4V5z"></path><circle cx="9" cy="10.5" r="1.1" fill="#2A1810" stroke="none"></circle><circle cx="15" cy="10.5" r="1.1" fill="#2A1810" stroke="none"></circle></svg></span>KI-Assistent</button>
   <button class="bn-item" data-s="community" onclick="goTo('community')"><span class="bn-icon"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"></circle><circle cx="17" cy="9.5" r="2.4"></circle><path d="M3 19c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"></path><path d="M15 19c0-2.3 1.6-4 3.5-4s2.5 1.3 2.5 3"></path></svg></span>Community</button>
   <button class="bn-item" data-s="profile" onclick="goTo('profile')"><span class="bn-icon" id="profile-nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"></path></svg></span>Profil</button>
@@ -541,5 +541,6 @@
 <script src="src/js/services/auth.js"></script>
 
 </body></html>
+
 
 

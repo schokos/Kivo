@@ -1,0 +1,13 @@
+﻿{
+  "id": "algebra",
+  "title": "Algebra",
+  "description": "Mathe-Kurs fuer Rechen- und Grundlagenthemen.",
+  "lessons": [
+    {
+      "id": "bruchrechnung",
+      "title": "Bruchrechnung",
+      "type": "standalone-html",
+      "path": "src/data/subjects/mathe/courses/algebra/lessons/bruchrechnung/index.html"
+    }
+  ]
+}

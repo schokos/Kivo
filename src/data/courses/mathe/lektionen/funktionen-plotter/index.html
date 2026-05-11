@@ -8,7 +8,7 @@
 </head>
 <body>
   <main class="tool-shell">
-    <a class="back-link" href="../../../../../../app.html">← Zurueck zur App</a>
+    <a class="back-link" href="../../../../../../app.html" onclick="if(window.history.length > 1){ event.preventDefault(); window.history.back(); }">← Zurück zur App</a>
     <h1>Funktionen-Plotter</h1>
     <p>Eigenstaendiger Platz fuer spaetere Graphen-, Canvas- oder SVG-Logik.</p>
     <section class="plot-card">
@@ -20,3 +20,4 @@
   <script src="script.js"></script>
 </body>
 </html>
+

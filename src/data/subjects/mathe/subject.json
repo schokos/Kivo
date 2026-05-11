@@ -1,0 +1,22 @@
+﻿{
+  "id": "mathe",
+  "title": "Mathe",
+  "description": "Fachstruktur fuer Mathe mit getrennten Kursen und Modulen.",
+  "courses": [
+    {
+      "id": "algebra",
+      "title": "Algebra",
+      "path": "src/data/subjects/mathe/courses/algebra/course.json"
+    },
+    {
+      "id": "geometrie",
+      "title": "Geometrie",
+      "path": "src/data/subjects/mathe/courses/geometrie/course.json"
+    },
+    {
+      "id": "funktionen",
+      "title": "Funktionen",
+      "path": "src/data/subjects/mathe/courses/funktionen/course.json"
+    }
+  ]
+}

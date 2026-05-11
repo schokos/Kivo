@@ -1,0 +1,13 @@
+﻿{
+  "id": "grammatik",
+  "title": "Grammatik",
+  "description": "Englisch-Kurs fuer Zeiten und Satzbau.",
+  "lessons": [
+    {
+      "id": "tenses",
+      "title": "Tenses",
+      "type": "standalone-html",
+      "path": "src/data/subjects/englisch/courses/grammatik/lessons/tenses/index.html"
+    }
+  ]
+}

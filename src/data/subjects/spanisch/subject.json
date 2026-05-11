@@ -1,0 +1,17 @@
+﻿{
+  "id": "spanisch",
+  "title": "Spanisch",
+  "description": "Fachstruktur fuer Spanisch mit Vokabel- und Grammatik-Kursen.",
+  "courses": [
+    {
+      "id": "vokabeln",
+      "title": "Vokabeln",
+      "path": "src/data/subjects/spanisch/courses/vokabeln/course.json"
+    },
+    {
+      "id": "grammatik",
+      "title": "Grammatik",
+      "path": "src/data/subjects/spanisch/courses/grammatik/course.json"
+    }
+  ]
+}

@@ -3,7 +3,7 @@
 ## Was jetzt wichtig ist
 - `index.html` ist die Einstiegsseite im Root.
 - `app.html` ist die eigentliche Kivo-Lernplattform.
-- Standalone-Lektionen liegen unter `src/data/courses/.../lektionen/.../index.html`.
+- Standalone-Lektionen liegen unter `src/data/subjects/.../courses/.../lessons/.../index.html`.
 - Alle Pfade sind relativ angelegt und damit fuer GitHub Pages geeignet.
 
 ## Das musst du in GitHub einstellen
@@ -34,7 +34,7 @@ In Supabase solltet ihr nachsehen, ob eure GitHub-Pages-URL eingetragen ist:
 1. Laedt `index.html`?
 2. Oeffnet der Button auf `app.html` korrekt?
 3. Laden die Dateien aus `src/styles/...` und `src/js/...` in `app.html`?
-4. Oeffnen die Lektionen unter `src/data/courses/.../lektionen/.../index.html`?
+4. Oeffnen die Lektionen unter `src/data/subjects/.../courses/.../lessons/.../index.html`?
 5. Funktioniert Login mit Supabase noch?
 
 ## Empfehlung

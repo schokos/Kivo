@@ -28,13 +28,13 @@ function renderOverview() {
   el.innerHTML=html;
 }
 
-function openNewPoolModal() {
+function openNewPoolModal(presetLang='', presetName='') {
   document.getElementById('npm-title').textContent='Neuer Pool';
   document.getElementById('new-pool-content').innerHTML=`
-    <div class="k-group"><label class="k-label">Pool-Name</label><input class="k-input" id="np-name" placeholder="z.B. Spanisch Alltag"></div>
-    <div class="k-group"><label class="k-label">Sprache</label><input class="k-input" id="np-lang" value="Englisch" placeholder="Englisch / Spanisch / ..."></div>
+    <div class="k-group"><label class="k-label">Kurs- / Pool-Name</label><input class="k-input" id="np-name" value="${String(presetName || '').replace(/"/g,'&quot;')}" placeholder="z.B. Spanisch Alltag"></div>
+    <div class="k-group"><label class="k-label">Sprache / Fach</label><input class="k-input" id="np-lang" value="${String(presetLang || 'Englisch').replace(/"/g,'&quot;')}" placeholder="Englisch / Spanisch / ..."></div>
     <div class="k-group"><label class="k-label">Vokabeln (ein Paar pro Zeile: Deutsch = Englisch)</label><textarea class="k-input" id="np-pairs" rows="8" placeholder="Hund = Dog&#10;Katze = Cat&#10;Haus = House"></textarea></div>
-    <button class="btn btn-lime" style="width:100%" onclick="saveNewPool()">Pool erstellen</button>`;
+    <button class="btn btn-lime" style="width:100%" onclick="saveNewPool()">Kurs erstellen</button>`;
   openModal('new-pool-modal');
 }
 
@@ -43,7 +43,7 @@ function openEditPoolModal(key) {
   const pairs=flattenPool(pool).map(v=>`${v.de} = ${v.en}`).join('\n');
   document.getElementById('npm-title').textContent='Pool bearbeiten';
   document.getElementById('new-pool-content').innerHTML=`
-    <div class="k-group"><label class="k-label">Pool-Name</label><input class="k-input" id="np-name" value="${p.replace(/"/g,'&quot;')}"></div>
+    <div class="k-group"><label class="k-label">Kurs- / Pool-Name</label><input class="k-input" id="np-name" value="${p.replace(/"/g,'&quot;')}"></div>
     <div class="k-group"><label class="k-label">Sprache</label><input class="k-input" id="np-lang" value="${l.replace(/"/g,'&quot;')}"></div>
     <div class="k-group"><label class="k-label">Vokabeln (ein Paar pro Zeile: Deutsch = Englisch)</label><textarea class="k-input" id="np-pairs" rows="10">${pairs}</textarea></div>
     <button class="btn btn-lime" style="width:100%" onclick="saveEditedPool('${key}')">Änderungen speichern</button>`;
@@ -62,6 +62,7 @@ function saveNewPool() {
   saveCustom();
   if(currentUser) syncPoolToServer(lang,name);
   closeModal('new-pool-modal'); renderOverview(); setActivePool(mkKey(lang,name));
+  if(document.getElementById('screen-courses')?.classList.contains('active')) renderCourses();
   toast('✓ Pool "'+name+'" erstellt!');
 }
 
@@ -76,7 +77,7 @@ async function saveEditedPool(oldKey) {
   if(!POOLS[lang])POOLS[lang]={};
   if((old.l!==lang||old.p!==name)&&POOLS[old.l]?.[old.p]){delete POOLS[old.l][old.p];if(!Object.keys(POOLS[old.l]).length)delete POOLS[old.l];}
   POOLS[lang][name]={subcats:{[name]:pairs}}; saveCustom(); await syncPoolToServer(lang,name);
-  activeKey=mkKey(lang,name); lsSet('kivo_ak',activeKey); closeModal('new-pool-modal'); loadState(); renderOverview(); toast('✓ Pool gespeichert');
+  activeKey=mkKey(lang,name); lsSet('kivo_ak',activeKey); closeModal('new-pool-modal'); loadState(); renderOverview(); if(document.getElementById('screen-courses')?.classList.contains('active')) renderCourses(); toast('✓ Pool gespeichert');
 }
 
 async function syncPoolToServer(lang,name) {
@@ -94,7 +95,7 @@ async function deletePool(key) {
     const {l,p}=spKey(key);
     delete POOLS[l][p]; if(!Object.keys(POOLS[l]).length)delete POOLS[l];
     saveCustom(); if(activeKey===key){const lk=Object.keys(POOLS)[0];activeKey=lk?mkKey(lk,Object.keys(POOLS[lk])[0]):null;}
-    buildVocab(); renderOverview(); toast('Pool gelöscht');
+    buildVocab(); renderOverview(); if(document.getElementById('screen-courses')?.classList.contains('active')) renderCourses(); toast('Pool gelöscht');
   }
 }
 

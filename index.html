@@ -51,7 +51,7 @@
       <img class="logo" src="assets/logo.png" alt="Kivo Logo">
       <div>
         <h1>Kivo</h1>
-        <p>Die Hauptplattform lebt jetzt sauber in <code>app.html</code>. Einzelne Lektionen koennen als eigene, unabhaengige HTML-Module in <code>src/data/courses/.../lektionen/</code> stehen.</p>
+        <p>Die Hauptplattform lebt jetzt sauber in <code>app.html</code>. Fachinhalte sind als <code>Fächer → Kurse → Lektionen</code> gedacht, und einzelne Lektionen koennen als eigene, unabhaengige HTML-Module in <code>src/data/subjects/.../courses/.../lessons/</code> stehen.</p>
       </div>
       <div class="actions">
         <a class="btn primary" href="app.html">Zur Lernplattform</a>
@@ -62,22 +62,23 @@
       <div class="list">
         <div class="item">
           <strong>Haupt-App</strong>
-          <small><a href="app.html">app.html</a> enthaelt Dashboard, Community, Profil, Kurse und globale Funktionen.</small>
+          <small><a href="app.html">app.html</a> enthaelt Dashboard, Community, Profil, Fächer und globale Funktionen.</small>
         </div>
         <div class="item">
           <strong>Mathe</strong>
-          <small>Standalone-Module: <a href="src/data/courses/mathe/lektionen/geogebra/index.html">GeoGebra</a>, <a href="src/data/courses/mathe/lektionen/funktionen-plotter/index.html">Funktionen-Plotter</a>, <a href="src/data/courses/mathe/lektionen/bruchrechnung/index.html">Bruchrechnung</a></small>
+          <small>Fach mit Kursen wie Algebra, Geometrie und Funktionen. Beispiele: <a href="src/data/subjects/mathe/courses/geometrie/lessons/geogebra/index.html">GeoGebra</a>, <a href="src/data/subjects/mathe/courses/funktionen/lessons/funktionen-plotter/index.html">Funktionen-Plotter</a>, <a href="src/data/subjects/mathe/courses/algebra/lessons/bruchrechnung/index.html">Bruchrechnung</a></small>
         </div>
         <div class="item">
           <strong>Deutsch</strong>
-          <small>Standalone-Module: <a href="src/data/courses/deutsch/lektionen/vokabeltrainer/index.html">Vokabeltrainer</a> und <a href="src/data/courses/deutsch/lektionen/grammatik/index.html">Grammatik</a></small>
+          <small>Fach mit Kursen wie Vokabeln und Grammatik. Beispiele: <a href="src/data/subjects/deutsch/courses/vokabeln/lessons/wortschatz/index.html">Wortschatz</a> und <a href="src/data/subjects/deutsch/courses/grammatik/lessons/grammatik-grundlagen/index.html">Grammatik-Grundlagen</a></small>
         </div>
         <div class="item">
           <strong>Spanisch</strong>
-          <small>Standalone-Module: <a href="src/data/courses/spanisch/lektionen/vokabeln-a1/index.html">Vokabeln A1</a> und <a href="src/data/courses/spanisch/lektionen/verben/index.html">Verben</a></small>
+          <small>Fach mit Kursen wie Vokabeln und Grammatik. Beispiele: <a href="src/data/subjects/spanisch/courses/vokabeln/lessons/vokabeln-a1/index.html">Vokabeln A1</a> und <a href="src/data/subjects/spanisch/courses/grammatik/lessons/verben/index.html">Verben</a></small>
         </div>
       </div>
     </section>
   </main>
 </body>
 </html>
+

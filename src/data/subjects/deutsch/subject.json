@@ -1,0 +1,17 @@
+﻿{
+  "id": "deutsch",
+  "title": "Deutsch",
+  "description": "Fachstruktur fuer Deutsch mit Wortschatz und Grammatik.",
+  "courses": [
+    {
+      "id": "vokabeln",
+      "title": "Vokabeln",
+      "path": "src/data/subjects/deutsch/courses/vokabeln/course.json"
+    },
+    {
+      "id": "grammatik",
+      "title": "Grammatik",
+      "path": "src/data/subjects/deutsch/courses/grammatik/course.json"
+    }
+  ]
+}

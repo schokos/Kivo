@@ -1,0 +1,13 @@
+﻿{
+  "id": "vokabeln",
+  "title": "Vokabeln",
+  "description": "Deutsch-Kurs fuer Wortschatz und Begriffe.",
+  "lessons": [
+    {
+      "id": "wortschatz",
+      "title": "Wortschatz",
+      "type": "standalone-html",
+      "path": "src/data/subjects/deutsch/courses/vokabeln/lessons/wortschatz/index.html"
+    }
+  ]
+}
