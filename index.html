@@ -642,7 +642,6 @@ textarea.k-input{resize:vertical;min-height:70px}
       <div class="um-email" id="um-email"></div>
       <div class="um-item" onclick="closeUserMenu();openModal('auth-modal')"><svg class="um-ico" viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg><span>Anmelden</span></div>
       <div class="um-sep"></div>
-      <div class="um-item" onclick="closeUserMenu();openSettings()"><svg class="um-ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg><span>Einstellungen</span></div>
       <div class="um-item" onclick="closeUserMenu();goTo('profile')"><svg class="um-ico" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><span>Mein Profil</span></div>
       <div class="um-item" onclick="closeUserMenu();goTo('pass')"><svg class="um-ico" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8.5-8 9-4.5-.5-8-4-8-9V6l8-3z"></path><path d="m9 12 2 2 4-4"></path></svg><span>Lern-Pass</span></div>
       <div class="um-item" onclick="closeUserMenu();goTo('shop')"><svg class="um-ico" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg><span>Shop</span></div>
@@ -1016,14 +1015,6 @@ textarea.k-input{resize:vertical;min-height:70px}
   <div class="modal">
     <div class="modal-head"><div class="modal-title" id="npm-title">Neuer Pool</div><button class="modal-close" onclick="closeModal('new-pool-modal')">✕</button></div>
     <div id="new-pool-content"></div>
-  </div>
-</div>
-
-<!-- SETTINGS MODAL -->
-<div class="modal-overlay" id="settings-modal" onclick="if(event.target===this)closeModal('settings-modal')">
-  <div class="modal">
-    <div class="modal-head"><div class="modal-title">⚙ Einstellungen</div><button class="modal-close" onclick="closeModal('settings-modal')">✕</button></div>
-    <div id="settings-content"></div>
   </div>
 </div>
 
@@ -2655,7 +2646,6 @@ function openChatModal() {
   body.innerHTML = `
     <div style="display:flex;gap:8px;margin-bottom:12px;">
       <button class="btn btn-lime btn-sm" onclick="aiCreateAndOpenNewChat()">＋ Neuer Chat</button>
-      <button class="btn btn-sm" onclick="aiLoadChatSessions();openChatModal()">↻ Aktualisieren</button>
     </div>
 
     <div style="display:flex;flex-direction:column;gap:8px;">
@@ -3903,6 +3893,7 @@ function openAvatarBuilder(){
   _abRender();
   openModal('avatar-builder-modal');
 }
+
 function _abRender(){
   document.getElementById('ab-preview').innerHTML = renderCustomAvatar(_abState, 180);
   const ctrls = document.getElementById('ab-controls');
@@ -4005,16 +3996,62 @@ function renderProfile(targetUser=null) {
       ${renderStatsVs(null)}
     </div>`:'' }
 
-    ${currentUser?`
-    <div class="k-card-sm">
+  ${currentUser ? `
+    <div class="k-card-sm" role="region" aria-label="Benutzereinstellungen">
       <div class="k-section-title">Einstellungen</div>
-      <div class="k-group"><label class="k-label">Nutzername ändern</label>
-        <div style="display:flex;gap:6px"><input class="k-input" id="prof-uname" value="${currentUser?.username||''}" style="flex:1"><button class="btn btn-ok btn-sm" onclick="changeUsername()">Speichern</button></div>
-        <div id="uname-msg" style="font-size:9px;margin-top:4px;color:var(--muted)"></div>
+      <div class="k-group">
+        <label class="k-label" for="prof-uname">Nutzername ändern</label>
+        <div style="display:flex;gap:6px">
+          <input
+            class="k-input"
+            id="prof-uname"
+            value="${currentUser?.username || ''}"
+            aria-label="Neuer Nutzername"
+            style="flex:1"
+          >
+          <button
+            class="btn btn-ok btn-sm"
+            onclick="changeUsername()"
+            aria-label="Nutzername speichern"
+          >Speichern</button>
+        </div>
+        <label class="k-label" for="sett-pw">Passwort ändern</label>
+        <div style="display:flex;gap:6px">
+          <input
+            class="k-input"
+            id="sett-pw"
+            type="password"
+            placeholder="Neues Passwort"
+            aria-label="Neues Passwort"
+            style="flex:1"
+          >
+          <button
+            class="btn btn-ok btn-sm"
+            onclick="changePw()"
+            aria-label="Passwort speichern"
+          >Speichern</button>
+        </div>
       </div>
-      <button class="btn btn-danger btn-sm" onclick="doLogout()">↩ Abmelden</button>
-    </div>`:''}`;
+      <button
+        class="btn btn-danger btn-sm"
+        onclick="doLogout()"
+        aria-label="Abmelden"
+      >↩ Abmelden</button>
+    </div>
+  ` : ''}
+  `;
 }
+
+// ── SETTINGS ──────────────────────────────────────────────────
+
+    
+async function changePw(){
+  const pw=document.getElementById('sett-pw')?.value;
+  if(!pw||pw.length<6){toast('Mind. 6 Zeichen');return;}
+  try{await sb.auth.updateUser({password:pw});toast('✓ Passwort geändert');}catch(e){toast('Fehler: '+e.message);}
+}
+function saveNvKey(){ toast('KI-Schlüssel werden serverseitig verwaltet'); }
+
 
 function getUserAvatar(user, size = 24) {
   const defaultIcon = `
@@ -4455,11 +4492,11 @@ async function viewFriendProfile(uid,username){
     const el=document.getElementById('profile-content');
     const av=p?.avatar_url?`<img src="${p.avatar_url}">`:(username||'?')[0].toUpperCase();
     el.innerHTML=`
-      <button class="btn btn-sm btn-ghost" onclick="renderProfile()" style="margin-bottom:12px">← Zurück</button>
+      <button class="btn btn-sm btn-ghost" onclick="loadFriendPanel()" style="margin-bottom:12px">← Zurück</button>
       <div class="profile-hero">
         <div class="profile-av">${av}</div>
         <div style="flex:1">
-          <div style="font-size:20px;font-weight:800;margin-bottom:4px">${p?.username||username}</div>
+          <div style="font-size:20px;font-weight:8C00;margin-bottom:4px">${p?.username||username}</div>
           <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px">
             <div style="text-align:center"><div style="font-size:18px;font-weight:700;color:var(--lime)">${(p?.xp_total||0).toLocaleString()}</div><div style="font-size:9px;color:var(--muted)">XP</div></div>
             <div style="text-align:center"><div style="font-size:18px;font-weight:700;color:var(--orange)">${p?.streak||0}</div><div style="font-size:9px;color:var(--muted)">Streak</div></div>
@@ -4489,11 +4526,13 @@ function handlePhotoFile(inp){
   };
   reader.readAsDataURL(file);
 }
+
 function handlePhotoDrop(e){
   e.preventDefault(); document.getElementById('drop-zone').classList.remove('drag-over');
   const file=e.dataTransfer.files[0]; if(!file)return;
   const inp=document.getElementById('photo-file-inp'); const dt=new DataTransfer(); dt.items.add(file); inp.files=dt.files; handlePhotoFile(inp);
 }
+
 async function doPhotoScan(){
   if(!photoBase64){toast('Bitte zuerst ein Bild hochladen');return;}
   const poolName=(document.getElementById('photo-pool-name')?.value||'Foto-Import').trim();
@@ -4516,58 +4555,6 @@ async function doPhotoScan(){
   }catch(e){status.textContent='⚠ Fehler: '+e.message; status.style.color='var(--danger)';}
   btn.disabled=false; btn.textContent='🔍 KI scannen';
 }
-
-// ── SETTINGS ──────────────────────────────────────────────────
-function openSettings(){
-  const el=document.getElementById('settings-content'); if(!el)return;
-  el.innerHTML=`
-    <div class="auth-tabs" style="margin-bottom:14px">
-      <button class="auth-tab active" onclick="this.parentElement.querySelectorAll('.auth-tab').forEach(b=>b.classList.remove('active'));this.classList.add('active');document.getElementById('sett-account').style.display='block';document.getElementById('sett-cl').style.display='none'">Konto</button>
-      <button class="auth-tab" onclick="this.parentElement.querySelectorAll('.auth-tab').forEach(b=>b.classList.remove('active'));this.classList.add('active');document.getElementById('sett-account').style.display='none';document.getElementById('sett-cl').style.display='block';loadChangelog()">Versions-Log</button>
-    </div>
-    <div id="sett-account">
-      ${currentUser?`
-      <div class="k-group"><label class="k-label">Angemeldet als</label><div style="padding:8px 12px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--r-sm);font-size:12px;color:var(--text)">${currentUser.email}</div></div>
-      <div class="k-group"><label class="k-label">Passwort ändern</label><input class="k-input" id="sett-pw" type="password" placeholder="Neues Passwort"><button class="btn btn-sm btn-ok" style="margin-top:6px" onclick="changePw()">Speichern</button></div>`:'<div style="font-size:11px;color:var(--muted);margin-bottom:12px">Nicht angemeldet</div>'}
-      
-      <div class="k-group"><label class="k-label">Tägliche Ziele</label><div style="font-size:11px;color:var(--muted);line-height:1.5">Statt eines XP-Ziels gibt es nun <strong>Daily Quests</strong> mit konkreten Aufgaben und automatischen Belohnungen. <a onclick="closeModal('settings-modal');goTo('challenges')" style="color:var(--lime);cursor:pointer;text-decoration:underline">Quests ansehen →</a></div></div>
-      ${currentUser?`<div style="display:flex;gap:8px;margin-top:10px"><button class="btn btn-danger btn-sm" onclick="doLogout();closeModal('settings-modal')">↩ Abmelden</button></div>`:''}
-    </div>
-    <div id="sett-cl" style="display:none">
-      <div id="cl-list" style="font-size:12px;color:var(--muted);text-align:center;padding:20px">Lade Versions-Log…</div>
-    </div>`;
-  openModal('settings-modal');
-}
-
-async function loadChangelog(){
-  const list=document.getElementById('cl-list'); if(!list)return;
-  try{
-    const {data,error}=await sb.from('changelog').select('*').order('released_at',{ascending:false}).order('sort_order',{ascending:true}).limit(200);
-    if(error)throw error;
-    if(!data||!data.length){list.innerHTML='<div style="font-size:11px;color:var(--muted);text-align:center;padding:20px">Noch keine Einträge</div>';return;}
-    // Gruppieren nach Version
-    const groups={};
-    const order=[];
-    data.forEach(row=>{
-      const key=row.version+'|'+(row.label||'');
-      if(!groups[key]){groups[key]={version:row.version,label:row.label,items:[]};order.push(key);}
-      groups[key].items.push(row);
-    });
-    list.innerHTML=order.map(k=>{
-      const g=groups[k];
-      return `<div class="cl-entry"><div class="cl-ver"><span class="cl-ver-num">v${g.version}</span>${g.label?`<span class="cl-badge">${g.label}</span>`:''}</div>${g.items.map(it=>`<div class="cl-item"><div class="cl-dot ${it.entry_type==='fix'?'fix':it.entry_type==='remove'?'remove':''}"></div><span>${it.text}</span></div>`).join('')}</div>`;
-    }).join('');
-  }catch(e){
-    list.innerHTML='<div style="font-size:11px;color:var(--danger);text-align:center;padding:20px">Fehler beim Laden: '+(e.message||e)+'</div>';
-  }
-}
-
-async function changePw(){
-  const pw=document.getElementById('sett-pw')?.value;
-  if(!pw||pw.length<6){toast('Mind. 6 Zeichen');return;}
-  try{await sb.auth.updateUser({password:pw});toast('✓ Passwort geändert');}catch(e){toast('Fehler: '+e.message);}
-}
-function saveNvKey(){ toast('KI-Schlüssel werden serverseitig verwaltet'); }
 
 // ── AUTH ──────────────────────────────────────────────────────
 function _authShow(which){
