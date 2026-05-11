@@ -1,0 +1,9 @@
+﻿{
+  "id": "spanisch-grundlagen",
+  "title": "Spanisch",
+  "description": "Beispielstruktur fuer Spanisch-Inhalte in Kivo.",
+  "lessons": [
+    "lektionen/definitionen.json",
+    "lektionen/vokabeln.json"
+  ]
+}

@@ -1,0 +1,9 @@
+﻿{
+  "id": "mathe-grundlagen",
+  "title": "Mathe",
+  "description": "Beispielstruktur fuer Mathe-Inhalte in Kivo.",
+  "lessons": [
+    "lektionen/definitionen.json",
+    "lektionen/vokabeln.json"
+  ]
+}

@@ -1,0 +1,9 @@
+﻿{
+  "id": "deutsch-grundlagen",
+  "title": "Deutsch",
+  "description": "Beispielstruktur fuer Deutsch-Inhalte in Kivo.",
+  "lessons": [
+    "lektionen/definitionen.json",
+    "lektionen/wortarten.json"
+  ]
+}
