@@ -2892,23 +2892,37 @@ function renderAiSessionMessages(session) {
         try {
           const vocabData = JSON.parse(vocabBlock.vocabRaw);
           const importEnc = encodeURIComponent(JSON.stringify(vocabData));
+          const introText = (vocabBlock.displayText || '').trim();
 
-          div.innerHTML = `
-            <div style="display:flex;flex-direction:column;align-items:flex-start;width:100%">
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-                <span style="color:var(--lime);display:flex;align-items:center">✓</span>
-                <span style="font-size:13px;font-weight:600">
-                  Vokabelliste: "${escapeHtml(vocabData.name || 'Unbenannt')}" (${vocabData.pairs?.length || 0} Wörter)
-                </span>
-              </div>
-              <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
-                <button class="btn btn-lime btn-sm"
-                        onclick="importAiList('${importEnc}')">
-                  📥 Direkt importieren
-                </button>
-              </div>
-            </div>
-          `;
+          if (introText) {
+            const introDiv = document.createElement('div');
+            introDiv.className = 'ai-msg bot';
+            introDiv.innerHTML = renderMarkdown(vocabBlock.displayText);
+            renderLatex(introDiv);
+            highlightCode(introDiv);
+            msgs.appendChild(introDiv);
+          }
+
+          const cardDiv = document.createElement('div');
+          cardDiv.className = 'ai-msg bot ai-vocab-result';
+          const importBtnId = aiUid('import');
+          cardDiv.innerHTML = makeLoadingHTML(
+            `Vokabelliste: "${vocabData.name || 'Unbenannt'}" (${vocabData.pairs?.length || 0} Wörter)`,
+            undefined,
+            'done',
+            `
+              <button class="btn btn-lime btn-sm" data-import-btn="${importBtnId}">
+                📥 Direkt importieren
+              </button>
+            `
+          );
+          msgs.appendChild(cardDiv);
+
+          const importBtn = cardDiv.querySelector(`[data-import-btn="${importBtnId}"]`);
+          if (importBtn) {
+            importBtn.addEventListener('click', () => importAiList(importEnc));
+          }
+          continue;
         } catch (e) {
           console.error('[AI] Fehler beim Parsen der Vokabelliste:', e);
           div.innerHTML = renderMarkdown(m.content);
@@ -2959,6 +2973,7 @@ async function streamWelcomeMessage({ noStream = false } = {}) {
 
   if (noStream) {
     session.messages.push({ role: 'assistant', content: text, kind: 'welcome', streaming: false });
+    aiBotHistory.push({ role: 'assistant', content: text, kind: 'welcome' });
     session.updatedAt = aiNow();
     aiSaveChatSessions();
 
@@ -2984,6 +2999,11 @@ async function streamWelcomeMessage({ noStream = false } = {}) {
     content: '',
     kind: 'welcome',
     streaming: true
+  });
+  aiBotHistory.push({
+    role: 'assistant',
+    content: '',
+    kind: 'welcome'
   });
   session.streaming = {
     active: true,
@@ -3056,7 +3076,7 @@ function aiBotSend(preset) {
   msgs.appendChild(loadingDiv);
   msgs.scrollTop = msgs.scrollHeight;
 
-  const assistantIndex = aiBotHistory.length;
+  const assistantIndex = session.messages.length;
   const assistantMsg = {
     role: 'assistant',
     content: '',
@@ -3575,6 +3595,47 @@ function initAiChatPersistence() {
   });
 }
 
+async function importAiList(encOrRaw) {
+  try {
+    let raw = encOrRaw;
+    try {
+      raw = decodeURIComponent(encOrRaw);
+    } catch (_) {
+      // schon raw
+    }
+    const p = typeof raw === 'string' ? JSON.parse(raw) : raw;
+    const lang = p.lang || 'KI-Import';
+    const name = p.name || 'KI-Liste';
+    const pairs = p.pairs || [];
+    if (!pairs.length) {
+      toast('Keine Vokabeln');
+      return;
+    }
+    const poolData = {
+      subcats: {
+        [name]: pairs.map(x => [x.en, x.de])
+      }
+    };
+    if (!POOLS[lang]) POOLS[lang] = {};
+    POOLS[lang][name] = poolData;
+    saveCustom();
+    if (currentUser) {
+      await syncPoolToServer(lang, name);
+    }
+    loadState();
+    toast(`✓ "${name}" mit ${pairs.length} Wörtern importiert!`);
+    confirm2(
+      'Pool wechseln?',
+      `Zu "${name}" wechseln und lernen?`,
+      () => {
+        setActivePool(mkKey(lang, name));
+        goTo('cards');
+      }
+    );
+  } catch (e) {
+    toast('Fehler: ' + e.message);
+  }
+}
 
 
 // ── PROFILE ───────────────────────────────────────────────────
