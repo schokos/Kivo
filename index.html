@@ -1980,8 +1980,15 @@ async function syncPoolToServer(lang,name) {
 }
 
 function deletePool(key) {
-  confirm2('Pool löschen?','Alle Fortschritte für diesen Pool werden entfernt.',()=>{
+  confirm2('Pool löschen?','Alle Fortschritte für diesen Pool werden entfernt.',async ()=>{
     const {l,p}=spKey(key);
+    try {
+      const { error } = await sb.from('pools').delete().eq('id', currentUser.id+'_'+esc(mkKey(l,p)));
+      if (error) throw error;
+    } catch(e) {
+      toast('Löschen in der Cloud fehlgeschlagen: '+e.message);
+      return;
+    }
     delete POOLS[l][p]; if(!Object.keys(POOLS[l]).length)delete POOLS[l];
     saveCustom(); if(activeKey===key){const lk=Object.keys(POOLS)[0];activeKey=mkKey(lk,Object.keys(POOLS[lk])[0]);}
     buildVocab(); renderOverview(); toast('Pool gelöscht');
