@@ -164,12 +164,18 @@ async function hydrateSession(session){
     const mergedUsername = lsGet('kivo_username','""') || prof?.username || session.user.user_metadata?.username || session.user.email?.split('@')[0] || 'User';
     lsSet('kivo_username', mergedUsername);
 
+    const serverThemeMode = window.KivoTheme?.normalizeMode?.(prof?.chat_data?.settings?.theme_mode || 'system') || 'system';
+    const rawLocalThemeMode = lsGet('kivo_theme_mode','"system"');
+    const localThemeMode = window.KivoTheme?.normalizeMode?.(rawLocalThemeMode || 'system') || 'system';
+    const mergedThemeMode = localThemeMode || serverThemeMode || 'system';
+    window.KivoTheme?.setThemeMode?.(mergedThemeMode, {persist:true});
+
     const mergedAvatarData = lsGet('kivo_avatar_data','null') || prof?.avatar_data || null;
     if(mergedAvatarData) lsSet('kivo_avatar_data', mergedAvatarData);
     const mergedAvatarUrl = getScopedString('kivo_avatar_url','') || prof?.avatar_url || '';
     if(mergedAvatarUrl) lsSet('kivo_avatar_url', mergedAvatarUrl);
 
-    currentUser={id:uid,email:session.user.email,username:mergedUsername,is_dev:!!prof?.is_dev,avatar_data:mergedAvatarData||null,avatar_url:mergedAvatarUrl||null};
+    currentUser={id:uid,email:session.user.email,username:mergedUsername,is_dev:!!prof?.is_dev,avatar_data:mergedAvatarData||null,avatar_url:mergedAvatarUrl||null,theme_mode:mergedThemeMode};
     if(prof?.is_dev){document.getElementById('rb-coding')?.style.setProperty('display','flex');}
 
     const{data:poolRows}=await sb.from('pools').select('*').eq('user_id',uid);
@@ -204,9 +210,17 @@ async function hydrateSession(session){
     const localChats = lsGet(AI_CHAT_STORAGE_KEY,'{}') || {};
     const serverChats = chatProf?.chat_data && typeof chatProf.chat_data==='object' ? chatProf.chat_data : {};
     const mergedChats = _mergeChatPayload(serverChats, localChats);
-    lsSet(AI_CHAT_STORAGE_KEY, mergedChats);
+    const mergedChatData = {
+      ...serverChats,
+      ...mergedChats,
+      settings: {
+        ...(serverChats?.settings && typeof serverChats.settings === 'object' ? serverChats.settings : {}),
+        theme_mode: mergedThemeMode,
+      },
+    };
+    lsSet(AI_CHAT_STORAGE_KEY, mergedChatData);
     lsSet(AI_CHAT_ACTIVE_KEY, mergedChats.activeId || '');
-    if(JSON.stringify(mergedChats)!==JSON.stringify(serverChats)) syncChats();
+    if(JSON.stringify(mergedChatData)!==JSON.stringify(serverChats)) syncChats();
 
     const profileChanged =
       mergedCoins !== serverCoins ||
@@ -215,7 +229,8 @@ async function hydrateSession(session){
       JSON.stringify(mergedXp) !== JSON.stringify(serverXp) ||
       mergedUsername !== (prof?.username || session.user.user_metadata?.username || session.user.email?.split('@')[0] || 'User') ||
       mergedAvatarUrl !== (prof?.avatar_url || '') ||
-      JSON.stringify(mergedAvatarData || null) !== JSON.stringify(prof?.avatar_data || null);
+      JSON.stringify(mergedAvatarData || null) !== JSON.stringify(prof?.avatar_data || null) ||
+      mergedThemeMode !== serverThemeMode;
     if(profileChanged) syncProfile();
 
     loadState();
@@ -223,6 +238,8 @@ async function hydrateSession(session){
     checkPendingFriendReqs();
   } else {
     currentUser=null;
+    const fallbackMode = window.KivoTheme?.normalizeMode?.(lsGet('kivo_theme_mode','"system"') || 'system') || 'system';
+    window.KivoTheme?.setThemeMode?.(fallbackMode, {persist:true});
     updateUserUi(null);
     loadState();
   }

@@ -281,6 +281,13 @@ function renderProfile(targetUser=null) {
             aria-label="Passwort speichern"
           >Speichern</button>
         </div>
+        <label class="k-label" for="sett-theme">Designmodus</label>
+        <select class="k-input" id="sett-theme" aria-label="Designmodus" onchange="changeThemeMode(this.value)">
+          <option value="light" ${window.KivoTheme?.getThemeMode?.()==='light'?'selected':''}>Light</option>
+          <option value="dark" ${window.KivoTheme?.getThemeMode?.()==='dark'?'selected':''}>Dark</option>
+          <option value="system" ${window.KivoTheme?.getThemeMode?.()!=='light'&&window.KivoTheme?.getThemeMode?.()!=='dark'&&window.KivoTheme?.getThemeMode?.()!=='auto'?'selected':''}>System</option>
+          <option value="auto" ${window.KivoTheme?.getThemeMode?.()==='auto'?'selected':''}>Auto (Sonnenauf/-untergang)</option>
+        </select>
       </div>
       <button
         class="btn btn-danger btn-sm"
@@ -299,6 +306,15 @@ async function changePw(){
   const pw=document.getElementById('sett-pw')?.value;
   if(!pw||pw.length<6){toast('Mind. 6 Zeichen');return;}
   try{await sb.auth.updateUser({password:pw});toast('? Passwort geändert');}catch(e){toast('Fehler: '+e.message);}
+}
+function changeThemeMode(mode){
+  const normalized = window.KivoTheme?.normalizeMode?.(mode) || 'system';
+  window.KivoTheme?.setThemeMode?.(normalized, {persist:true});
+  if(currentUser){
+    currentUser.theme_mode = normalized;
+    syncProfile();
+  }
+  toast('Theme aktualisiert');
 }
 function saveNvKey(){ toast('KI-Schlüssel werden serverseitig verwaltet'); }
 

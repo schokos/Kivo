@@ -114,6 +114,17 @@ async function _syncProfileToServer(){
     const avatarUrl = getScopedString('kivo_avatar_url', '') || currentUser.avatar_url || '';
     const avatarData = currentUser.avatar_data || null;
     const username = currentUser.username || '';
+    const themeMode = window.KivoTheme?.normalizeMode?.(lsGet('kivo_theme_mode','"system"') || currentUser.theme_mode || 'system') || 'system';
+    const { data:profileRow, error:profileErr } = await sb.from('profiles').select('chat_data').eq('id', currentUser.id).maybeSingle();
+    if(profileErr) throw profileErr;
+    const baseChatData = profileRow?.chat_data && typeof profileRow.chat_data === 'object' ? profileRow.chat_data : {};
+    const chatDataWithTheme = {
+      ...baseChatData,
+      settings: {
+        ...(baseChatData.settings && typeof baseChatData.settings === 'object' ? baseChatData.settings : {}),
+        theme_mode: themeMode,
+      },
+    };
     const payload = {
       username,
       avatar_url: avatarUrl || null,
@@ -124,12 +135,14 @@ async function _syncProfileToServer(){
       currency,
       items: Array.isArray(items)?items:[],
       pass_data: passData,
+      chat_data: chatDataWithTheme,
       updated_at: new Date().toISOString(),
     };
     const { error } = await sb.from('profiles').update(payload).eq('id', currentUser.id);
     if(error) throw error;
     currentUser.avatar_data = avatarData || currentUser.avatar_data || null;
     currentUser.avatar_url = avatarUrl || currentUser.avatar_url || null;
+    currentUser.theme_mode = themeMode;
     return true;
   }catch(e){
     console.warn('[SYNC] profile failed', e);
@@ -210,10 +223,19 @@ async function _syncChatsToServer(){
     if(error) throw error;
     const serverPayload = prof?.chat_data && typeof prof.chat_data==='object' ? prof.chat_data : {};
     const merged = _mergeChatPayload(serverPayload, localPayload);
-    const { error:updErr } = await sb.from('profiles').update({chat_data:merged, updated_at:new Date().toISOString()}).eq('id',currentUser.id);
+    const themeMode = window.KivoTheme?.normalizeMode?.(lsGet('kivo_theme_mode','"system"') || currentUser.theme_mode || serverPayload?.settings?.theme_mode || 'system') || 'system';
+    const nextChatData = {
+      ...serverPayload,
+      ...merged,
+      settings: {
+        ...(serverPayload?.settings && typeof serverPayload.settings === 'object' ? serverPayload.settings : {}),
+        theme_mode: themeMode,
+      },
+    };
+    const { error:updErr } = await sb.from('profiles').update({chat_data:nextChatData, updated_at:new Date().toISOString()}).eq('id',currentUser.id);
     if(updErr) throw updErr;
-    lsSet(AI_CHAT_STORAGE_KEY, merged);
-    lsSet(AI_CHAT_ACTIVE_KEY, merged.activeId || '');
+    lsSet(AI_CHAT_STORAGE_KEY, nextChatData);
+    lsSet(AI_CHAT_ACTIVE_KEY, nextChatData.activeId || '');
     return true;
   }catch(e){
     console.warn('[SYNC] chats failed', e);

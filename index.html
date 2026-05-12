@@ -1,84 +1,569 @@
 ﻿<!DOCTYPE html>
-<html lang="de">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#121712">
-  <title>Kivo</title>
-  <style>
-    :root {
-      --bg:#121712;
-      --panel:#19201C;
-      --panel-2:#262E2A;
-      --line:#2E3A34;
-      --text:#E8EBE3;
-      --muted:#969E96;
-      --primary:#6BB592;
-      --primary-strong:#36544A;
-    }
-    * { box-sizing:border-box; margin:0; padding:0; }
-    body {
-      font-family:Inter, "Segoe UI", Arial, sans-serif;
-      min-height:100vh;
-      background:radial-gradient(circle at top left, rgba(107,181,146,.18), transparent 34%), radial-gradient(circle at bottom right, rgba(156,207,183,.12), transparent 28%), var(--bg);
-      color:var(--text);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:32px;
-    }
-    .shell { width:min(1120px,100%); display:grid; grid-template-columns:1.2fr .8fr; gap:24px; }
-    .card { background:linear-gradient(180deg, rgba(25,32,28,.96), rgba(18,23,18,.96)); border:1px solid var(--line); border-radius:24px; padding:28px; box-shadow:0 28px 60px rgba(0,0,0,.28); }
-    .hero { display:flex; flex-direction:column; gap:20px; }
-    .logo { width:68px; height:68px; object-fit:contain; }
-    h1 { font-size:48px; line-height:1; }
-    p { color:var(--muted); line-height:1.6; }
-    .actions, .links { display:flex; flex-wrap:wrap; gap:12px; }
-    .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; border-radius:999px; padding:12px 18px; text-decoration:none; border:1px solid var(--line); color:var(--text); background:var(--panel-2); font-weight:700; }
-    .btn.primary { background:linear-gradient(135deg, var(--primary), var(--primary-strong)); color:#121712; border:none; }
-    .list { display:grid; gap:12px; }
-    .item { padding:14px 16px; border-radius:16px; border:1px solid var(--line); background:rgba(38,46,42,.55); }
-    .item strong { display:block; margin-bottom:4px; }
-    .item small { color:var(--muted); }
-    .item a { color:#9CCFB7; text-decoration:none; }
-    code { color:#9CCFB7; }
-    @media (max-width: 900px) { .shell { grid-template-columns:1fr; } h1 { font-size:38px; } }
-  </style>
-</head>
+<html lang="de"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1E1E1E">
+<title>Kivo</title>
+<script>
+  (function () {
+    try {
+      var raw = localStorage.getItem("kivo_theme_mode");
+      var mode = raw ? JSON.parse(raw) : "system";
+      if (!["light", "dark", "system", "auto"].includes(mode)) mode = "system";
+      var effective = "light";
+      if (mode === "dark") effective = "dark";
+      else if (mode === "light") effective = "light";
+      else if (mode === "auto") {
+        var h = new Date().getHours();
+        effective = h >= 7 && h < 19 ? "light" : "dark";
+      } else if (window.matchMedia) {
+        effective = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      document.documentElement.dataset.theme = effective;
+      var meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) meta.setAttribute("content", effective === "dark" ? "#121712" : "#EFF1F0");
+    } catch (error) {}
+  })();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.8/dist/purify.min.js"></script>
+
+<link rel="stylesheet"
+ href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+
+<script defer
+ src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+
+<script defer
+ src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<link rel="stylesheet" href="src/styles/main.css">
 <body>
-  <main class="shell">
-    <section class="card hero">
-      <img class="logo" src="assets/logo.png" alt="Kivo Logo">
-      <div>
-        <h1>Kivo</h1>
-        <p>Die Hauptplattform lebt jetzt sauber in <code>app.html</code>. Fachinhalte sind als <code>Fächer → Kurse → Lektionen</code> gedacht, und einzelne Lektionen koennen als eigene, unabhaengige HTML-Module in <code>src/data/subjects/.../courses/.../lessons/</code> stehen.</p>
+
+<!-- ── SHELL ─────────────────────────────────────────────────────── -->
+<div class="shell">
+
+  <!-- RAIL (desktop sidebar icons) -->
+  <nav class="rail" id="rail">
+    <div class="rail-top">
+      <button class="brand-btn" onclick="goTo('home')" title="Kivo" aria-label="Kivo"></button>
+      <button class="rail-btn active" id="rb-home" data-s="home" onclick="goTo('home')" title="Dashboard"><span class="rail-ico"><svg viewBox="0 0 24 24"><path d="M3 12 12 3l9 9"></path><path d="M5 10v10h14V10"></path><path d="M10 20v-6h4v6"></path></svg></span><span class="rail-lbl">Dashboard</span></button>
+      <button class="rail-btn" id="rb-courses" data-s="courses" onclick="goTo('courses')" title="Fächer"><span class="rail-ico"><svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2V5z"></path><path d="M8 7h8M8 11h8M8 15h5"></path></svg></span><span class="rail-lbl">Fächer</span></button>
+      <button class="rail-btn" id="rb-challenges" data-s="challenges" onclick="goTo('challenges')" title="Challenges"><span class="rail-ico"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8.5-8 9-4.5-.5-8-4-8-9V6l8-3z"></path><path d="m9 12 2 2 4-4"></path></svg></span><span class="rail-lbl">Challenges</span></button>
+      <button class="rail-btn" id="rb-community" data-s="community" onclick="goTo('community')" title="Community"><span class="rail-ico"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"></circle><circle cx="17" cy="9.5" r="2.4"></circle><path d="M3 19c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"></path><path d="M15 19c0-2.3 1.6-4 3.5-4s2.5 1.3 2.5 3"></path></svg></span><span class="rail-lbl">Community</span></button>
+      <button class="rail-btn" id="rb-pass" data-s="pass" onclick="goTo('pass')" title="Lern-Pass"><span class="rail-ico"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8.5-8 9-4.5-.5-8-4-8-9V6l8-3z"></path><path d="m9 12 2 2 4-4"></path></svg></span><span class="rail-lbl">Lern-Pass</span></button>
+      <button class="rail-btn" id="rb-shop" data-s="shop" onclick="goTo('shop')" title="Belohnungen"><span class="rail-ico"><svg viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6L5 8z"></path><path d="M9 8V6a3 3 0 0 1 6 0v2"></path><path d="M9 12v2M15 12v2"></path></svg></span><span class="rail-lbl">Belohnungen</span></button>
+    </div>
+    <div class="rail-bot">
+      <button class="rail-btn" id="rb-github" data-s="github"
+      onclick="(async()=>{ 
+        const ok = await confirm2(
+          'URL öffnen?',
+          'Möchten Sie https://github.com/schokos/Kivo/issues wirklich öffnen?'
+        );
+        if(ok){
+          window.open('https://github.com/schokos/Kivo/issues', '_blank');
+        }
+      })()"
+      title="GitHub">
+        <span class="rail-ico">
+          <img src="assets/GitHub_Logos/SVG/GitHub_Invertocat_White_Clearspace.svg" alt="GitHub" width="24" height="24">
+        </span>
+        <span class="rail-lbl">GitHub</span>
+      </button>
+      <button class="rail-btn" id="rb-aibot" data-s="aibot" onclick="goTo('aibot')" title="KI-Assistent"><span class="rail-ico"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H8l-4 4V5z"></path><circle cx="9" cy="10.5" r="1.1" fill="currentColor" stroke="none"></circle><circle cx="15" cy="10.5" r="1.1" fill="currentColor" stroke="none"></circle></svg>
+      </span><span class="rail-lbl">KI-Assistent</span></button>
+      <button class="rail-btn" id="rb-profile" data-s="profile" onclick="goTo('profile')" title="Profil"><span class="rail-ico" id="profile-rail-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"></path></svg></span><span class="rail-lbl">Profil</span></button>
+    </div>
+  </nav>
+
+  <!-- MAIN AREA -->
+  <div class="main-area">
+
+    <div class="user-menu" id="user-menu">
+      <div class="um-name" id="um-name">Gast</div>
+      <div class="um-email" id="um-email"></div>
+      <div class="um-item" onclick="closeUserMenu();openModal('auth-modal')"><svg class="um-ico" viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg><span>Anmelden</span></div>
+      <div class="um-sep"></div>
+      <div class="um-item" onclick="closeUserMenu();goTo('profile')"><svg class="um-ico" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><span>Mein Profil</span></div>
+      <div class="um-item" onclick="closeUserMenu();goTo('pass')"><svg class="um-ico" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8.5-8 9-4.5-.5-8-4-8-9V6l8-3z"></path><path d="m9 12 2 2 4-4"></path></svg><span>Lern-Pass</span></div>
+      <div class="um-item" onclick="closeUserMenu();goTo('shop')"><svg class="um-ico" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg><span>Shop</span></div>
+      <div class="um-sep"></div>
+      <div class="um-item" onclick="closeUserMenu();openModal('photo-modal')"><svg class="um-ico" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg><span>Foto-Import</span></div>
+      <div class="um-item" id="um-avatar-builder" onclick="closeUserMenu();openAvatarBuilder()"><svg class="um-ico" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-7 8-7s8 3 8 7"></path><circle cx="18" cy="6" r="2.5" fill="currentColor" stroke="none"></circle></svg><span>Avatar gestalten</span></div>
+      <div class="um-sep"></div>
+      <div class="um-item" id="um-logout" style="display:none;color:var(--danger)" onclick="doLogout()"><svg class="um-ico" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg><span>Abmelden</span></div>
+    </div>
+    <div class="topbar">
+      <div class="tb-left">
+        <div class="tb-title" id="tb-title">Dashboard</div>
       </div>
-      <div class="actions">
-        <a class="btn primary" href="app.html">Zur Lernplattform</a>
-        <a class="btn" href="docs/github-pages-checkliste.md">GitHub Pages Hinweise</a>
+      <div class="tb-right">
+        <div class="pool-pill" id="streak-pill">
+          <span class="dash-ico" style="color:#6AC28A">
+            <svg viewBox="0 0 24 24"><path d="M12 2c1 4 5 5 5 10a5 5 0 1 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3 1-6 1-9z"></path></svg>
+          </span>
+          <span id="topbar-streak">0</span>
+        </div>
+        <div class="pool-pill" id="currency-pill" style="display:none">
+          <span class="dash-ico gem">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 6v12M9 9h4.5a2 2 0 0 1 0 4H9.5a2 2 0 0 0 0 4H15"/></svg>
+          </span>
+          <span id="currency-val">0</span>
+        </div>
+        <button class="friend-btn" onclick="openFriendPanel()" title="Freunde">
+          <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"></circle><circle cx="17" cy="9.5" r="2.4"></circle><path d="M3 19c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"></path><path d="M15 19c0-2.3 1.6-4 3.5-4s2.5 1.3 2.5 3"></path></svg>
+          <span class="friend-notif" id="friend-notif"></span>
+        </button>
+        <div class="avatar-btn" id="avatar-btn" onclick="event.stopPropagation();toggleUserMenu()" title="Profilmenü"></div>
       </div>
-    </section>
-    <section class="card">
-      <div class="list">
-        <div class="item">
-          <strong>Haupt-App</strong>
-          <small><a href="app.html">app.html</a> enthaelt Dashboard, Community, Profil, Fächer und globale Funktionen.</small>
+    </div>
+
+    <!-- SCREENS -->
+    <div class="screens">
+
+      <!-- HOME ─────────────────────────────────── -->
+      <div class="screen active" id="screen-home">
+        <div class="home-welcome">
+          <div>
+            <div class="home-title">Hallo, <span id="home-user-name">Lerner</span>!</div>
+            <div class="home-kicker">Weiter so! Dein Wissen wächst.</div>
+          </div>
         </div>
-        <div class="item">
-          <strong>Mathe</strong>
-          <small>Fach mit Kursen wie Algebra, Geometrie und Funktionen. Beispiele: <a href="src/data/subjects/mathe/courses/geometrie/lessons/geogebra/index.html">GeoGebra</a>, <a href="src/data/subjects/mathe/courses/funktionen/lessons/funktionen-plotter/index.html">Funktionen-Plotter</a>, <a href="src/data/subjects/mathe/courses/algebra/lessons/bruchrechnung/index.html">Bruchrechnung</a></small>
+
+        <div class="dashboard-grid">
+          <div class="k-card dash-card progress-card">
+            <div style="font-size:17px;font-weight:850">Fortschrittsübersicht</div>
+            <div class="progress-ring-wrap">
+              <div><div style="font-size:13px;margin-bottom:8px;color:color-mix(in srgb,#E6E6E6 78%,transparent)">Level</div><div class="level-num" id="hm-level">1</div><div style="font-size:13px;margin-top:8px;color:color-mix(in srgb,#E6E6E6 78%,transparent)"><span id="hm-xp">0</span> / <span id="hm-next-xp">500</span> XP</div></div>
+              <div class="ring" id="hm-ring"></div>
+            </div>
+          </div>
+          <div class="k-card dash-card challenge-card">
+            <div style="font-size:17px;font-weight:850;margin-bottom:8px">Tägliche Quests</div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:14px">Erledige alle 3, um deine Belohnungen einzusacken.</div>
+            <div style="font-size:30px;font-weight:900;margin-bottom:6px"><span id="hm-k">0</span> / <span id="hm-t">3</span></div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:10px">Quests heute erledigt</div>
+            <div class="daily-goal-bar"><div class="daily-goal-fill" id="hm-bar" style="width:0%"></div></div>
+            <button class="btn btn-lime" style="margin-top:22px" onclick="goTo('challenges')">Zu den Quests</button>
+          </div>
+          <div class="k-card dash-card">
+            <div style="font-size:17px;font-weight:850">Empfohlenes Fach</div>
+            <div class="course-visual"></div>
+            <div style="font-size:13px;font-weight:850" id="home-pool-name">–</div>
+            <button class="course-link btn btn-ghost" style="width:100%;margin-top:8px" onclick="goTo('courses')"><span>Weiterlernen ❯</span><span>›</span></button>
+          </div>
         </div>
-        <div class="item">
-          <strong>Deutsch</strong>
-          <small>Fach mit Kursen wie Vokabeln und Grammatik. Beispiele: <a href="src/data/subjects/deutsch/courses/vokabeln/lessons/wortschatz/index.html">Wortschatz</a> und <a href="src/data/subjects/deutsch/courses/grammatik/lessons/grammatik-grundlagen/index.html">Grammatik-Grundlagen</a></small>
+
+        <div class="course-grid-head">
+          <div style="font-size:18px;font-weight:900">Fächer entdecken</div>
+          <button class="btn btn-ghost btn-sm" onclick="goTo('courses')">Alle anzeigen</button>
         </div>
-        <div class="item">
-          <strong>Spanisch</strong>
-          <small>Fach mit Kursen wie Vokabeln und Grammatik. Beispiele: <a href="src/data/subjects/spanisch/courses/vokabeln/lessons/vokabeln-a1/index.html">Vokabeln A1</a> und <a href="src/data/subjects/spanisch/courses/grammatik/lessons/verben/index.html">Verben</a></small>
+        <div class="course-grid">
+          <div class="course-tile" onclick="goTo('cards')"><div class="tile-icon"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="14" height="16" rx="2"></rect><path d="M7 5V3h10a4 4 0 0 1 4 4v12"></path></svg></div><div class="tile-title">Karteikarten</div><div class="tile-sub">Schnell wiederholen</div></div>
+          <div class="course-tile" onclick="goTo('quiz')"><div class="tile-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.8.4-1 .9-1 1.7"></path><circle cx="12" cy="17" r=".6" fill="currentColor"></circle></svg></div><div class="tile-title">Quiz</div><div class="tile-sub">Wissen testen</div></div>
+          <div class="course-tile" onclick="goTo('typing')"><div class="tile-icon"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"></rect><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"></path></svg></div><div class="tile-title">Tippen</div><div class="tile-sub">Aktiv erinnern</div></div>
+          <div class="course-tile" onclick="goTo('matching')"><div class="tile-icon"><svg viewBox="0 0 24 24"><path d="M20.5 11H19V7a2 2 0 0 0-2-2h-4V3.5a2.5 2.5 0 0 0-5 0V5H4a2 2 0 0 0-2 2v3.8h1.5a2.2 2.2 0 0 1 0 4.4H2V19a2 2 0 0 0 2 2h3.8v-1.5a2.2 2.2 0 0 1 4.4 0V21H17a2 2 0 0 0 2-2v-4h1.5a2.5 2.5 0 0 0 0-5z"></path></svg></div><div class="tile-title">Zuordnen</div><div class="tile-sub">Logisch verbinden</div></div>
+        </div>
+
+        <div class="k-grid" style="margin-top:18px">
+          <div class="k-card full">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+              <div><div class="k-section-title">Aktueller Pool</div><div style="font-size:13px;color:var(--muted)"><span id="hm-sr">0</span> Wiederholungen fällig · <span id="hm-goal-lbl">0 XP heute</span></div></div>
+              <div class="btn-row" style="margin-top:0"><button class="btn btn-sm" onclick="openModal('pool-modal')">Pool wählen</button><button class="btn btn-sm" onclick="openModal('photo-modal')">Foto-Import</button></div>
+            </div>
+            <div class="daily-goal-bar" style="margin-top:12px"><div class="daily-goal-fill" id="daily-goal-fill" style="width:0%"></div></div>
+            <div id="hm-sessions" style="font-size:10px;color:var(--muted);margin-top:10px">–</div>
+          </div>
         </div>
       </div>
-    </section>
-  </main>
-</body>
-</html>
+
+      <!-- Fächer ─────────────────────────────────── -->
+      <div class="screen" id="screen-courses">
+        <div class="app-page-head">
+          <div><div class="app-page-title">Fächer</div><div class="app-page-sub">Wähle zuerst ein Fach wie Spanisch oder Mathe und öffne darin Vokabeln, Grammatik oder eigenständige Lektionen.</div></div>
+          <a class="btn btn-ghost btn-sm" href="index.html">Struktur ansehen</a>
+        </div>
+        <div id="courses-content"></div>
+      </div>
+
+      <!-- CHALLENGES ────────────────────────────── -->
+      <div class="screen" id="screen-challenges">
+        <div class="app-page-head">
+          <div><div class="app-page-title">Challenges</div><div class="app-page-sub">Daily &amp; Weekly Quests — Belohnungen werden automatisch ausgezahlt.</div></div>
+        </div>
+        <div id="challenges-content"></div>
+      </div>
+
+      <!-- COMMUNITY ─────────────────────────────── -->
+      <div class="screen" id="screen-community">
+        <div class="app-page-head">
+          <div><div class="app-page-title">Community</div><div class="app-page-sub">Freunde, Global Leaderboard und Team-Vorschau.</div></div>
+          <button class="btn btn-lime btn-sm" onclick="openFriendPanel()">Freund hinzufügen</button>
+        </div>
+        <div id="community-content"></div>
+      </div>
+
+      <!-- KARTEIKARTEN ─────────────────────────── -->
+      <div class="screen" id="screen-cards">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <div style="font-size:18px;font-weight:800">Karteikarten</div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <label style="font-size:10px;color:var(--muted);display:flex;align-items:center;gap:5px;cursor:pointer">
+              <input type="checkbox" id="skip-known" onchange="initCards()"> Bekannte überspringen
+            </label>
+          </div>
+        </div>
+        <div class="fc-progress"><div class="fc-progress-fill" id="fc-prog" style="width:0%"></div></div>
+        <div class="fc-counter" id="fc-counter">0 / 0</div>
+        <div class="fc-wrap" onclick="flipCard()">
+          <div class="fc" id="fc">
+            <div class="fc-face fc-front">
+              <div class="fc-word" id="fc-front-word">–</div>
+              <div class="fc-hint">Tippe um umzudrehen</div>
+            </div>
+            <div class="fc-face fc-back">
+              <div class="fc-word" id="fc-back-word">–</div>
+              <div class="fc-hint" id="fc-cat-hint"></div>
+            </div>
+          </div>
+        </div>
+        <div class="fc-actions" id="fc-btns" style="display:none">
+          <button class="btn btn-danger btn-sm" onclick="setKnown(false)">✗ Nicht gekonnt</button>
+          <button class="btn btn-ok btn-sm" onclick="setKnown(true)">✓ Gekonnt</button>
+        </div>
+        <div class="fc-nav">
+          <button class="btn btn-sm" onclick="navCard(-1)">← Zurück</button>
+          <button class="btn btn-sm" onclick="flipCard()">↩ Umdrehen</button>
+          <button class="btn btn-sm" onclick="navCard(1)">Weiter →</button>
+        </div>
+        <div style="text-align:center;margin-top:14px;font-size:10px;color:var(--muted)">Kein XP für Karteikarten — nutze Quiz oder Tippen für XP</div>
+      </div>
+
+      <!-- QUIZ ─────────────────────────────────── -->
+      <div class="screen" id="screen-quiz">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <div style="font-size:18px;font-weight:800">Quiz</div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <label style="font-size:10px;color:var(--muted);display:flex;align-items:center;gap:5px;cursor:pointer">
+              <input type="checkbox" id="quiz-d2e"> Übersetzungsrichtung ↔
+            </label>
+          </div>
+        </div>
+        <div id="quiz-area"></div>
+      </div>
+
+      <!-- TIPPEN ──────────────────────────────── -->
+      <div class="screen" id="screen-typing">
+        <div style="font-size:18px;font-weight:800;margin-bottom:14px">Tippen</div>
+        <div id="typing-area"></div>
+      </div>
+
+      <!-- ZUORDNEN ────────────────────────────── -->
+      <div class="screen" id="screen-matching">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <div style="font-size:18px;font-weight:800">Zuordnen</div>
+          <div style="font-size:11px;color:var(--muted)">Gefunden: <span id="mc-cnt">0</span> / <span id="mc-tot">0</span></div>
+        </div>
+        <div id="matching-area"></div>
+      </div>
+
+      <!-- ÜBERSICHT ────────────────────────────── -->
+      <div class="screen" id="screen-overview">
+        <div class="app-page-head">
+          <div><div class="app-page-title">Meine Pools</div><div class="app-page-sub">Verwalte deine Vokabel-Pools.</div></div>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-sm btn-lime" onclick="openNewPoolModal()">+ Neuer Pool</button>
+            <button class="btn btn-sm" onclick="openModal('photo-modal')">Foto-Import</button>
+            <button class="btn btn-sm" onclick="goTo('courses')">← Zurück</button>
+          </div>
+        </div>
+        <div id="overview-content"></div>
+      </div>
+
+      <!-- STATISTIKEN ─────────────────────────── -->
+      <div class="screen" id="screen-stats">
+        <div style="font-size:18px;font-weight:800;margin-bottom:14px">Statistiken</div>
+        <div id="stats-content"></div>
+      </div>
+
+      <!-- KI-LÜCKENTEXT ───────────────────────── -->
+      <div class="screen" id="screen-gap">
+        <div style="font-size:18px;font-weight:800;margin-bottom:6px">KI-Lückentext</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:14px">KI generiert einen Text passend zu deinem Pool — füll die Lücken aus</div>
+        <div id="gap-content"></div>
+      </div>
+
+      <!-- KI-ASSISTENT ────────────────────────── -->
+      <div class="screen" id="screen-aibot">
+        <div class="app-page-head">
+          <div>
+            <div class="app-page-title">KI-Assistent</div>
+            <div class="app-page-sub">Stelle Fragen oder lass dir Lerntipps geben.</div>
+          </div>
+          <button class="btn btn-lime btn-sm" onclick="openChatModal()">Chats</button>
+        </div>
+        <div class="aibot-wrap" id="aibot-wrap"></div>
+      </div>
+
+      <!-- PROFIL ──────────────────────────────── -->
+      <div class="screen" id="screen-profile">
+        <div class="app-page-head"><div><div class="app-page-title">Mein Profil</div><div class="app-page-sub">Deine Statistiken, Avatar und Account-Einstellungen.</div></div></div>
+        <div id="profile-content"></div>
+      </div>
+
+      <!-- SHOP ────────────────────────────────── -->
+      <div class="screen" id="screen-shop">
+        <div class="app-page-head"><div><div class="app-page-title">Belohnungen</div><div class="app-page-sub">Ein Shop für Items, Badges und kosmetische Belohnungen.</div></div></div>
+        <div id="shop-content"></div>
+      </div>
+
+      <!-- PASS ────────────────────────────────── -->
+      <div class="screen" id="screen-pass">
+        <div class="app-page-head"><div><div class="app-page-title">Lern-Pass</div><div class="app-page-sub">Schalte Avatar-Items frei, indem du Level aufsteigst.</div></div></div>
+        <div id="pass-content"></div>
+      </div>
+
+    </div><!-- /screens -->
+  </div><!-- /main-area -->
+</div><!-- /shell -->
+
+<!-- BOTTOM NAV (mobile) -->
+<nav class="bottom-nav" id="bottom-nav">
+  <button class="bn-item active" data-s="home" onclick="goTo('home')"><span class="bn-icon"><svg viewBox="0 0 24 24"><path d="M3 12 12 3l9 9"></path><path d="M5 10v10h14V10"></path><path d="M10 20v-6h4v6"></path></svg></span>Dashboard</button>
+  <button class="bn-item" data-s="courses" onclick="goTo('courses')"><span class="bn-icon"><svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2V5z"></path><path d="M8 7h8M8 11h8M8 15h5"></path></svg></span>Fächer</button>
+  <button class="bn-item" data-s="aibot" onclick="goTo('aibot')"><span class="bn-icon"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H8l-4 4V5z"></path><circle cx="9" cy="10.5" r="1.1" fill="#2A1810" stroke="none"></circle><circle cx="15" cy="10.5" r="1.1" fill="#2A1810" stroke="none"></circle></svg></span>KI-Assistent</button>
+  <button class="bn-item" data-s="community" onclick="goTo('community')"><span class="bn-icon"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"></circle><circle cx="17" cy="9.5" r="2.4"></circle><path d="M3 19c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"></path><path d="M15 19c0-2.3 1.6-4 3.5-4s2.5 1.3 2.5 3"></path></svg></span>Community</button>
+  <button class="bn-item" data-s="profile" onclick="goTo('profile')"><span class="bn-icon" id="profile-nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"></path></svg></span>Profil</button>
+</nav>
+
+<!-- TOAST -->
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<!-- CONFIRM DIALOG -->
+<div class="confirm-overlay" id="confirm-overlay">
+  <div class="confirm-box">
+    <div class="confirm-title" id="confirm-title">Bestätigen</div>
+    <div class="confirm-msg" id="confirm-msg"></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-sm" onclick="document.getElementById('confirm-overlay').classList.remove('open')">Abbrechen</button>
+      <button class="btn btn-danger btn-sm" id="confirm-ok">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="auth-modal" onclick="if(event.target===this)closeModal('auth-modal')">
+  <div class="modal auth-modal">
+    <button class="auth-close" onclick="closeModal('auth-modal')" aria-label="Schließen">✕</button>
+    <div class="auth-split" id="auth-split">
+      <!-- AVATAR SIDE -->
+      <div class="auth-side">
+        <h2 id="as-title">Willkommen zurück</h2>
+        <div class="as-sub" id="as-sub">Noch kein Konto?</div>
+        <button class="as-switch" id="as-switch" onclick="authSwitchMode()">Registrieren</button>
+        <div class="av-stage" id="av-stage">
+          <svg class="av-svg" viewBox="0 0 240 300" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <!-- shoulders / shirt -->
+            <path d="M30 300 C30 230, 90 210, 120 210 C150 210, 210 230, 210 300 Z" fill="#3A5C7A"></path>
+            <!-- neck -->
+            <rect x="104" y="180" width="32" height="30" rx="6" fill="#E8B89A"></rect>
+            <!-- head -->
+            <ellipse cx="120" cy="130" rx="68" ry="78" fill="#F0C0A0"></ellipse>
+            <!-- hair -->
+            <path d="M58 110 C58 60, 95 38, 120 38 C150 38, 184 60, 184 108 C184 112, 182 116, 178 118 C170 96, 150 84, 120 84 C92 84, 70 96, 62 118 C58 116, 58 113, 58 110 Z" fill="#3A2418"></path>
+            <!-- eyebrows -->
+            <path d="M82 112 Q96 104 110 112" stroke="#2A1810" stroke-width="4" fill="none" stroke-linecap="round"></path>
+            <path d="M130 112 Q144 104 158 112" stroke="#2A1810" stroke-width="4" fill="none" stroke-linecap="round"></path>
+            <!-- eyes (whites) -->
+            <ellipse cx="96" cy="132" rx="11" ry="9" fill="#fff"></ellipse>
+            <ellipse cx="144" cy="132" rx="11" ry="9" fill="#fff"></ellipse>
+            <!-- pupils (animated) -->
+            <g id="av-pupil-l" class="av-eye-pupil" style="transform: translate(3.06038px, -3.2991px);"><circle cx="96" cy="132" r="4.5" fill="#2A1810"></circle></g>
+            <g id="av-pupil-r" class="av-eye-pupil" style="transform: translate(2.84032px, -3.49036px);"><circle cx="144" cy="132" r="4.5" fill="#2A1810"></circle></g>
+            <!-- nose -->
+            <path d="M120 140 Q116 158 120 162 Q124 160 124 156" stroke="#C99A78" stroke-width="2" fill="none" stroke-linecap="round"></path>
+            <!-- mouth -->
+            <path d="M104 178 Q120 188 136 178" stroke="#8B4A3A" stroke-width="3" fill="none" stroke-linecap="round"></path>
+            <!-- HANDS over eyes (hidden by default) -->
+            <g id="av-hands" class="av-hand hidden">
+              <ellipse cx="92" cy="134" rx="22" ry="16" fill="#F0C0A0" stroke="#C99A78" stroke-width="1.5"></ellipse>
+              <ellipse cx="148" cy="134" rx="22" ry="16" fill="#F0C0A0" stroke="#C99A78" stroke-width="1.5"></ellipse>
+              <path d="M70 136 L78 130 M76 142 L84 138 M108 138 L116 134" stroke="#C99A78" stroke-width="1.2" fill="none" stroke-linecap="round"></path>
+              <path d="M126 136 L134 130 M132 142 L140 138 M164 138 L172 134" stroke="#C99A78" stroke-width="1.2" fill="none" stroke-linecap="round"></path>
+            </g>
+          </svg>
+        </div>
+      </div>
+      <!-- FORM SIDE -->
+      <div class="auth-form">
+        <!-- LOGIN -->
+        <div id="auth-login-form" style="display: block;">
+          <h1>Anmelden</h1>
+          <div class="af-sub">Bitte gib deine Daten ein</div>
+          <div class="af-input">
+            <input id="login-email" type="email" placeholder="E-Mail" autocomplete="username" value="">
+            <span class="af-icon"><svg viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg></span>
+          </div>
+          <div class="af-input">
+            <input id="login-pw" type="password" placeholder="Passwort" autocomplete="current-password">
+            <span class="af-icon btn" id="login-pw-toggle" onclick="authTogglePw('login-pw',this)" title="Anzeigen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"></path><circle cx="12" cy="12" r="3"></circle></svg></span>
+          </div>
+          <button class="af-forgot" onclick="authShowForgot()">Passwort vergessen?</button>
+          <button class="af-primary" onclick="doLogin()">Einloggen</button>
+          <div class="af-foot">Noch kein Konto? <a onclick="authSwitchMode()">Registrieren</a></div>
+        </div>
+        <!-- REGISTER -->
+        <div id="auth-register-form" style="display:none">
+          <h1>Registrieren</h1>
+          <div class="af-sub">Erstelle dein Konto</div>
+          <div class="af-input">
+            <input id="reg-username" placeholder="Benutzername" autocomplete="username">
+            <span class="af-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></span>
+          </div>
+          <div class="af-input">
+            <input id="reg-email" type="email" placeholder="E-Mail" autocomplete="email">
+            <span class="af-icon"><svg viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg></span>
+          </div>
+          <div class="af-input">
+            <input id="reg-pw" type="password" placeholder="Passwort" autocomplete="new-password">
+            <span class="af-icon btn" onclick="authTogglePw('reg-pw',this)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            </span>
+          </div>
+          <div class="af-input">
+            <input id="reg-pw2" type="password" placeholder="Passwort bestätigen" autocomplete="new-password">
+            <span class="af-icon btn" onclick="authTogglePw('reg-pw2',this)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            </span>
+          </div>
+          <button class="af-primary" onclick="doRegister()">Konto erstellen</button>
+          <div class="af-foot">Schon registriert? <a onclick="authSwitchMode()">Anmelden</a></div>
+        </div>
+        <!-- FORGOT -->
+        <div id="auth-forgot-form" style="display: none;">
+          <h1>Passwort zurücksetzen</h1>
+          <div class="af-sub">Wir senden dir einen Link</div>
+          <div class="af-input">
+            <input id="forgot-email" type="email" placeholder="E-Mail">
+            <span class="af-icon"><svg viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg></span>
+          </div>
+          <button class="af-primary" onclick="doForgotPw()">Reset-Link senden</button>
+          <div class="af-foot"><a onclick="authShowLogin()">← Zurück zum Login</a></div>
+        </div>
+        <div class="af-msg err" id="auth-msg">Fehler: can't access property "split", k is null</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- POOL MODAL -->
+<div class="modal-overlay" id="pool-modal" onclick="if(event.target===this)closeModal('pool-modal')">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title">Pool wählen / erstellen</div><button class="modal-close" onclick="closeModal('pool-modal')">✕</button></div>
+    <div id="pool-modal-content"></div>
+  </div>
+</div>
+
+<!-- NEW POOL MODAL -->
+<div class="modal-overlay" id="new-pool-modal" onclick="if(event.target===this)closeModal('new-pool-modal')">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title" id="npm-title">Neuer Pool</div><button class="modal-close" onclick="closeModal('new-pool-modal')">✕</button></div>
+    <div id="new-pool-content"></div>
+  </div>
+</div>
+
+<!-- PHOTO IMPORT MODAL -->
+<div class="modal-overlay" id="photo-modal" onclick="if(event.target===this)closeModal('photo-modal')">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title">📷 Foto-Import</div><button class="modal-close" onclick="closeModal('photo-modal')">✕</button></div>
+    <div id="photo-content">
+      <div class="drop-zone" id="drop-zone" onclick="document.getElementById('photo-file-inp').click()" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="handlePhotoDrop(event)">
+        <div style="font-size:36px;margin-bottom:10px">📷</div>
+        <div style="font-size:13px;font-weight:600;margin-bottom:6px">Bild hochladen</div>
+        <div style="font-size:10px;color:var(--muted)">Klicke oder ziehe ein Bild hierher</div>
+        <img id="photo-preview" style="display:none">
+      </div>
+      <input type="file" id="photo-file-inp" accept="image/*" style="display:none" onchange="handlePhotoFile(this)">
+      <div class="k-group"><label class="k-label">Pool-Name für Import</label><input class="k-input" id="photo-pool-name" placeholder="z.B. Meine Wörterliste"></div>
+      <button class="btn btn-lime" id="photo-scan-btn" style="width:100%" onclick="doPhotoScan()">🔍 KI scannen</button>
+      <div id="photo-status" style="margin-top:10px;font-size:11px;color:var(--muted)"></div>
+    </div>
+  </div>
+</div>
+
+<!-- AVATAR BUILDER MODAL (Dev only) -->
+<div class="modal-overlay" id="avatar-builder-modal" onclick="if(event.target===this)closeModal('avatar-builder-modal')">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-head">
+      <div class="modal-title">Avatar gestalten</div>
+      <button class="modal-close" onclick="closeModal('avatar-builder-modal')">✕</button>
+    </div>
+    <div id="ab-content">
+      <div class="ab-preview-wrap">
+        <div class="ab-preview" id="ab-preview"></div>
+        <div style="font-size:10px;color:var(--muted);text-align:center;margin-top:6px">Live-Vorschau</div>
+      </div>
+      <div id="ab-controls"></div>
+      <div style="display:flex;gap:8px;margin-top:14px">
+        <button class="btn btn-ghost btn-sm" style="flex:1" onclick="abRandomize()">🎲 Zufällig</button>
+        <button class="btn btn-lime" style="flex:2" onclick="saveAvatarBuilder()">Speichern</button>
+      </div>
+      <div id="ab-msg" style="font-size:10px;color:var(--muted);margin-top:8px;text-align:center"></div>
+    </div>
+  </div>
+</div>
+
+<!-- FRIEND PANEL -->
+<div class="fp-overlay" id="fp-overlay" onclick="closeFriendPanel()"></div>
+<div class="fp-panel" id="fp-panel">
+  <div class="fp-head">
+    <div style="font-size:14px;font-weight:700">🏆 Freunde &amp; Leaderboard</div>
+    <button class="modal-close" onclick="closeFriendPanel()">✕</button>
+  </div>
+  <div class="fp-body">
+    <div class="fp-tabs">
+      <button class="fp-tab active" id="fpt-board" onclick="switchFpTab('board')">👥 Freunde</button>
+      <button class="fp-tab" id="fpt-global" onclick="switchFpTab('global')">🌍 Global</button>
+      <button class="fp-tab" id="fpt-social" onclick="switchFpTab('social')">➕ Anfragen <span id="fp-req-badge" style="display:none" class="req-badge">0</span></button>
+      <button class="fp-tab" id="fpt-pools" onclick="switchFpTab('pools')">📤 Pools</button>
+    </div>
+    <div id="fp-board-content"></div>
+    <div id="fp-global-content" style="display:none"></div>
+    <div id="fp-social-content" style="display:none"></div>
+    <div id="fp-pools-content" style="display:none"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ SCRIPT ══════ -->
+<script src="src/js/services/supabase.js"></script>
+<script src="src/js/utils/storage.js"></script>
+<script src="src/js/core/theme.js"></script>
+<script src="src/js/core/ui.js"></script>
+<script src="src/js/core/navigation.js"></script>
+<script src="src/js/app.js"></script>
+<script src="src/js/services/sync.js"></script>
+<script src="src/js/screens/home.js"></script>
+<script src="src/js/screens/challenges.js"></script>
+<script src="src/js/screens/learn/cards.js"></script>
+<script src="src/js/screens/learn/quiz.js"></script>
+<script src="src/js/screens/learn/typing.js"></script>
+<script src="src/js/screens/learn/matching.js"></script>
+<script src="src/js/screens/courses.js"></script>
+<script src="src/js/screens/community.js"></script>
+<script src="src/js/screens/overview.js"></script>
+<script src="src/js/screens/stats.js"></script>
+<script src="src/js/screens/gap.js"></script>
+<script src="src/js/screens/aibot.js"></script>
+<script src="src/js/screens/profile.js"></script>
+<script src="src/js/screens/pass.js"></script>
+<script src="src/js/screens/shop.js"></script>
+<script src="src/js/services/auth.js"></script>
+<script src="src/js/core/bootstrap.js"></script>
+
+</body></html>
+
+
+
 
