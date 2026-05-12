@@ -1190,17 +1190,6 @@ if (typeof marked !== 'undefined' && !marked.__kivoReady) {
     mangle: false,
     headerIds: false
   });
-
-  const renderer = new marked.Renderer();
-  const baseTable = renderer.table?.bind(renderer);
-  renderer.table = (header, body) => {
-    const tableHtml = baseTable
-      ? baseTable(header, body)
-      : `<table><thead>${header}</thead><tbody>${body}</tbody></table>`;
-    return `<div class="md-table-wrap">${tableHtml}</div>`;
-  };
-
-  marked.use({ renderer });
   marked.__kivoReady = true;
 }
 
@@ -1707,23 +1696,37 @@ async function fetchLatestRelease(force = false) {
   if (!force && latestReleaseCache && now - latestReleaseCacheAt < 5 * 60 * 1000) {
     return latestReleaseCache;
   }
-  const res = await fetch(GITHUB_RELEASES_URL, {
-    headers: { Accept: 'application/vnd.github+json' }
-  });
-  if (!res.ok) {
-    throw new Error(`GitHub API ${res.status}`);
+  try {
+    const res = await withTimeout(
+      fetch(GITHUB_RELEASES_URL, {
+        headers: { Accept: 'application/vnd.github+json' }
+      }),
+      8000,
+      'GitHub API Timeout'
+    );
+    if (!res.ok) {
+      console.error(`[API] GitHub API Error: ${res.status} ${res.statusText}`);
+      throw new Error(`GitHub API ${res.status} ${res.statusText}`);
+    }
+    const releases = await res.json();
+    if (!Array.isArray(releases)) {
+      console.error('[API] GitHub API returned non-array response', releases);
+      throw new Error('GitHub API: Invalid response format');
+    }
+    const latest = releases
+      .filter(r => r && !r.draft && !r.prerelease)
+      .sort((a, b) => {
+        const at = new Date(a.published_at || a.created_at || 0).getTime();
+        const bt = new Date(b.published_at || b.created_at || 0).getTime();
+        return bt - at;
+      })[0] || null;
+    latestReleaseCache = latest;
+    latestReleaseCacheAt = now;
+    return latest;
+  } catch (err) {
+    console.error('[API] fetchLatestRelease failed:', err.message);
+    return null;
   }
-  const releases = await res.json();
-  const latest = (Array.isArray(releases) ? releases : [])
-    .filter(r => r && !r.draft && !r.prerelease)
-    .sort((a, b) => {
-      const at = new Date(a.published_at || a.created_at || 0).getTime();
-      const bt = new Date(b.published_at || b.created_at || 0).getTime();
-      return bt - at;
-    })[0] || null;
-  latestReleaseCache = latest;
-  latestReleaseCacheAt = now;
-  return latest;
 }
 
 async function fetchReleaseFeed(force = false) {
@@ -1732,14 +1735,23 @@ async function fetchReleaseFeed(force = false) {
     return latestReleaseListCache;
   }
   try {
-    const res = await fetch(GITHUB_RELEASES_URL, {
-      headers: { Accept: 'application/vnd.github+json' }
-    });
+    const res = await withTimeout(
+      fetch(GITHUB_RELEASES_URL, {
+        headers: { Accept: 'application/vnd.github+json' }
+      }),
+      8000,
+      'GitHub API Timeout'
+    );
     if (!res.ok) {
-      throw new Error(`GitHub API ${res.status}`);
+      console.error(`[API] GitHub API Error: ${res.status} ${res.statusText}`);
+      throw new Error(`GitHub API ${res.status} ${res.statusText}`);
     }
     const releases = await res.json();
-    const sorted = (Array.isArray(releases) ? releases : [])
+    if (!Array.isArray(releases)) {
+      console.error('[API] GitHub API returned non-array response', releases);
+      throw new Error('GitHub API: Invalid response format');
+    }
+    const sorted = releases
       .filter(r => r && !r.draft && !r.prerelease)
       .sort((a, b) => {
         const at = new Date(a.published_at || a.created_at || 0).getTime();
@@ -1750,10 +1762,12 @@ async function fetchReleaseFeed(force = false) {
     latestReleaseListCacheAt = now;
     latestReleaseCache = sorted[0] || null;
     latestReleaseCacheAt = now;
+    console.log(`[API] Fetched ${sorted.length} releases successfully`);
     return sorted;
   } catch (err) {
-    console.warn('Failed to fetch releases:', err);
+    console.warn('[API] Failed to fetch releases:', err.message || err);
     if (latestReleaseListCache.length) {
+      console.log('[API] Using cached releases:', latestReleaseListCache.length);
       return latestReleaseListCache;
     }
     const fallback = getLocalReleaseFallback();
@@ -1761,6 +1775,7 @@ async function fetchReleaseFeed(force = false) {
     latestReleaseListCacheAt = now;
     latestReleaseCache = fallback[0] || null;
     latestReleaseCacheAt = now;
+    console.log('[API] Using fallback releases:', fallback.length);
     return fallback;
   }
 }
@@ -1860,11 +1875,14 @@ async function loadWhatsNew(options = {}) {
     }
     return renderWhatsNewReleaseDetail(activeRelease);
   } catch (e) {
+    const errMsg = e.message || 'Unbekannter Fehler';
+    console.error('[What\'s New] Error loading releases:', errMsg, e);
     listEl.innerHTML = `<div class="wn-empty">Fehler beim Laden</div>`;
     contentEl.innerHTML = `
       <div class="k-card-sm" style="text-align:center;padding:24px">
         <div class="k-section-title">What's new</div>
         <div style="font-size:12px;color:var(--danger);margin-bottom:10px">Release-Notizen konnten nicht geladen werden.</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Fehler: ${escapeHtml(errMsg)}</div>
         <button class="btn btn-sm btn-lime" onclick="loadWhatsNew({force:true})">Erneut versuchen</button>
       </div>`;
     return null;
@@ -2944,11 +2962,26 @@ function stripVocabBlock(text = '') {
 function renderMarkdown(text) {
   const displayText = stripVocabBlock(text).displayText;
   const raw = marked.parse(displayText || '');
-  return DOMPurify.sanitize(raw);
+  const withWrappedTables = raw.replace(/<table\b[\s\S]*?<\/table>/gi, (tableHtml) => {
+    return `<div class="md-table-wrap">${tableHtml}</div>`;
+  });
+  return DOMPurify.sanitize(withWrappedTables);
 }
 
 function renderLatex(el) {
   if (typeof renderMathInElement !== 'function') return;
+  // Normalize quoted math delimiters/content from LLM output, e.g.
+  // "$$"<br>"a^2+b^2=c^2"<br>"$$"
+  if (el && typeof el.innerHTML === 'string') {
+    el.innerHTML = el.innerHTML
+      .replace(/(["'“”])\s*\$\$\s*\1/g, '$$')
+      .replace(/(["'“”])\s*\\\(\s*/g, '\\(')
+      .replace(/\s*\\\)\s*(["'“”])/g, '\\)')
+      .replace(/(["'“”])\s*\\\[\s*/g, '\\[')
+      .replace(/\s*\\\]\s*(["'“”])/g, '\\]')
+      .replace(/<p>\s*\$\$\s*<br>\s*/gi, '<p>$$')
+      .replace(/\s*<br>\s*\$\$\s*<\/p>/gi, '$$</p>');
+  }
   renderMathInElement(el, {
     delimiters: [
       { left: '$$', right: '$$', display: true },
