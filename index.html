@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#1E1E1E">
+<link rel="icon" type="image/png" href="assets/logo_light.png">
+<link rel="apple-touch-icon" href="assets/logo_light.png">
 <title>Kivo</title>
 <script>
   (function () {
@@ -68,7 +70,7 @@
       })()"
       title="GitHub">
         <span class="rail-ico">
-          <img src="assets/GitHub_Logos/SVG/GitHub_Invertocat_White_Clearspace.svg" alt="GitHub" width="24" height="24">
+          <img id="github-rail-icon" src="assets/GitHub_Logos/SVG/GitHub_Invertocat_White_Clearspace.svg" alt="GitHub" width="24" height="24">
         </span>
         <span class="rail-lbl">GitHub</span>
       </button>
@@ -533,6 +535,22 @@
     <div id="fp-global-content" style="display:none"></div>
     <div id="fp-social-content" style="display:none"></div>
     <div id="fp-pools-content" style="display:none"></div>
+  </div>
+</div>
+
+<!-- WHAT'S NEW PANEL -->
+<div class="wn-overlay" id="wn-overlay" onclick="closeWhatsNewPanel()"></div>
+<div class="wn-panel" id="wn-panel">
+  <div class="wn-head">
+    <div>
+      <div class="wn-head-title">What's New</div>
+      <div class="wn-head-sub">Release-Notizen und Versionsverlauf.</div>
+    </div>
+    <button class="modal-close" onclick="closeWhatsNewPanel()">✕</button>
+  </div>
+  <div class="wn-body">
+    <div class="wn-list" id="wn-list"></div>
+    <div class="wn-content" id="wn-content"></div>
   </div>
 </div>
 

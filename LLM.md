@@ -2,9 +2,11 @@
 
 Diese Datei ist die zentrale Orientierung fuer LLMs und Agenten, die an Kivo weiterarbeiten. Sie beschreibt den aktuellen Projektstand, die Architektur, das Backend und die wichtigsten Datenfluesse.
 
-## Pflicht fuer zukuenftige LLMs
+## Pflicht fuer zukuenftige LLMs (MUSS-Regel)
 
-Wenn du ein Feature implementierst, einen Datenfluss aenderst, Backend-Tabellen beruehrst, Sync-Verhalten anpasst oder wichtige UI-/Produktlogik veraenderst, aktualisiere diese `LLM.md` im selben Arbeitsschritt.
+Wenn du ein Feature implementierst, einen Datenfluss aenderst, Backend-Tabellen beruehrst, Sync-Verhalten anpasst oder wichtige UI-/Produktlogik veraenderst, **musst** du diese `LLM.md` im selben Arbeitsschritt aktualisieren.
+
+Pull Requests oder Aufgaben gelten als unvollstaendig, wenn relevante Aenderungen ohne `LLM.md`-Update abgegeben werden.
 
 Dokumentiere mindestens:
 
@@ -20,10 +22,12 @@ Diese Datei soll nicht perfekt literarisch sein. Sie soll zukuenftige Implementi
 
 Kivo ist eine browserbasierte Lernplattform fuer Vokabeln, Lernkarten, Quiz, Tipptraining, Matching, KI-gestuetzte Vokabellisten, Avatar-/Shop-Mechaniken, Freundesfunktionen und Fortschrittsspeicherung.
 
-Der aktuelle Code ist fast vollstaendig in einer einzigen Datei konzentriert:
+Der aktuelle Code ist modular aufgeteilt:
 
-- `index.html`: UI, Styles, App-Logik, Supabase-Client, Auth, LocalStorage, Sync, KI-Chat, Lernmodi, Profil, Shop und Social Features
-- `assets/logo.png`: App-Logo
+- `index.html`: Shell/Markup und Script-Einbindung
+- `src/styles/main.css`: zentrales Styling inkl. Theme-Variablen
+- `src/js/**`: Core, Services und Screens (u. a. Auth, Sync, Theme, Kurse, Profil, KI-Chat)
+- `assets/logo_light.png` und `assets/logo_dark.png`: App-Logos fuer Light/Dark
 - `.github/workflows/static.yml`: statische GitHub-Pages/Deployment-Konfiguration
 
 Es gibt kein separates Build-System, keine Package-Dateien und keinen lokalen Backend-Code im Repository. Externe Libraries werden per CDN geladen.
@@ -37,13 +41,27 @@ Die App ist eine statische HTML-Seite. Sie laedt:
 - `DOMPurify` fuer HTML-Sanitizing
 - KaTeX fuer mathematische Darstellung
 
-Der Einstieg passiert am Ende von `index.html`:
+Der Einstieg passiert ueber `src/js/core/bootstrap.js`:
 
+- `KivoTheme.initTheme()` setzt Theme + Asset-Switching (Icons/Meta)
 - `loadState()` baut den lokalen App-Zustand aus Built-in-Pools und LocalStorage auf
 - `initAuth()` laedt Supabase-Session und ruft `hydrateSession(session)` auf
 - `checkShareUrl()` verarbeitet Pool-Share-URLs
 - `updateNavIcons()` aktualisiert Avatar-/Profilnavigation
 - `initAiChatPersistence()` initialisiert Chat-Persistenz
+
+## Theme- und Icon-Logik
+
+- Theme-Engine: `src/js/core/theme.js`
+- Modi: `light`, `dark`, `system`, `auto`
+- Effektives Theme wird auf `document.documentElement.dataset.theme` gesetzt
+- Browser-/PWA-Branding:
+  - `meta[name="theme-color"]` wird dynamisch gesetzt
+  - `link[rel="icon"]` und `link[rel="apple-touch-icon"]` werden theme-basiert auf `logo_light`/`logo_dark` gesetzt
+  - Webapp-Manifest in `bootstrap.js` nutzt ebenfalls theme-basierte Kivo-Logos
+- GitHub-Icons:
+  - Dark Theme: `GitHub_Invertocat_White_Clearspace.svg`
+  - Light Theme: `GitHub_Invertocat_Black_Clearspace.svg`
 
 ## Frontend-Struktur
 

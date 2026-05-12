@@ -11,6 +11,7 @@ async function _doProfileSync(){
       currency: parseInt(userCurrency)||0,
       items: itemsArr,
       pass_data: passRaw||{},
+      release_seen_tag: currentUser.release_seen_tag || null,
       updated_at: new Date().toISOString(),
     }).eq('id', currentUser.id);
   } catch(e){ /* offline-tolerant */ }
@@ -114,6 +115,7 @@ async function _syncProfileToServer(){
     const avatarUrl = getScopedString('kivo_avatar_url', '') || currentUser.avatar_url || '';
     const avatarData = currentUser.avatar_data || null;
     const username = currentUser.username || '';
+    const releaseSeenTag = currentUser.release_seen_tag || null;
     const themeMode = window.KivoTheme?.normalizeMode?.(lsGet('kivo_theme_mode','"system"') || currentUser.theme_mode || 'system') || 'system';
     const { data:profileRow, error:profileErr } = await sb.from('profiles').select('chat_data').eq('id', currentUser.id).maybeSingle();
     if(profileErr) throw profileErr;
@@ -135,6 +137,7 @@ async function _syncProfileToServer(){
       currency,
       items: Array.isArray(items)?items:[],
       pass_data: passData,
+      release_seen_tag: releaseSeenTag,
       chat_data: chatDataWithTheme,
       updated_at: new Date().toISOString(),
     };

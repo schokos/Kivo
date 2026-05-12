@@ -7,6 +7,215 @@ function withTimeout(promise, ms = 8000, label = 'Request timeout') {
   return Promise.race([promise, timeout]);
 }
 
+let latestReleaseCache = null;
+let latestReleaseCacheAt = 0;
+let latestReleaseListCache = [];
+let latestReleaseListCacheAt = 0;
+let latestReleaseSelectedTag = null;
+const GITHUB_RELEASES_URL = 'https://api.github.com/repos/schokos/Kivo/releases';
+const GITHUB_ISSUES_URL = 'https://github.com/schokos/Kivo/issues';
+const WHATSNEW_ACTIVE_TAG_KEY = 'kivo_whatsnew_active_tag';
+
+function openFeedbackIssues() {
+  window.open(GITHUB_ISSUES_URL, '_blank', 'noopener,noreferrer');
+}
+
+function getReleaseSeenTag() {
+  return currentUser?.release_seen_tag || '';
+}
+
+function formatReleaseDate(release) {
+  const dt = release?.published_at || release?.created_at;
+  if (!dt) return '';
+  try {
+    return new Date(dt).toLocaleDateString('de-DE', {
+      year: 'numeric',
+      month: 'long',
+      day: '2-digit'
+    });
+  } catch (e) {
+    return '';
+  }
+}
+
+function getStoredWhatsNewTag() {
+  return localStorage.getItem(WHATSNEW_ACTIVE_TAG_KEY) || '';
+}
+
+function setStoredWhatsNewTag(tag) {
+  if (tag) localStorage.setItem(WHATSNEW_ACTIVE_TAG_KEY, tag);
+  else localStorage.removeItem(WHATSNEW_ACTIVE_TAG_KEY);
+}
+
+function getReleaseTag(release) {
+  return release?.tag_name || release?.name || '';
+}
+
+function getLocalReleaseFallback() {
+  return [{
+    tag_name: 'local',
+    name: 'Offline Release-Hinweis',
+    body: 'Release-Notizen konnten nicht von GitHub geladen werden. Bitte später erneut versuchen.',
+    published_at: new Date().toISOString()
+  }];
+}
+
+async function fetchReleaseFeed(force = false) {
+  const now = Date.now();
+  if (!force && latestReleaseListCache.length && now - latestReleaseListCacheAt < 5 * 60 * 1000) {
+    return latestReleaseListCache;
+  }
+  try {
+    const res = await withTimeout(
+      fetch(GITHUB_RELEASES_URL, {
+        headers: { Accept: 'application/vnd.github+json' }
+      }),
+      8000,
+      'GitHub API Timeout'
+    );
+    if (!res.ok) throw new Error(`GitHub API ${res.status} ${res.statusText}`);
+    const releases = await res.json();
+    if (!Array.isArray(releases)) throw new Error('GitHub API: Invalid response format');
+    const sorted = releases
+      .filter(r => r && !r.draft && !r.prerelease)
+      .sort((a, b) => {
+        const at = new Date(a.published_at || a.created_at || 0).getTime();
+        const bt = new Date(b.published_at || b.created_at || 0).getTime();
+        return bt - at;
+      });
+    latestReleaseListCache = sorted;
+    latestReleaseListCacheAt = now;
+    latestReleaseCache = sorted[0] || null;
+    latestReleaseCacheAt = now;
+    return sorted;
+  } catch (err) {
+    if (latestReleaseListCache.length) return latestReleaseListCache;
+    const fallback = getLocalReleaseFallback();
+    latestReleaseListCache = fallback;
+    latestReleaseListCacheAt = now;
+    latestReleaseCache = fallback[0] || null;
+    latestReleaseCacheAt = now;
+    return fallback;
+  }
+}
+
+function renderWhatsNewReleaseList(releases, activeTag) {
+  const el = document.getElementById('wn-list');
+  if (!el) return;
+  if (!releases.length) {
+    el.innerHTML = '<div class="wn-empty">Keine veröffentlichte Release-Version gefunden.</div>';
+    return;
+  }
+  el.innerHTML = releases.map((release, idx) => {
+    const tag = getReleaseTag(release);
+    const title = release.name || release.tag_name || `Release ${idx + 1}`;
+    const date = formatReleaseDate(release);
+    const active = tag && tag === activeTag;
+    return `
+      <button class="wn-item ${active ? 'active' : ''}" onclick="openWhatsNewRelease(${JSON.stringify(tag)})">
+        <div class="wn-item-title">${escapeHtml(title)}</div>
+        <div class="wn-item-tag">${escapeHtml(tag || 'ohne Tag')}${date ? ' · ' + escapeHtml(date) : ''}</div>
+      </button>
+    `;
+  }).join('');
+}
+
+function renderWhatsNewReleaseDetail(release) {
+  const el = document.getElementById('wn-content');
+  if (!el) return null;
+  if (!release) {
+    el.innerHTML = '<div class="wn-empty">Kein Release ausgewählt.</div>';
+    return null;
+  }
+  const releaseId = getReleaseTag(release);
+  const releaseTitle = release.name || release.tag_name || 'Neues Update';
+  const releaseDate = formatReleaseDate(release);
+  const notes = release.body || '_Keine Release-Notes verfügbar._';
+  const meta = [release.tag_name ? `Tag ${release.tag_name}` : '', releaseDate ? `Veröffentlicht ${releaseDate}` : '']
+    .filter(Boolean)
+    .join(' · ');
+
+  el.innerHTML = `
+    <div class="k-card-sm" style="margin-bottom:12px">
+      <div class="release-head">
+        <div class="k-section-title" style="margin-bottom:0">What's new</div>
+        <div style="font-size:16px;font-weight:800">${escapeHtml(releaseTitle)}</div>
+        <div class="release-meta">${escapeHtml(meta || 'Neueste Release-Notizen von GitHub')}</div>
+      </div>
+      <div class="release-body">${renderMarkdown(notes)}</div>
+      <div class="wn-mobile-actions" style="margin-top:12px">
+        <button class="btn btn-ghost btn-sm mobile-only" onclick="openFeedbackIssues()">Feedback abgeben</button>
+      </div>
+    </div>`;
+
+  if (releaseId && currentUser && getReleaseSeenTag() !== releaseId) {
+    currentUser.release_seen_tag = releaseId;
+    syncProfile();
+  }
+  return release;
+}
+
+async function loadWhatsNew(options = {}) {
+  const listEl = document.getElementById('wn-list');
+  const contentEl = document.getElementById('wn-content');
+  if (!listEl || !contentEl) return null;
+  listEl.innerHTML = `<div class="wn-empty" style="display:flex;align-items:center;justify-content:center;min-height:140px">${makeLoadingHTML("Lade What's New...", undefined, 'loading')}</div>`;
+  contentEl.innerHTML = makeLoadingHTML("Lade What's New...", undefined, 'loading');
+  try {
+    const releases = options.releases || await fetchReleaseFeed(!!options.force);
+    if (!releases.length) {
+      renderWhatsNewReleaseList([], '');
+      contentEl.innerHTML = `
+        <div class="k-card-sm" style="text-align:center;padding:24px">
+          <div class="k-section-title">What's new</div>
+          <div style="font-size:12px;color:var(--muted)">Keine veröffentlichte Release-Version gefunden.</div>
+        </div>`;
+      return null;
+    }
+    const activeTag = options.releaseTag || latestReleaseSelectedTag || getStoredWhatsNewTag() || getReleaseTag(releases[0]);
+    latestReleaseSelectedTag = activeTag;
+    setStoredWhatsNewTag(activeTag);
+    renderWhatsNewReleaseList(releases, activeTag);
+    const activeRelease = releases.find(r => getReleaseTag(r) === activeTag) || releases[0];
+    if (!activeRelease) return null;
+    return renderWhatsNewReleaseDetail(activeRelease);
+  } catch (e) {
+    const errMsg = e.message || 'Unbekannter Fehler';
+    listEl.innerHTML = '<div class="wn-empty">Fehler beim Laden</div>';
+    contentEl.innerHTML = `
+      <div class="k-card-sm" style="text-align:center;padding:24px">
+        <div class="k-section-title">What's new</div>
+        <div style="font-size:12px;color:var(--danger);margin-bottom:10px">Release-Notizen konnten nicht geladen werden.</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Fehler: ${escapeHtml(errMsg)}</div>
+        <button class="btn btn-sm btn-lime" onclick="loadWhatsNew({force:true})">Erneut versuchen</button>
+      </div>`;
+    return null;
+  }
+}
+
+function openWhatsNewRelease(tag) {
+  if (!tag) return;
+  latestReleaseSelectedTag = tag;
+  setStoredWhatsNewTag(tag);
+  loadWhatsNew({ releaseTag: tag });
+}
+
+function openWhatsNewPanel(options = {}) {
+  if (!currentUser) {
+    openModal('auth-modal');
+    return;
+  }
+  closeFriendPanel();
+  document.getElementById('wn-overlay')?.classList.add('open');
+  document.getElementById('wn-panel')?.classList.add('open');
+  loadWhatsNew(options);
+}
+
+function closeWhatsNewPanel() {
+  document.getElementById('wn-overlay')?.classList.remove('open');
+  document.getElementById('wn-panel')?.classList.remove('open');
+}
+
 async function renderCommunity() {
   const el = document.getElementById('community-content');
   if (!el) return;
@@ -215,6 +424,7 @@ async function renderCommunity() {
 
 // ── FRIEND PANEL ──────────────────────────────────────────────
 function openFriendPanel() {
+  closeWhatsNewPanel();
   document.getElementById('fp-overlay').classList.add('open');
   document.getElementById('fp-panel').classList.add('open');
   loadFriendPanel();
@@ -223,7 +433,7 @@ function closeFriendPanel() {
   document.getElementById('fp-overlay').classList.remove('open');
   document.getElementById('fp-panel').classList.remove('open');
 }
-function switchFpTab(tab) {
+function switchFpTab(tab, opts = {}) {
   fpTab=tab;
   document.querySelectorAll('.fp-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('fpt-'+tab)?.classList.add('active');

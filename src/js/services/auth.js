@@ -174,8 +174,9 @@ async function hydrateSession(session){
     if(mergedAvatarData) lsSet('kivo_avatar_data', mergedAvatarData);
     const mergedAvatarUrl = getScopedString('kivo_avatar_url','') || prof?.avatar_url || '';
     if(mergedAvatarUrl) lsSet('kivo_avatar_url', mergedAvatarUrl);
+    const mergedReleaseSeenTag = prof?.release_seen_tag || '';
 
-    currentUser={id:uid,email:session.user.email,username:mergedUsername,is_dev:!!prof?.is_dev,avatar_data:mergedAvatarData||null,avatar_url:mergedAvatarUrl||null,theme_mode:mergedThemeMode};
+    currentUser={id:uid,email:session.user.email,username:mergedUsername,is_dev:!!prof?.is_dev,avatar_data:mergedAvatarData||null,avatar_url:mergedAvatarUrl||null,theme_mode:mergedThemeMode,release_seen_tag:mergedReleaseSeenTag||null};
     if(prof?.is_dev){document.getElementById('rb-coding')?.style.setProperty('display','flex');}
 
     const{data:poolRows}=await sb.from('pools').select('*').eq('user_id',uid);
@@ -230,7 +231,8 @@ async function hydrateSession(session){
       mergedUsername !== (prof?.username || session.user.user_metadata?.username || session.user.email?.split('@')[0] || 'User') ||
       mergedAvatarUrl !== (prof?.avatar_url || '') ||
       JSON.stringify(mergedAvatarData || null) !== JSON.stringify(prof?.avatar_data || null) ||
-      mergedThemeMode !== serverThemeMode;
+      mergedThemeMode !== serverThemeMode ||
+      mergedReleaseSeenTag !== (prof?.release_seen_tag || '');
     if(profileChanged) syncProfile();
 
     loadState();

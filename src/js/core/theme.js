@@ -5,6 +5,10 @@
   const DARK_THEME_COLOR = "#121712";
   const AUTO_LIGHT_START_HOUR = 7;
   const AUTO_DARK_START_HOUR = 19;
+  const LOGO_LIGHT = "assets/logo_light.png";
+  const LOGO_DARK = "assets/logo_dark.png";
+  const GITHUB_BLACK = "assets/GitHub_Logos/SVG/GitHub_Invertocat_Black_Clearspace.svg";
+  const GITHUB_WHITE = "assets/GitHub_Logos/SVG/GitHub_Invertocat_White_Clearspace.svg";
 
   let currentMode = "system";
   let currentEffective = "light";
@@ -61,10 +65,36 @@
     meta.setAttribute("content", effectiveTheme === "dark" ? DARK_THEME_COLOR : LIGHT_THEME_COLOR);
   }
 
+  function getLogoPathByTheme(effectiveTheme) {
+    return effectiveTheme === "dark" ? LOGO_DARK : LOGO_LIGHT;
+  }
+
+  function getGitHubIconPathByTheme(effectiveTheme) {
+    return effectiveTheme === "dark" ? GITHUB_WHITE : GITHUB_BLACK;
+  }
+
+  function updateThemeAssets(effectiveTheme) {
+    const logoPath = getLogoPathByTheme(effectiveTheme);
+    const githubPath = getGitHubIconPathByTheme(effectiveTheme);
+
+    const favicon = document.querySelector('link[rel="icon"]');
+    if (favicon) favicon.setAttribute("href", logoPath);
+
+    const appleTouchIcon = document.querySelector('link[rel="apple-touch-icon"]');
+    if (appleTouchIcon) appleTouchIcon.setAttribute("href", logoPath);
+
+    const railGitHubIcon = document.getElementById("github-rail-icon");
+    if (railGitHubIcon) railGitHubIcon.setAttribute("src", githubPath);
+
+    const profileGitHubIcon = document.getElementById("profile-github-icon");
+    if (profileGitHubIcon) profileGitHubIcon.setAttribute("src", githubPath);
+  }
+
   function applyTheme(effectiveTheme) {
     currentEffective = effectiveTheme === "dark" ? "dark" : "light";
     document.documentElement.dataset.theme = currentEffective;
     updateThemeColorMeta(currentEffective);
+    updateThemeAssets(currentEffective);
   }
 
   function clearSystemListener() {
@@ -144,5 +174,7 @@
     getEffectiveTheme,
     resolveEffectiveTheme,
     normalizeMode,
+    getLogoPathByTheme,
+    getGitHubIconPathByTheme,
   };
 })();

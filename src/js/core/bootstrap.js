@@ -9,25 +9,28 @@
   }
 }
 
-// â”€â”€ PWA MANIFEST â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 (function () {
+  const eff = window.KivoTheme?.getEffectiveTheme?.() || "dark";
+  const iconPath = eff === "dark" ? "assets/logo_dark.png" : "assets/logo_light.png";
+  const themeColor = eff === "dark" ? "#121712" : "#EFF1F0";
   const manifest = {
     name: "Kivo",
     short_name: "Kivo",
     description: "Kivo Lernplattform",
     start_url: ".",
     display: "standalone",
-    background_color: "#1E1E1E",
-    theme_color: "#1E1E1E",
+    background_color: themeColor,
+    theme_color: themeColor,
     icons: [
       {
-        src:
-          "data:image/svg+xml," +
-          encodeURIComponent(
-            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect width="192" height="192" rx="32" fill="#1E1E1E"/><circle cx="96" cy="88" r="44" fill="#6AC28A"/><text x="96" y="104" font-size="44" text-anchor="middle" fill="#1E1E1E" font-family="sans-serif" font-weight="900">K</text></svg>'
-          ),
+        src: iconPath,
         sizes: "192x192",
-        type: "image/svg+xml",
+        type: "image/png",
+      },
+      {
+        src: iconPath,
+        sizes: "512x512",
+        type: "image/png",
       },
     ],
   };
@@ -38,6 +41,15 @@
 })();
 
 window.addEventListener("DOMContentLoaded", () => {
+  if (typeof marked !== "undefined" && !marked.__kivoReady) {
+    marked.setOptions({
+      gfm: true,
+      breaks: true,
+      mangle: false,
+      headerIds: false
+    });
+    marked.__kivoReady = true;
+  }
   window.KivoTheme?.initTheme?.();
   userCurrency = parseInt(lsGet("kivo_currency", "0")) || 0;
   loadState();

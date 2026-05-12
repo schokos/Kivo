@@ -295,6 +295,29 @@ function renderProfile(targetUser=null) {
         aria-label="Abmelden"
       >? Abmelden</button>
     </div>
+
+    <div style="height:12px;"></div>
+
+    <div class="k-card-sm profile-github-card" style="margin-bottom:12px">
+      <div class="profile-github-glow"></div>
+      <div class="k-section-title">GitHub</div>
+      <div style="display:flex;gap:14px;align-items:flex-start">
+        <div class="profile-github-icon-wrap">
+          <img id="profile-github-icon" src="${window.KivoTheme?.getGitHubIconPathByTheme?.(window.KivoTheme?.getEffectiveTheme?.() || 'light') || 'assets/GitHub_Logos/SVG/GitHub_Invertocat_Black_Clearspace.svg'}" alt="GitHub" width="24" height="24">
+        </div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:15px;font-weight:800;margin-bottom:4px">GitHub &amp; What's New</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:10px">
+            Hier kannst du Fehler melden, Ideen teilen und die neuesten Release-Notizen im
+            eigenen What's-New-Bereich ansehen.
+          </div>
+          <div class="btn-row" style="margin-top:0">
+            <button class="btn btn-ghost btn-sm mobile-only" onclick="openFeedbackIssues()">Feedback abgeben</button>
+            <button class="btn btn-blue btn-sm" onclick="openWhatsNewPanel()">What's New</button>
+          </div>
+        </div>
+      </div>
+    </div>
   ` : ''}
   `;
 }

@@ -63,11 +63,24 @@ function stripVocabBlock(text = '') {
 function renderMarkdown(text) {
   const displayText = stripVocabBlock(text).displayText;
   const raw = marked.parse(displayText || '');
-  return DOMPurify.sanitize(raw);
+  const withWrappedTables = raw.replace(/<table\b[\s\S]*?<\/table>/gi, (tableHtml) => {
+    return `<div class="md-table-wrap">${tableHtml}</div>`;
+  });
+  return DOMPurify.sanitize(withWrappedTables);
 }
 
 function renderLatex(el) {
   if (typeof renderMathInElement !== 'function') return;
+  if (el && typeof el.innerHTML === 'string') {
+    el.innerHTML = el.innerHTML
+      .replace(/(["'“”])\s*\$\$\s*\1/g, '$$')
+      .replace(/(["'“”])\s*\\\(\s*/g, '\\(')
+      .replace(/\s*\\\)\s*(["'“”])/g, '\\)')
+      .replace(/(["'“”])\s*\\\[\s*/g, '\\[')
+      .replace(/\s*\\\]\s*(["'“”])/g, '\\]')
+      .replace(/<p>\s*\$\$\s*<br>\s*/gi, '<p>$$')
+      .replace(/\s*<br>\s*\$\$\s*<\/p>/gi, '$$</p>');
+  }
   renderMathInElement(el, {
     delimiters: [
       { left: '$$', right: '$$', display: true },
