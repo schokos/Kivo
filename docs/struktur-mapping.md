@@ -1,25 +1,43 @@
-# Kivo Struktur-Mapping (Hard Cut)
+﻿# Kivo Struktur-Mapping
 
-## Aktueller Stand
-- `index.html` ist die Einstiegsseite.
-- `app.html` ist die eigentliche Kivo-App.
-- `src/styles/main.css` enthaelt globales Styling.
-- `src/js/core/*` enthaelt Shell/UI/Navigation/Bootstrap.
-- `src/js/screens/*` enthaelt die Fachbereiche und Lernmodi.
-- `src/js/services/*` enthaelt Supabase, Auth und Sync.
-- `src/data/subjects/subjects.json` ist der einzige Einstieg in den Fachkatalog.
+## Zweck
+Dieses Dokument beschreibt die aktuelle technische Zuordnung von Verantwortlichkeiten in Kivo. Es ist die Referenz fuer Architektur-, Team- und Modulgrenzen.
 
-## Verbindliche Content-Struktur
-- `src/data/subjects/<fach>/subject.json`
-- `src/data/subjects/<fach>/courses/<kurs>/course.json`
-- `src/data/subjects/<fach>/courses/<kurs>/lessons/<lektion>/index.html`
+## Ist-Zustand (Repo-Wahrheit)
+- Einstiegspunkt: `index.html`
+- Globales Styling: `src/styles/main.css`
+- Core/Shell/Navigation: `src/js/core/*`
+- Screen-Logik je Bereich: `src/js/screens/*`
+- Services fuer Supabase/Auth/Sync: `src/js/services/*`
+- State/Utilities: `src/js/state/*`, `src/js/utils/*`
+- Fach-/Content-Daten: `src/data/subjects/*`
+- Fachkatalog-Einstieg: `src/data/subjects/subjects.json`
 
-## Team-Aufteilung
-- App-Team: `app.html`, `src/js/core/*`, `src/js/screens/*`, `src/styles/*`
-- Fach-/Content-Team: `src/data/subjects/*`
-- Modul-Team: `src/data/subjects/*/courses/*/lessons/*`
+## Soll-Zustand (stabile Zielstruktur)
+- Shell-/App-Rahmen bleibt in `index.html` + `src/js/core/*`.
+- Fachliche UI-Logik bleibt in `src/js/screens/*`.
+- Backend-nahe Logik bleibt in `src/js/services/*`.
+- Content bleibt strikt unter `src/data/subjects/*`.
 
-## Migration-Entscheidung
-- `src/data/courses/` wurde entfernt.
-- Keine Runtime-Fallbacks auf alte Pfade.
-- `index_alt.html` bleibt nur als Archiv/Referenz.
+## Ownership-Modell
+- App-Team:
+  - `index.html`
+  - `src/js/core/*`
+  - `src/js/screens/*`
+  - `src/styles/*`
+- Service-/Backend-Team:
+  - `src/js/services/*`
+  - `src/js/state/*`
+  - `src/js/utils/*`
+- Content-Team:
+  - `src/data/subjects/*`
+
+## Migrations- und Aenderungsregeln
+- Alte Strukturpfade duerfen nicht reaktiviert werden (kein Rueckfall auf Legacy-Datenpfade).
+- Neue Feature-Logik darf nicht zentral in einem Monolith-File gesammelt werden, wenn ein passender Modulbereich existiert.
+- Bei Verschiebung von Verantwortlichkeiten sind `LLM.md` und dieses Dokument im selben PR zu aktualisieren.
+
+## Inputs / Outputs / Regeln (LLM-lesbar)
+- Input: Neue Features, Refactors, Datei-Verschiebungen.
+- Output: Aktualisierte Verantwortungszuordnung und konsistente Pfade.
+- Regel: Jede Aenderung an Modulgrenzen muss hier dokumentiert werden.

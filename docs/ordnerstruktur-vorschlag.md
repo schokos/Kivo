@@ -1,4 +1,7 @@
-# Kivo Ordnerstruktur (Verbindlich)
+ï»¿# Kivo Ordnerstruktur (Normative Spezifikation)
+
+## Zweck
+Dieses Dokument definiert verbindlich die Zielstruktur im Repository.
 
 ## Zielbild
 ```text
@@ -18,24 +21,30 @@ Kivo/
 |  |                 |- <lektion>/
 |  |                    |- index.html (+ optional script/style/json)
 |  |- js/
-|  |  |- core/          # Shell, UI, Navigation, Bootstrap
-|  |  |- screens/       # Home, Courses, Community, Learn, Profile ...
-|  |  |- services/      # Supabase, Auth, Sync
+|  |  |- core/
+|  |  |- screens/
+|  |  |- services/
 |  |  |- state/
 |  |  |- utils/
 |  |- styles/
 |- index.html
-|- app.html
+|- LLM.md
+|- llm_voise.md
 ```
 
-## Verbindliche Regeln
-- Neue Inhalte nur unter `src/data/subjects/` anlegen.
-- Kein Wiedereinführen von `src/data/courses/`.
-- Kurskatalog immer aus `src/data/subjects/subjects.json` laden.
-- Pro Lektion ein eigener Ordner unter `lessons/<lektion>/`.
+## MUST-Regeln
+- Neue Fachinhalte MUESSEN unter `src/data/subjects/` angelegt werden.
+- Der Kurskatalog MUSS aus `src/data/subjects/subjects.json` gelesen werden.
+- Jede Lesson MUSS einen eigenen Ordner unter `lessons/<lektion>/` haben.
+- Deployment-relevante Einstiegspfade MUESSEN statisch aufloesbar sein.
+- Bei Strukturregel-Aenderungen MUESSEN `LLM.md` und `docs/struktur-mapping.md` im selben PR aktualisiert werden.
 
-## Team-Regeln
-- Neue Features nicht in `src/js/app.js` sammeln.
-- Shell-/Navigationslogik in `src/js/core/*` halten.
-- Fachlogik in `screens/*`, Sync/Auth in `services/*`.
-- Bei neuen Faechern: `subject.json`, mindestens ein `course.json`, und Lessons konsistent anlegen.
+## SHOULD-Regeln
+- Feature-Code SOLLTE im passenden Modul liegen statt in zentralen Sammeldateien.
+- Neue Daten- oder Service-Schnittstellen SOLLTEN nahe am fachlichen Modul dokumentiert werden.
+- Dateinamen SOLLTEN konsistent kleingeschrieben und sprechend sein.
+
+## Inputs / Outputs / Regeln (LLM-lesbar)
+- Input: Neue Dateien, neue Faecher/Kurse/Lessons, Refactors.
+- Output: Struktur bleibt maschinenlesbar und vorhersagbar.
+- Regel: Kein Legacy-Rueckfall auf alte Content-Strukturen.
