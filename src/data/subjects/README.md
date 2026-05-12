@@ -1,21 +1,12 @@
-﻿# Fachdaten
+# Subject-Datenstruktur
 
-Die neue Zielstruktur lautet jetzt:
-- `Faecher` oben
-- darin `Kurse`
-- darin `Lektionen`
-
-## Beispiel
-- `Spanisch`
-  - `Vokabeln`
-    - `Vokabeln A1`
-  - `Grammatik`
-    - `Verben`
-
-## Dateien
+## Pflichtstruktur
+- `src/data/subjects/subjects.json` listet alle Faecher
 - `src/data/subjects/<fach>/subject.json` beschreibt ein Fach
 - `src/data/subjects/<fach>/courses/<kurs>/course.json` beschreibt einen Kurs
 - `src/data/subjects/<fach>/courses/<kurs>/lessons/<lektion>/index.html` ist ein eigenstaendiges Modul
 
-## Hinweis
-Die alte `src/data/courses/`-Struktur bleibt vorerst als Altbestand erhalten, damit nichts kaputtgeht. Neue Inhalte sollten ab jetzt in `src/data/subjects/` landen.
+## Hard-Cut-Status
+- Die alte Struktur `src/data/courses/` wurde entfernt.
+- Es gibt keine Kompatibilitaets-Fallbacks auf Legacy-Pfade.
+- `index_alt.html` dient nur noch als historische Referenz.

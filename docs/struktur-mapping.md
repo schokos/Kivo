@@ -1,24 +1,25 @@
-﻿# Kivo Struktur-Mapping
+# Kivo Struktur-Mapping (Hard Cut)
 
 ## Aktueller Stand
 - `index.html` ist die Einstiegsseite.
 - `app.html` ist die eigentliche Kivo-App.
-- `src/styles/main.css` enthaelt das globale App-Styling.
-- `src/js/...` enthaelt die globale App-Logik fuer Dashboard, Community, Profil, Faecher und Lernmodi.
-- `src/data/subjects/*/subject.json` enthaelt Fach-Metadaten.
-- `src/data/subjects/*/courses/*/course.json` enthaelt Kurs-Metadaten.
-- `src/data/subjects/*/courses/*/lessons/*/index.html` ist fuer eigenstaendige Lernmodule gedacht.
+- `src/styles/main.css` enthaelt globales Styling.
+- `src/js/core/*` enthaelt Shell/UI/Navigation/Bootstrap.
+- `src/js/screens/*` enthaelt die Fachbereiche und Lernmodi.
+- `src/js/services/*` enthaelt Supabase, Auth und Sync.
+- `src/data/subjects/subjects.json` ist der einzige Einstieg in den Fachkatalog.
 
-## Architekturidee
-- Haupt-App: Navigation, Login, Dashboard, Community, Profil
-- Fachauswahl: z. B. Spanisch, Englisch, Deutsch, Mathe
-- Kursauswahl innerhalb eines Fachs: z. B. Vokabeln, Grammatik
-- Standalone-Lektionen: eigene HTML-, CSS- und JS-Dateien pro Modul
+## Verbindliche Content-Struktur
+- `src/data/subjects/<fach>/subject.json`
+- `src/data/subjects/<fach>/courses/<kurs>/course.json`
+- `src/data/subjects/<fach>/courses/<kurs>/lessons/<lektion>/index.html`
 
 ## Team-Aufteilung
-- App-Team: `app.html`, `src/js/*`, `src/styles/*`
+- App-Team: `app.html`, `src/js/core/*`, `src/js/screens/*`, `src/styles/*`
 - Fach-/Content-Team: `src/data/subjects/*`
 - Modul-Team: `src/data/subjects/*/courses/*/lessons/*`
 
-## Hinweis
-Die alte `src/data/courses/`-Struktur ist nur noch Altbestand. Neue Inhalte sollten in `src/data/subjects/` aufgebaut werden.
+## Migration-Entscheidung
+- `src/data/courses/` wurde entfernt.
+- Keine Runtime-Fallbacks auf alte Pfade.
+- `index_alt.html` bleibt nur als Archiv/Referenz.
