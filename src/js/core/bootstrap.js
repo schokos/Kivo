@@ -1,4 +1,4 @@
-function checkShareUrl() {
+﻿function checkShareUrl() {
   const params = new URLSearchParams(location.search);
   const shareKey = params.get("share");
   if (!shareKey) return;
@@ -9,7 +9,7 @@ function checkShareUrl() {
   }
 }
 
-// ── PWA MANIFEST ──────────────────────────────────────────────
+// â”€â”€ PWA MANIFEST â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 (function () {
   const manifest = {
     name: "Kivo",
@@ -45,4 +45,5 @@ window.addEventListener("DOMContentLoaded", () => {
   updateNavIcons();
   initAiChatPersistence();
 });
+
 

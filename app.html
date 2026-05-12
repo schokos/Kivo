@@ -26,7 +26,7 @@
   <!-- RAIL (desktop sidebar icons) -->
   <nav class="rail" id="rail">
     <div class="rail-top">
-      <button class="brand-btn" onclick="goTo('home')" title="Kivo">K</button>
+      <button class="brand-btn" onclick="goTo('home')" title="Kivo" aria-label="Kivo"></button>
       <button class="rail-btn active" id="rb-home" data-s="home" onclick="goTo('home')" title="Dashboard"><span class="rail-ico"><svg viewBox="0 0 24 24"><path d="M3 12 12 3l9 9"></path><path d="M5 10v10h14V10"></path><path d="M10 20v-6h4v6"></path></svg></span><span class="rail-lbl">Dashboard</span></button>
       <button class="rail-btn" id="rb-courses" data-s="courses" onclick="goTo('courses')" title="Fächer"><span class="rail-ico"><svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2V5z"></path><path d="M8 7h8M8 11h8M8 15h5"></path></svg></span><span class="rail-lbl">Fächer</span></button>
       <button class="rail-btn" id="rb-challenges" data-s="challenges" onclick="goTo('challenges')" title="Challenges"><span class="rail-ico"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8.5-8 9-4.5-.5-8-4-8-9V6l8-3z"></path><path d="m9 12 2 2 4-4"></path></svg></span><span class="rail-lbl">Challenges</span></button>
@@ -77,23 +77,25 @@
     <div class="topbar">
       <div class="tb-left">
         <div class="tb-title" id="tb-title">Dashboard</div>
-        <button class="pool-pill" onclick="openModal('pool-modal')" title="Pool wählen">
-          <span class="dot lime"></span>
-          <span id="active-pool-lbl">Pool wählen</span>
-        </button>
       </div>
       <div class="tb-right">
+        <div class="pool-pill" id="streak-pill">
+          <span class="dash-ico" style="color:#6AC28A">
+            <svg viewBox="0 0 24 24"><path d="M12 2c1 4 5 5 5 10a5 5 0 1 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3 1-6 1-9z"></path></svg>
+          </span>
+          <span id="topbar-streak">0</span>
+        </div>
         <div class="pool-pill" id="currency-pill" style="display:none">
-          <span class="dot lime"></span>
+          <span class="dash-ico gem">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 6v12M9 9h4.5a2 2 0 0 1 0 4H9.5a2 2 0 0 0 0 4H15"/></svg>
+          </span>
           <span id="currency-val">0</span>
-          <span>Münzen</span>
         </div>
         <button class="friend-btn" onclick="openFriendPanel()" title="Freunde">
           <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"></circle><circle cx="17" cy="9.5" r="2.4"></circle><path d="M3 19c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"></path><path d="M15 19c0-2.3 1.6-4 3.5-4s2.5 1.3 2.5 3"></path></svg>
           <span class="friend-notif" id="friend-notif"></span>
         </button>
         <div class="avatar-btn" id="avatar-btn" onclick="event.stopPropagation();toggleUserMenu()" title="Profilmenü"></div>
-        <img class="topbar-logo" src="assets/logo.png" alt="Kivo Logo">
       </div>
     </div>
 
@@ -106,11 +108,6 @@
           <div>
             <div class="home-title">Hallo, <span id="home-user-name">Lerner</span>!</div>
             <div class="home-kicker">Weiter so! Dein Wissen wächst.</div>
-          </div>
-          <div class="home-metrics">
-            <div class="metric-chip"><span class="dash-ico" style="color:#6AC28A"><svg viewBox="0 0 24 24"><path d="M12 2c1 4 5 5 5 10a5 5 0 1 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3 1-6 1-9z"></path></svg></span> <span id="hm-streak-top">0</span></div>
-            <div class="metric-chip"><span class="dash-ico gem"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 6v12M9 9h4.5a2 2 0 0 1 0 4H9.5a2 2 0 0 0 0 4H15"/></svg></span> <span id="currency-val-home">0</span></div>
-            <div class="avatar-btn" id="dash-avatar-btn" onclick="event.stopPropagation();toggleUserMenu()" title="Profilmenü"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-7 8-7s8 3 8 7"></path></svg></div>
           </div>
         </div>
 
@@ -165,7 +162,7 @@
       <div class="screen" id="screen-courses">
         <div class="app-page-head">
           <div><div class="app-page-title">Fächer</div><div class="app-page-sub">Wähle zuerst ein Fach wie Spanisch oder Mathe und öffne darin Vokabeln, Grammatik oder eigenständige Lektionen.</div></div>
-          <button class="btn btn-lime btn-sm" onclick="openNewPoolModal()">+ Eigener Kurs</button>
+          <a class="btn btn-ghost btn-sm" href="index.html">Struktur ansehen</a>
         </div>
         <div id="courses-content"></div>
       </div>
@@ -544,6 +541,7 @@
 <script src="src/js/core/bootstrap.js"></script>
 
 </body></html>
+
 
 
 

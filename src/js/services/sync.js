@@ -287,8 +287,6 @@ function buildVocab() {
   vocab=flat.map((v,i)=>({...v,id:i,known:knIds.includes(i)}));
   updateHomeStats();
   const {l,p}=spKey(activeKey);
-  const lbl=l+' · '+p;
-  document.getElementById('active-pool-lbl').textContent=lbl.length>22?lbl.slice(0,22)+'…':lbl;
   document.getElementById('home-pool-name').textContent=p;
 }
 
@@ -346,9 +344,8 @@ function updateCurrencyDisplay() {
   const val=document.getElementById('currency-val');
   if(el) el.style.display=currentUser?'flex':'none';
   if(val) val.textContent=userCurrency;
-  const homeVal=document.getElementById('currency-val-home');
-  if(homeVal) homeVal.textContent=userCurrency;
 }
 async function syncXpToServer() { return flushLocalSync(); }
+
 
 

@@ -1,4 +1,4 @@
-// ── TOAST & CONFIRM ──────────────────────────────────────────
+﻿// â”€â”€ TOAST & CONFIRM â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function toast(msg) {
   const wrap = document.getElementById("toast-wrap");
   const el = document.createElement("div");
@@ -42,7 +42,7 @@ function closeModal(id) {
   document.getElementById(id)?.classList.remove("open");
 }
 
-// ── USER MENU ────────────────────────────────────────────────
+// â”€â”€ USER MENU â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function toggleUserMenu() {
   document.getElementById("user-menu").classList.toggle("open");
 }
@@ -52,7 +52,7 @@ function closeUserMenu() {
 }
 
 document.addEventListener("click", (e) => {
-  if (!e.target.closest("#avatar-btn") && !e.target.closest("#dash-avatar-btn") && !e.target.closest("#user-menu")) {
+  if (!e.target.closest("#avatar-btn") && !e.target.closest("#user-menu")) {
     closeUserMenu();
   }
 });

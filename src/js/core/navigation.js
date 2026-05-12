@@ -1,7 +1,7 @@
-// ── SCREEN ROUTER ────────────────────────────────────────────
+﻿// â”€â”€ SCREEN ROUTER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const SCREEN_TITLES = {
   home: "Dashboard",
-  courses: "Fächer",
+  courses: "FÃ¤cher",
   challenges: "Challenges",
   community: "Community",
   cards: "Karteikarten",
@@ -10,7 +10,7 @@ const SCREEN_TITLES = {
   matching: "Zuordnen",
   overview: "Pool-Verwaltung",
   stats: "Statistiken",
-  gap: "KI-Lückentext",
+  gap: "KI-LÃ¼ckentext",
   aibot: "KI-Assistent",
   profile: "Profil",
   shop: "Belohnungen",
@@ -24,7 +24,10 @@ function goTo(name, opts = {}) {
   document.getElementById("screen-" + name)?.classList.add("active");
   document.getElementById("rb-" + name)?.classList.add("active");
   document.querySelector(`.bn-item[data-s="${name}"]`)?.classList.add("active");
-  document.getElementById("tb-title").textContent = SCREEN_TITLES[name] || name.toUpperCase();
+  const titleEl = document.getElementById("tb-title");
+  const hideTopbarTitleOn = new Set(["courses", "challenges", "community", "aibot", "profile", "shop", "pass", "overview", "stats", "gap"]);
+  titleEl.textContent = SCREEN_TITLES[name] || name.toUpperCase();
+  titleEl.style.display = hideTopbarTitleOn.has(name) ? "none" : "";
   closeUserMenu();
   if (name === "cards") initCards();
   else if (name === "quiz") startQuiz();

@@ -11,12 +11,12 @@
   const xpTotal=getTotalXp();
   const level=Math.max(1,Math.floor(xpTotal/500)+1);
   const levelStart=(level-1)*500, next=level*500, levelPct=Math.round((xpTotal-levelStart)/(next-levelStart)*100);
-  document.getElementById('hm-streak-top').textContent=s;
+  const topbarStreak=document.getElementById('topbar-streak');
+  if(topbarStreak) topbarStreak.textContent=s;
   document.getElementById('hm-xp').textContent=xpTotal.toLocaleString();
   document.getElementById('hm-level').textContent=level;
   document.getElementById('hm-next-xp').textContent=next.toLocaleString();
   document.getElementById('hm-ring').style.setProperty('--ring-pct',Math.max(4,levelPct)+'%');
-  document.getElementById('currency-val-home').textContent=userCurrency;
   document.getElementById('home-user-name').textContent=currentUser?.username||'Lerner';
   // Heute gesammelte XP (nur Anzeige)
   const today=new Date().toISOString().slice(0,10);
@@ -32,5 +32,6 @@
 }
 
 function saveDailyGoal(){ /* deprecated */ }
+
 
 

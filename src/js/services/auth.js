@@ -131,7 +131,6 @@ function updateUserUi(user){
   document.querySelector('[onclick="closeUserMenu();openModal(\'auth-modal\')"]').style.display=loggedIn?'none':'flex';
   const avHtml = getUserAvatar(user, 32);
   document.getElementById('avatar-btn').innerHTML=avHtml;
-  const dashAv=document.getElementById('dash-avatar-btn'); if(dashAv) dashAv.innerHTML=avHtml;
   updateCurrencyDisplay();
   updateNavIcons();
 }
@@ -239,5 +238,6 @@ async function checkPendingFriendReqs(){
   if(!currentUser)return;
   try{const{data}=await sb.from('friendships').select('id').eq('friend_id',currentUser.id).eq('status','pending');document.getElementById('friend-notif').classList.toggle('show',(data||[]).length>0);}catch(e){}
 }
+
 
 

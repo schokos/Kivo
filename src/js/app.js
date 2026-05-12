@@ -1,8 +1,8 @@
-// -- CONFIG --------------------------------------------------
+﻿// -- CONFIG --------------------------------------------------
 // Shared bootstrap modules are loaded before app.js from app.html.
 const { SUPABASE_URL, SUPABASE_ANON_KEY, sb, edgeHeaders } = window.KivoSupabase;
 
-// -- POOLS (empty � custom pools loaded from server after login) --
+// -- POOLS (empty — custom pools loaded from server after login) --
 const BUILTIN = {};
 
 // -- STATE ----------------------------------------------------
@@ -64,3 +64,4 @@ function levelUpReward() {
 
 // -- STORAGE --------------------------------------------------
 const { lsGet, lsSet, getScopedString } = window.KivoStorage;
+
