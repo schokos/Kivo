@@ -601,6 +601,108 @@ textarea.k-input{resize:vertical;min-height:70px}
   .k-grid .full{grid-column:1/-1}
 }
 
+/* -- LIGHT MODE FIXES (Dashboard/Faecher/Buttons/Progress) -- */
+.btn{color:var(--text)}
+.btn-ghost{color:var(--text)}
+.btn-lime{background:var(--primary);color:var(--primary-foreground)}
+.btn-lime:hover{background:var(--lime-2)}
+
+.progress-card{border-color:color-mix(in srgb,var(--line) 70%,transparent)}
+.ring{background:conic-gradient(var(--lime) var(--ring-pct,65%),color-mix(in srgb,var(--line) 70%,transparent) 0)}
+.course-visual{
+  background:linear-gradient(180deg,color-mix(in srgb,var(--lime) 72%,#ffffff 28%),color-mix(in srgb,var(--page) 82%,var(--lime) 18%));
+  border:1px solid color-mix(in srgb,var(--line) 80%,transparent);
+  color:var(--text);
+}
+.course-visual::before{color:color-mix(in srgb,var(--lime) 65%,var(--text) 35%)}
+
+.course-tile,
+.language-card{
+  border:1px solid color-mix(in srgb,var(--line) 80%,transparent);
+  background:linear-gradient(145deg,var(--panel),var(--panel-2));
+  color:var(--text);
+}
+.course-tile:hover,
+.language-card:hover,
+.language-card.active{
+  border-color:color-mix(in srgb,var(--lime) 40%,var(--line) 60%);
+  background:linear-gradient(145deg,color-mix(in srgb,var(--panel) 78%,var(--lime) 22%),var(--panel-2));
+}
+
+.daily-goal-bar,
+.fc-progress,
+.quiz-progress{background:color-mix(in srgb,var(--line) 85%,transparent)}
+
+/* -- TARGETED UI FIXES (requested) -- */
+.btn.btn-ghost.btn-sm{
+  background:var(--panel-2);
+  color:var(--text);
+  border-color:color-mix(in srgb,var(--line) 90%,transparent);
+}
+.btn.btn-ghost.btn-sm:hover{
+  background:color-mix(in srgb,var(--panel-2) 75%,var(--lime) 25%);
+  border-color:color-mix(in srgb,var(--lime) 45%,var(--line) 55%);
+  color:var(--text);
+}
+
+.language-grid{
+  grid-template-columns:repeat(auto-fill,minmax(210px,1fr));
+  gap:16px;
+}
+.language-card{
+  background:linear-gradient(145deg,var(--panel),var(--panel-2));
+  border-color:color-mix(in srgb,var(--line) 90%,transparent);
+  color:var(--text);
+}
+.language-card:hover,.language-card.active{
+  border-color:color-mix(in srgb,var(--lime) 42%,var(--line) 58%);
+  background:linear-gradient(145deg,color-mix(in srgb,var(--panel) 78%,var(--lime) 22%),var(--panel-2));
+}
+
+.course-grid{
+  grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+  gap:16px;
+}
+.course-tile{
+  background:linear-gradient(145deg,var(--panel),var(--panel-2));
+  border-color:color-mix(in srgb,var(--line) 90%,transparent);
+  color:var(--text);
+}
+.course-tile:hover{
+  border-color:color-mix(in srgb,var(--lime) 42%,var(--line) 58%);
+}
+.learning-grid .learn-card{
+  background:linear-gradient(145deg,var(--panel),var(--panel-2));
+}
+
+.k-card.dash-card.progress-card{
+  background:linear-gradient(145deg,var(--card),color-mix(in srgb,var(--panel-2) 45%,var(--card) 55%));
+  border:1px solid color-mix(in srgb,var(--line) 90%,transparent);
+  box-shadow:var(--shadow-sm);
+}
+
+.ai-msg.bot{
+  background:var(--card);
+  border-color:color-mix(in srgb,var(--line) 92%,transparent);
+  color:var(--text);
+}
+.ai-msg.bot.ai-vocab-result{
+  background:linear-gradient(145deg,var(--card),var(--panel-2));
+  border-color:color-mix(in srgb,var(--lime) 34%,var(--line) 66%);
+  box-shadow:var(--shadow-sm);
+}
+
+.progress-ring-wrap{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+  flex-wrap:wrap;
+}
+.progress-ring-wrap > *{
+  min-width:0;
+}
+
 
 
 

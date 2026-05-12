@@ -1,5 +1,4 @@
-﻿// â”€â”€ SCREEN ROUTER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-const SCREEN_TITLES = {
+﻿const SCREEN_TITLES = {
   home: "Dashboard",
   courses: "FÃ¤cher",
   challenges: "Challenges",

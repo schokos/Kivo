@@ -1207,7 +1207,7 @@ async function fetchAiReply(loadingDiv) {
 function makeLoadingHTML(label = 'Lädt...', progress = undefined, status = 'loading', buttons = '', errorMsg = '') {
   let barHtml = '';
   if (progress !== undefined) {
-    barHtml = `<div class="loading-bar-container" style="width:100%;height:6px;background:var(--panel-2);border-radius:3px;margin:8px 0;overflow:hidden"><div id="loading-bar" class="loading-bar" style="height:100%;background:var(--lime);width:${Math.max(0, Math.min(100, progress))}%;transition:width 0.3s ease"></div></div>`;
+    barHtml = `<div class="loading-bar-container" style="width:100%;height:6px;background:var(--line);border-radius:3px;margin:8px 0;overflow:hidden"><div id="loading-bar" class="loading-bar" style="height:100%;background:var(--lime);width:${Math.max(0, Math.min(100, progress))}%;transition:width 0.3s ease"></div></div>`;
   }
 
   let statusIcon = '⏳';

@@ -1,5 +1,4 @@
-﻿// â”€â”€ TOAST & CONFIRM â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-function toast(msg) {
+﻿function toast(msg) {
   const wrap = document.getElementById("toast-wrap");
   const el = document.createElement("div");
   el.className = "k-toast";
@@ -42,7 +41,6 @@ function closeModal(id) {
   document.getElementById(id)?.classList.remove("open");
 }
 
-// â”€â”€ USER MENU â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function toggleUserMenu() {
   document.getElementById("user-menu").classList.toggle("open");
 }
