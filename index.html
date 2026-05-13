@@ -1614,6 +1614,15 @@ function goTo(name, opts={}) {
   else if(name==='home')    updateHomeStats();
 }
 
+function refreshActiveScreen() {
+  const activeScreen = document.querySelector('.screen.active');
+  if(!activeScreen) return;
+  const screenId = activeScreen.id;
+  if(!screenId.startsWith('screen-')) return;
+  const screenName = screenId.slice('screen-'.length);
+  goTo(screenName);
+}
+ 
 // ── TOAST & CONFIRM ──────────────────────────────────────────
 function toast(msg) {
   const wrap=document.getElementById('toast-wrap');
@@ -5331,6 +5340,7 @@ async function doLogin(){
     if(error)throw error;
     await hydrateSession(data.session);
     closeModal('auth-modal'); toast('✓ Willkommen zurück!');
+    refreshActiveScreen();
   }catch(e){authMsg('Fehler: '+e.message);}
 }
 async function doRegister(){
@@ -5365,6 +5375,7 @@ async function doLogout(){
   updateUserUi(null);
   loadState();
   toast('Abgemeldet');
+  refreshActiveScreen();
 }
 function updateUserUi(user){
   const loggedIn=!!user;
@@ -5513,7 +5524,14 @@ async function hydrateSession(session){
 async function initAuth(){
   const{data:{session}}=await sb.auth.getSession();
   await hydrateSession(session);
-  sb.auth.onAuthStateChange((event,session)=>{setTimeout(()=>hydrateSession(session),0);});
+  sb.auth.onAuthStateChange((event,session)=>{
+    setTimeout(async ()=>{
+      const hadUser = !!currentUser;
+      await hydrateSession(session);
+      const hasUser = !!currentUser;
+      if(hadUser !== hasUser) refreshActiveScreen();
+    },0);
+  });
 }
 
 async function checkPendingFriendReqs(){
