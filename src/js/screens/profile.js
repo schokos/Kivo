@@ -4,41 +4,41 @@
 // der dann im Avatar-State (z.B. hair, glasses, hat, beard, outfit, bg) gesetzt wird.
 const SHOP_ITEMS = [
   // FRISUREN (zusaetzlich zu den Standard-Frisuren)
-  {id:'hair_long',  cat:'hair',    value:'long',    icon:'??',  name:'Lange Haare',     price:40, desc:'Schulterlange Haare'},
-  {id:'hair_curly', cat:'hair',    value:'curly',   icon:'??',  name:'Locken',          price:45, desc:'Lockige Mähne'},
-  {id:'hair_buzz',  cat:'hair',    value:'buzz',    icon:'??',  name:'Buzzcut',         price:25, desc:'Sehr kurzer Schnitt'},
-  {id:'hair_mohawk',cat:'hair',    value:'mohawk',  icon:'??',  name:'Mohawk',          price:60, desc:'Punk-Style'},
-  {id:'hair_bald',  cat:'hair',    value:'bald',   icon:'??',  name:'Glatze',          price:15, desc:'Klar im Kopf'},
+  {id:'hair_long',  cat:'hair',    value:'long',    icon:'💇',  name:'Lange Haare',     price:40, desc:'Schulterlange Haare'},
+  {id:'hair_curly', cat:'hair',    value:'curly',   icon:'🦱',  name:'Locken',          price:45, desc:'Lockige Mähne'},
+  {id:'hair_buzz',  cat:'hair',    value:'buzz',    icon:'👨',  name:'Buzzcut',         price:25, desc:'Sehr kurzer Schnitt'},
+  {id:'hair_mohawk',cat:'hair',    value:'mohawk',  icon:'🤘',  name:'Mohawk',          price:60, desc:'Punk-Style'},
+  {id:'hair_bald',  cat:'hair',    value:'bald',   icon:'🥚',  name:'Glatze',          price:15, desc:'Klar im Kopf'},
 
   // BRILLEN
-  {id:'gl_round',   cat:'glasses', value:'round',   icon:'??',  name:'Runde Brille',    price:35, desc:'Klassisch rund'},
-  {id:'gl_square',  cat:'glasses', value:'square',  icon:'??',  name:'Eckige Brille',   price:35, desc:'Nerdy chic'},
-  {id:'gl_sun',     cat:'glasses', value:'sun',     icon:'???',  name:'Sonnenbrille',    price:55, desc:'Cool bleiben'},
-  {id:'gl_visor',   cat:'glasses', value:'visor',   icon:'??',  name:'Visor',           price:75, desc:'Cyberpunk-Style'},
+  {id:'gl_round',   cat:'glasses', value:'round',   icon:'👓',  name:'Runde Brille',    price:35, desc:'Klassisch rund'},
+  {id:'gl_square',  cat:'glasses', value:'square',  icon:'🤓',  name:'Eckige Brille',   price:35, desc:'Nerdy chic'},
+  {id:'gl_sun',     cat:'glasses', value:'sun',     icon:'🕶️',  name:'Sonnenbrille',    price:55, desc:'Cool bleiben'},
+  {id:'gl_visor',   cat:'glasses', value:'visor',   icon:'🥽',  name:'Visor',           price:75, desc:'Cyberpunk-Style'},
 
   // KOPFBEDECKUNGEN
-  {id:'hat_cap',    cat:'hat',     value:'cap',     icon:'??',  name:'Cap',             price:30, desc:'Lässige Kappe'},
-  {id:'hat_beanie', cat:'hat',     value:'beanie',  icon:'??',  name:'Beanie',          price:35, desc:'Warme Mütze'},
-  {id:'hat_crown',  cat:'hat',     value:'crown',   icon:'??',  name:'Krone',           price:120,desc:'Königlich'},
-  {id:'hat_top',    cat:'hat',     value:'top',     icon:'??',  name:'Zylinder',        price:90, desc:'Sehr fein'},
+  {id:'hat_cap',    cat:'hat',     value:'cap',     icon:'🧢',  name:'Cap',             price:30, desc:'Lässige Kappe'},
+  {id:'hat_beanie', cat:'hat',     value:'beanie',  icon:'🎩',  name:'Beanie',          price:35, desc:'Warme Mütze'},
+  {id:'hat_crown',  cat:'hat',     value:'crown',   icon:'👑',  name:'Krone',           price:120,desc:'Königlich'},
+  {id:'hat_top',    cat:'hat',     value:'top',     icon:'🎩',  name:'Zylinder',        price:90, desc:'Sehr fein'},
 
   // BART
-  {id:'bd_stub',    cat:'beard',   value:'stub',    icon:'??',  name:'Stoppelbart',     price:20, desc:'Drei-Tage-Bart'},
-  {id:'bd_full',    cat:'beard',   value:'full',    icon:'?????', name:'Vollbart',        price:40, desc:'Buschig'},
-  {id:'bd_mous',    cat:'beard',   value:'mous',    icon:'?????', name:'Schnurrbart',     price:30, desc:'Klassisch'},
+  {id:'bd_stub',    cat:'beard',   value:'stub',    icon:'🧔',  name:'Stoppelbart',     price:20, desc:'Drei-Tage-Bart'},
+  {id:'bd_full',    cat:'beard',   value:'full',    icon:'🧔‍♂️', name:'Vollbart',        price:40, desc:'Buschig'},
+  {id:'bd_mous',    cat:'beard',   value:'mous',    icon:'👨‍🦰', name:'Schnurrbart',     price:30, desc:'Klassisch'},
 
   // OUTFITS (Farben fuer das Hemd)
-  {id:'out_red',    cat:'outfit',  value:'#A33B2E', icon:'??',  name:'Rotes Outfit',    price:25, desc:'Auffällig'},
-  {id:'out_purple', cat:'outfit',  value:'#7A4FB0', icon:'??',  name:'Lila Outfit',     price:30, desc:'Königlich'},
-  {id:'out_gold',   cat:'outfit',  value:'#C9892F', icon:'??',  name:'Goldenes Outfit', price:50, desc:'Champion'},
-  {id:'out_white',  cat:'outfit',  value:'#E8E1D3', icon:'?',  name:'Weißes Outfit',   price:35, desc:'Elegant'},
+  {id:'out_red',    cat:'outfit',  value:'#A33B2E', icon:'🟥',  name:'Rotes Outfit',    price:25, desc:'Auffällig'},
+  {id:'out_purple', cat:'outfit',  value:'#7A4FB0', icon:'🟪',  name:'Lila Outfit',     price:30, desc:'Königlich'},
+  {id:'out_gold',   cat:'outfit',  value:'#C9892F', icon:'🟨',  name:'Goldenes Outfit', price:50, desc:'Champion'},
+  {id:'out_white',  cat:'outfit',  value:'#E8E1D3', icon:'⬜',  name:'Weißes Outfit',   price:35, desc:'Elegant'},
 
   // HINTERGRUENDE
-  {id:'bg_sunset',  cat:'bg',      value:'#4a3a26', icon:'??',  name:'Sonnenuntergang', price:40, desc:'Warmer Hintergrund'},
-  {id:'bg_purple',  cat:'bg',      value:'#3a2645', icon:'??',  name:'Galaxie',         price:40, desc:'Lila Nacht'},
-  {id:'bg_ocean',   cat:'bg',      value:'#26454a', icon:'??',  name:'Ozean',           price:40, desc:'Tiefes Blau'},
-  {id:'bg_rose',    cat:'bg',      value:'#4a2638', icon:'??',  name:'Rosé',            price:40, desc:'Romantisch'},
-  {id:'bg_night',   cat:'bg',      value:'#2D2D2D', icon:'??',  name:'Mitternacht',     price:30, desc:'Dunkel & edel'},
+  {id:'bg_sunset',  cat:'bg',      value:'#4a3a26', icon:'🌅',  name:'Sonnenuntergang', price:40, desc:'Warmer Hintergrund'},
+  {id:'bg_purple',  cat:'bg',      value:'#3a2645', icon:'🌌',  name:'Galaxie',         price:40, desc:'Lila Nacht'},
+  {id:'bg_ocean',   cat:'bg',      value:'#26454a', icon:'🌊',  name:'Ozean',           price:40, desc:'Tiefes Blau'},
+  {id:'bg_rose',    cat:'bg',      value:'#4a2638', icon:'🌹',  name:'Rosé',            price:40, desc:'Romantisch'},
+  {id:'bg_night',   cat:'bg',      value:'#2D2D2D', icon:'🌑',  name:'Mitternacht',     price:30, desc:'Dunkel & edel'},
 ];
 
 
@@ -205,7 +205,7 @@ function renderProfile(targetUser=null) {
   const user=targetUser||currentUser;
   if(!user&&!targetUser){
     el.innerHTML=`<div class="k-card" style="text-align:center;padding:40px">
-      <div style="font-size:40px;margin-bottom:12px">${'??'}</div>
+      <div style="font-size:40px;margin-bottom:12px">👤</div>
       <div style="font-size:14px;margin-bottom:8px">Noch nicht angemeldet</div>
       <button class="btn btn-lime" onclick="openModal('auth-modal')">Jetzt anmelden</button>
     </div>`;
@@ -217,7 +217,32 @@ function renderProfile(targetUser=null) {
   const equipped=lsGet('kivo_equipped','[]');
   el.innerHTML=`
     <div class="profile-hero">
-      <div class="profile-av" id="prof-av">${getUserAvatar(user, 64)}</div>
+      <div style="position:relative;width:64px;height:64px">
+      <div
+        class="profile-av profile-av-upload"
+        id="prof-av"
+        onclick="document.getElementById('avatar-inp').click()"
+        title="Upload picture"
+      >
+        ${getUserAvatar(user, 64)}
+
+        ${currentUser ? `
+          <div class="profile-av-overlay">
+            Upload picture
+          </div>
+        ` : ''}
+      </div>
+
+      ${currentUser ? `
+        <input
+          type="file"
+          id="avatar-inp"
+          accept="image/*"
+          style="display:none"
+          onchange="uploadAvatar(this)"
+        >
+      ` : ''}
+    </div>
       <div style="flex:1">
         <div style="font-size:20px;font-weight:800;margin-bottom:4px">${user?.username||'Gast'}</div>
         <div style="font-size:11px;color:var(--muted);margin-bottom:8px">${user?.email||''}</div>
@@ -227,7 +252,6 @@ function renderProfile(targetUser=null) {
           <div style="text-align:center"><div style="font-size:18px;font-weight:700">${sessions.length}</div><div style="font-size:9px;color:var(--muted)">Sessions</div></div>
         </div>
       </div>
-      ${currentUser?`<button class="btn btn-sm" onclick="document.getElementById('avatar-inp').click()">??</button><input type="file" id="avatar-inp" accept="image/*" style="display:none" onchange="uploadAvatar(this)">`:'' }
     </div>
 
     <!-- Gekaufte Avatar-Items -->
@@ -236,7 +260,7 @@ function renderProfile(targetUser=null) {
       <div class="profile-items-row" id="equipped-row">
         ${(()=>{const owned=lsGet('kivo_items','[]');const its=SHOP_ITEMS.filter(i=>owned.includes(i.id));return its.length?its.map(it=>`<div class="profile-item-badge" title="${it.name}">${it.icon}</div>`).join(''):'<div style="font-size:11px;color:var(--muted)">Noch keine Items — kaufe welche im Shop und gestalte deinen Avatar!</div>'})()}
       </div>
-      ${currentUser?`<button class="btn btn-sm btn-lime" style="margin-top:8px" onclick="openAvatarBuilder()">?? Avatar gestalten</button>`:''}
+      ${currentUser?`<button class="btn btn-sm btn-lime" style="margin-top:8px" onclick="openAvatarBuilder()">Avatar gestalten</button>`:''}
     </div>
 
     <!-- Stats Vergleich (wenn eigenes Profil oder Freundesprofil) -->

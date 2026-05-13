@@ -34,14 +34,67 @@ function getDailyShopItems(count=6){
 // ── SHOP ──────────────────────────────────────────────────────
 const CAT_LABEL = {hair:'Frisur',glasses:'Brille',hat:'Kopfbedeckung',beard:'Bart',outfit:'Outfit',bg:'Hintergrund'};
 
-function _fmtRotation(){
-  const t=getNextShopRotation();
-  const h=String(t.getHours()).padStart(2,'0'), m=String(t.getMinutes()).padStart(2,'0');
-  const d=t.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'});
-  // Ist die nächste Rotation morgen oder heute?
-  const now=new Date();
-  const sameDay=t.getDate()===now.getDate()&&t.getMonth()===now.getMonth();
-  return (sameDay?'heute':'morgen')+' um '+h+':'+m;
+let shopCountdownInterval = null;
+
+function _fmtRotationCountdown() {
+  const target = getNextShopRotation();
+  const now = new Date();
+
+  const diff = target - now;
+
+  if (diff <= 0) return '00m 00s';
+
+  const totalSeconds = Math.floor(diff / 1000);
+
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  const parts = [];
+
+  if (days > 0) parts.push(days + 'd');
+
+  if (hours > 0 || days > 0) {
+    parts.push(String(hours).padStart(2, '0') + 'h');
+  }
+
+  parts.push(String(minutes).padStart(2, '0') + 'm');
+  parts.push(String(seconds).padStart(2, '0') + 's');
+
+  return parts.join(' ');
+}
+
+function startShopCountdown() {
+
+  // Vorheriges Interval sauber stoppen
+  if (shopCountdownInterval) {
+    clearInterval(shopCountdownInterval);
+  }
+
+  const countdownEl = document.getElementById('shop-rotation-countdown');
+
+  if (!countdownEl) return;
+
+  function updateCountdown() {
+
+    const remaining = getNextShopRotation() - new Date();
+
+    countdownEl.textContent = _fmtRotationCountdown();
+
+    // Wenn Rotation erreicht wurde
+    if (remaining <= 0) {
+
+      clearInterval(shopCountdownInterval);
+
+      // Shop neu laden
+      renderShop();
+    }
+  }
+
+  updateCountdown();
+
+  shopCountdownInterval = setInterval(updateCountdown, 1000);
 }
 
 function renderShop() {
@@ -57,7 +110,6 @@ function renderShop() {
   const dailyItems = getDailyShopItems(6);
   el.innerHTML=`
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap">
-      <div class="currency-pill" style="display:flex;align-items:center;gap:6px">${ic('coin',14)} ${userCurrency} Münzen</div>
       <div style="font-size:10px;color:var(--muted)">Münzen verdienst du durch Quests &amp; Level-Ups.</div>
       ${currentUser?`<button class="btn btn-sm btn-lime" style="margin-left:auto;display:inline-flex;align-items:center;gap:6px" onclick="openAvatarBuilder()">${ic('pen',13)} Avatar gestalten</button>`:''}
     </div>
@@ -65,7 +117,11 @@ function renderShop() {
       <div style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--lime)">
         ${ic('calendar',16)} Tages-Angebot
       </div>
-      <div style="font-size:10px;color:var(--muted);margin-top:4px">Der Shop rotiert ${_fmtRotation()} und zeigt dann neue Items.</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:4px">
+        Der Shop rotiert in
+        <span id="shop-rotation-countdown"></span>
+        und zeigt dann neue Items.
+      </div>
     </div>
     <div class="k-section-title">Heutige Items</div>
     <div class="shop-grid">${dailyItems.map(it=>{
@@ -81,6 +137,7 @@ function renderShop() {
     <div style="margin-top:18px;padding:12px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--r);font-size:11px;color:var(--muted);text-align:center;display:flex;align-items:center;justify-content:center;gap:6px">
       ${ic('sparkles',13)} Gekaufte Items findest du im <strong style="color:var(--text)">Avatar-Builder</strong> als neue Optionen.
     </div>`;
+  startShopCountdown();
 }
 
 async function buyItem(id) {

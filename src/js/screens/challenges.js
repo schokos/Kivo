@@ -1,11 +1,11 @@
-﻿// ── DAILY / WEEKLY QUESTS ───────────────────────────────────
+﻿// -- DAILY / WEEKLY QUESTS -----------------------------------
 // Trackt Lernfortschritt pro Tag/Woche. Quests sind feste Ziele, die durch
 // normale Lernaktionen erfüllt werden (kein extra Klick nötig).
 // Belohnungen werden EINMAL pro Quest-Periode automatisch ausgezahlt.
 const DAILY_QUESTS = [
-  {id:'q_cards',  icon:'cards',  name:'10 Karten lernen',     target:10, metric:'cards',   xp:15, coins:5},
-  {id:'q_quiz',   icon:'target', name:'Quiz oder Tipp-Runde', target:1,  metric:'sessions',xp:20, coins:8},
-  {id:'q_streak', icon:'flame',  name:'Heute aktiv lernen',   target:5,  metric:'xp',      xp:10, coins:5},
+  {id:'q_focus',  icon:'book',   name:'10 Lernaktionen durchführen', target:10, metric:'focus',   xp:15, coins:5},
+  {id:'q_session',icon:'target', name:'1 Lern-Session abschließen',  target:1,  metric:'sessions',xp:20, coins:8},
+  {id:'q_streak', icon:'flame',  name:'Heute aktiv lernen',          target:5,  metric:'xp',      xp:10, coins:5},
 ];
 const WEEKLY_QUESTS = [
   {id:'wq_xp',      icon:'trophy', name:'250 XP sammeln',           target:250, metric:'xp',      xp:50, coins:25},
@@ -21,8 +21,8 @@ function _weekKey(){
 function getQuestState(){
   const raw=lsGet('kivo_quests','{}');
   const tk=_todayKey(), wk=_weekKey();
-  if(raw.day!==tk) raw.daily={cards:0,sessions:0,xp:0,claimed:[]}, raw.day=tk;
-  if(raw.week!==wk) raw.weekly={cards:0,sessions:0,xp:0,claimed:[]}, raw.week=wk;
+  if(raw.day!==tk) raw.daily={focus:0,sessions:0,xp:0,claimed:[]}, raw.day=tk;
+  if(raw.week!==wk) raw.weekly={focus:0,sessions:0,xp:0,claimed:[]}, raw.week=wk;
   return raw;
 }
 function saveQuestState(s){ lsSet('kivo_quests',s); }
@@ -54,12 +54,11 @@ function trackQuest(metric, amount=1){
   if(document.getElementById('screen-challenges')?.classList.contains('active')) renderChallenges();
 }
 function dailyQuestsDone(){
-  const s=getQuestState();
   return DAILY_QUESTS.filter(q=>questProgress(q,'daily')>=q.target).length;
 }
 
 
-// ── CHALLENGE HUB ──────────────────────────────────────────────
+// -- CHALLENGE HUB ----------------------------------------------
 function renderChallenges(){
   const el=document.getElementById('challenges-content'); if(!el)return;
   const renderQuest=(q,scope)=>{
@@ -101,5 +100,4 @@ function renderChallenges(){
       </div>
     </div>`;
 }
-
 

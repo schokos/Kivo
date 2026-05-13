@@ -1330,7 +1330,7 @@ async function importAiList(encOrRaw) {
       `Zu "${name}" wechseln und lernen?`,
       () => {
         setActivePool(mkKey(lang, name));
-        goTo('cards');
+        goTo('courses');
       }
     );
   } catch (e) {

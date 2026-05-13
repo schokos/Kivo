@@ -1,20 +1,12 @@
 ﻿{
   "subjects": [
     {
-      "id": "spanisch",
-      "path": "src/data/subjects/spanisch/subject.json"
+      "id": "english",
+      "path": "src/data/subjects/english/subject.json"
     },
     {
-      "id": "englisch",
-      "path": "src/data/subjects/englisch/subject.json"
-    },
-    {
-      "id": "deutsch",
-      "path": "src/data/subjects/deutsch/subject.json"
-    },
-    {
-      "id": "mathe",
-      "path": "src/data/subjects/mathe/subject.json"
+      "id": "mathematics",
+      "path": "src/data/subjects/mathematics/subject.json"
     }
   ]
 }

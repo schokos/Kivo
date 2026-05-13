@@ -43,7 +43,7 @@
 <link rel="stylesheet" href="src/styles/main.css">
 <body>
 
-<!-- ── SHELL ─────────────────────────────────────────────────────── -->
+<!-- -- SHELL ------------------------------------------------------- -->
 <div class="shell">
 
   <!-- RAIL (desktop sidebar icons) -->
@@ -51,17 +51,16 @@
     <div class="rail-top">
       <button class="brand-btn" onclick="goTo('home')" title="Kivo" aria-label="Kivo"></button>
       <button class="rail-btn active" id="rb-home" data-s="home" onclick="goTo('home')" title="Dashboard"><span class="rail-ico"><svg viewBox="0 0 24 24"><path d="M3 12 12 3l9 9"></path><path d="M5 10v10h14V10"></path><path d="M10 20v-6h4v6"></path></svg></span><span class="rail-lbl">Dashboard</span></button>
-      <button class="rail-btn" id="rb-courses" data-s="courses" onclick="goTo('courses')" title="Fächer"><span class="rail-ico"><svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2V5z"></path><path d="M8 7h8M8 11h8M8 15h5"></path></svg></span><span class="rail-lbl">Fächer</span></button>
-      <button class="rail-btn" id="rb-challenges" data-s="challenges" onclick="goTo('challenges')" title="Challenges"><span class="rail-ico"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8.5-8 9-4.5-.5-8-4-8-9V6l8-3z"></path><path d="m9 12 2 2 4-4"></path></svg></span><span class="rail-lbl">Challenges</span></button>
-      <button class="rail-btn" id="rb-community" data-s="community" onclick="goTo('community')" title="Community"><span class="rail-ico"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"></circle><circle cx="17" cy="9.5" r="2.4"></circle><path d="M3 19c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"></path><path d="M15 19c0-2.3 1.6-4 3.5-4s2.5 1.3 2.5 3"></path></svg></span><span class="rail-lbl">Community</span></button>
+      <button class="rail-btn" id="rb-courses" data-s="courses" onclick="goTo('courses')" title="FÃ¤cher"><span class="rail-ico"><svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2V5z"></path><path d="M8 7h8M8 11h8M8 15h5"></path></svg></span><span class="rail-lbl">Fächer</span></button>
+      <button class="rail-btn" id="rb-challenges" data-s="challenges" onclick="goTo('challenges')" title="Challenges"><span class="rail-ico"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span><span class="rail-lbl">Challenges</span></button>
       <button class="rail-btn" id="rb-pass" data-s="pass" onclick="goTo('pass')" title="Lern-Pass"><span class="rail-ico"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8.5-8 9-4.5-.5-8-4-8-9V6l8-3z"></path><path d="m9 12 2 2 4-4"></path></svg></span><span class="rail-lbl">Lern-Pass</span></button>
-      <button class="rail-btn" id="rb-shop" data-s="shop" onclick="goTo('shop')" title="Belohnungen"><span class="rail-ico"><svg viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6L5 8z"></path><path d="M9 8V6a3 3 0 0 1 6 0v2"></path><path d="M9 12v2M15 12v2"></path></svg></span><span class="rail-lbl">Belohnungen</span></button>
+      <button class="rail-btn" id="rb-shop" data-s="shop" onclick="goTo('shop')" title="Shop"><span class="rail-ico"><svg viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6L5 8z"></path><path d="M9 8V6a3 3 0 0 1 6 0v2"></path><path d="M9 12v2M15 12v2"></path></svg></span><span class="rail-lbl">Shop</span></button>
     </div>
     <div class="rail-bot">
       <button class="rail-btn" id="rb-github" data-s="github"
       onclick="(async()=>{ 
         const ok = await confirm2(
-          'URL öffnen?',
+          'URL fnen?',
           'Möchten Sie https://github.com/schokos/Kivo/issues wirklich öffnen?'
         );
         if(ok){
@@ -90,49 +89,77 @@
       <div class="um-sep"></div>
       <div class="um-item" onclick="closeUserMenu();goTo('profile')"><svg class="um-ico" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><span>Mein Profil</span></div>
       <div class="um-item" onclick="closeUserMenu();goTo('pass')"><svg class="um-ico" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8.5-8 9-4.5-.5-8-4-8-9V6l8-3z"></path><path d="m9 12 2 2 4-4"></path></svg><span>Lern-Pass</span></div>
-      <div class="um-item" onclick="closeUserMenu();goTo('shop')"><svg class="um-ico" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg><span>Shop</span></div>
-      <div class="um-sep"></div>
-      <div class="um-item" onclick="closeUserMenu();openModal('photo-modal')"><svg class="um-ico" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg><span>Foto-Import</span></div>
+      <div class="um-item" onclick="closeUserMenu();goTo('challenges')"><svg class="um-ico" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><span>Challenges</span></div><div class="um-sep"></div>
       <div class="um-item" id="um-avatar-builder" onclick="closeUserMenu();openAvatarBuilder()"><svg class="um-ico" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-7 8-7s8 3 8 7"></path><circle cx="18" cy="6" r="2.5" fill="currentColor" stroke="none"></circle></svg><span>Avatar gestalten</span></div>
       <div class="um-sep"></div>
       <div class="um-item" id="um-logout" style="display:none;color:var(--danger)" onclick="doLogout()"><svg class="um-ico" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg><span>Abmelden</span></div>
     </div>
     <div class="topbar">
       <div class="tb-left">
+        <button class="tb-back-btn" id="courses-topbar-back" onclick="coursesTopbarBack()" title="ZurÃ¼ck" aria-label="ZurÃ¼ck">
+          <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"></path></svg>
+        </button>
         <div class="tb-title" id="tb-title">Dashboard</div>
       </div>
       <div class="tb-right">
-        <div class="pool-pill" id="streak-pill">
+        <button 
+          class="friend-btn" 
+          id="aibot-history-btn" 
+          onclick="openChatModal()" 
+          title="Chat-History"
+          style="display:none"
+        >
+          <svg viewBox="0 0 24 24" class="btn-icon">
+            <path d="M4 5h16v10H7l-3 3V5z"></path>
+          </svg>
+        </button>
+        <div class="pool-pill stats-pill" id="stats-pill">
+        <!-- Streak -->
+        <div class="stat-item">
           <span class="dash-ico" style="color:#6AC28A">
-            <svg viewBox="0 0 24 24"><path d="M12 2c1 4 5 5 5 10a5 5 0 1 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3 1-6 1-9z"></path></svg>
+            <svg viewBox="0 0 24 24">
+              <path d="M12 2c1 4 5 5 5 10a5 5 0 1 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3 1-6 1-9z"></path>
+            </svg>
           </span>
           <span id="topbar-streak">0</span>
         </div>
-        <div class="pool-pill" id="currency-pill" style="display:none">
+
+        <!-- Coins -->
+        <div class="stat-item">
           <span class="dash-ico gem">
-            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 6v12M9 9h4.5a2 2 0 0 1 0 4H9.5a2 2 0 0 0 0 4H15"/></svg>
+            <svg viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="9"/>
+              <path d="M12 6v12M9 9h4.5a2 2 0 0 1 0 4H9.5a2 2 0 0 0 0 4H15"/>
+            </svg>
           </span>
           <span id="currency-val">0</span>
         </div>
+
+        <!-- XP -->
+        <div class="stat-item">
+          <span class="dash-ico xp-ico">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 3l2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.8 6.4 20.2l1.1-6.2L3 9.6l6.2-.9L12 3z"></path>
+            </svg>
+          </span>
+          <span id="hm-xp">0</span>
+        </div>
+
+      </div>
         <button class="friend-btn" onclick="openFriendPanel()" title="Freunde">
           <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"></circle><circle cx="17" cy="9.5" r="2.4"></circle><path d="M3 19c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"></path><path d="M15 19c0-2.3 1.6-4 3.5-4s2.5 1.3 2.5 3"></path></svg>
           <span class="friend-notif" id="friend-notif"></span>
         </button>
-        <div class="avatar-btn" id="avatar-btn" onclick="event.stopPropagation();toggleUserMenu()" title="Profilmenü"></div>
+        <div class="avatar-btn" id="avatar-btn" title="Profilmenü"></div>
       </div>
     </div>
 
     <!-- SCREENS -->
     <div class="screens">
 
-      <!-- HOME ─────────────────────────────────── -->
+      <!-- HOME ----------------------------------- -->
       <div class="screen active" id="screen-home">
-        <div class="home-welcome">
-          <div>
-            <div class="home-title">Hallo, <span id="home-user-name">Lerner</span>!</div>
-            <div class="home-kicker">Weiter so! Dein Wissen wächst.</div>
-          </div>
-        </div>
+        <div class="home-welcome"></div>
 
         <div class="dashboard-grid">
           <div class="k-card dash-card progress-card">
@@ -151,54 +178,27 @@
             <button class="btn btn-lime" style="margin-top:22px" onclick="goTo('challenges')">Zu den Quests</button>
           </div>
           <div class="k-card dash-card">
-            <div style="font-size:17px;font-weight:850">Empfohlenes Fach</div>
-            <div class="course-visual"></div>
-            <div style="font-size:13px;font-weight:850" id="home-pool-name">–</div>
-            <button class="course-link btn btn-ghost" style="width:100%;margin-top:8px" onclick="goTo('courses')"><span>Weiterlernen ❯</span><span>›</span></button>
+            <div style="font-size:17px;font-weight:850;margin-bottom:8px">WebUntis</div>
+            <div style="font-size:10px;font-weight:800;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Hausaufgaben</div>
+            <div id="home-aggregated-homework" style="display:flex;flex-direction:column;gap:8px"></div>
+            <div style="font-size:10px;font-weight:800;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Klausuren</div>
+            <div id="home-aggregated-exams" style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px"></div>
           </div>
         </div>
 
-        <div class="course-grid-head">
-          <div style="font-size:18px;font-weight:900">Fächer entdecken</div>
-          <button class="btn btn-ghost btn-sm" onclick="goTo('courses')">Alle anzeigen</button>
-        </div>
-        <div class="course-grid">
-          <div class="course-tile" onclick="goTo('cards')"><div class="tile-icon"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="14" height="16" rx="2"></rect><path d="M7 5V3h10a4 4 0 0 1 4 4v12"></path></svg></div><div class="tile-title">Karteikarten</div><div class="tile-sub">Schnell wiederholen</div></div>
-          <div class="course-tile" onclick="goTo('quiz')"><div class="tile-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.8.4-1 .9-1 1.7"></path><circle cx="12" cy="17" r=".6" fill="currentColor"></circle></svg></div><div class="tile-title">Quiz</div><div class="tile-sub">Wissen testen</div></div>
-          <div class="course-tile" onclick="goTo('typing')"><div class="tile-icon"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"></rect><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"></path></svg></div><div class="tile-title">Tippen</div><div class="tile-sub">Aktiv erinnern</div></div>
-          <div class="course-tile" onclick="goTo('matching')"><div class="tile-icon"><svg viewBox="0 0 24 24"><path d="M20.5 11H19V7a2 2 0 0 0-2-2h-4V3.5a2.5 2.5 0 0 0-5 0V5H4a2 2 0 0 0-2 2v3.8h1.5a2.2 2.2 0 0 1 0 4.4H2V19a2 2 0 0 0 2 2h3.8v-1.5a2.2 2.2 0 0 1 4.4 0V21H17a2 2 0 0 0 2-2v-4h1.5a2.5 2.5 0 0 0 0-5z"></path></svg></div><div class="tile-title">Zuordnen</div><div class="tile-sub">Logisch verbinden</div></div>
-        </div>
-
-        <div class="k-grid" style="margin-top:18px">
-          <div class="k-card full">
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
-              <div><div class="k-section-title">Aktueller Pool</div><div style="font-size:13px;color:var(--muted)"><span id="hm-sr">0</span> Wiederholungen fällig · <span id="hm-goal-lbl">0 XP heute</span></div></div>
-              <div class="btn-row" style="margin-top:0"><button class="btn btn-sm" onclick="openModal('pool-modal')">Pool wählen</button><button class="btn btn-sm" onclick="openModal('photo-modal')">Foto-Import</button></div>
-            </div>
-            <div class="daily-goal-bar" style="margin-top:12px"><div class="daily-goal-fill" id="daily-goal-fill" style="width:0%"></div></div>
-            <div id="hm-sessions" style="font-size:10px;color:var(--muted);margin-top:10px">–</div>
-          </div>
-        </div>
       </div>
 
-      <!-- Fächer ─────────────────────────────────── -->
+      <!-- FÃ¤cher ----------------------------------- -->
       <div class="screen" id="screen-courses">
-        <div class="app-page-head">
-          <div><div class="app-page-title">Fächer</div><div class="app-page-sub">Wähle zuerst ein Fach wie Spanisch oder Mathe und öffne darin Vokabeln, Grammatik oder eigenständige Lektionen.</div></div>
-          <a class="btn btn-ghost btn-sm" href="index.html">Struktur ansehen</a>
-        </div>
         <div id="courses-content"></div>
       </div>
 
-      <!-- CHALLENGES ────────────────────────────── -->
+      <!-- CHALLENGES ------------------------------ -->
       <div class="screen" id="screen-challenges">
-        <div class="app-page-head">
-          <div><div class="app-page-title">Challenges</div><div class="app-page-sub">Daily &amp; Weekly Quests — Belohnungen werden automatisch ausgezahlt.</div></div>
-        </div>
         <div id="challenges-content"></div>
       </div>
 
-      <!-- COMMUNITY ─────────────────────────────── -->
+      <!-- COMMUNITY ------------------------------- -->
       <div class="screen" id="screen-community">
         <div class="app-page-head">
           <div><div class="app-page-title">Community</div><div class="app-page-sub">Freunde, Global Leaderboard und Team-Vorschau.</div></div>
@@ -207,123 +207,48 @@
         <div id="community-content"></div>
       </div>
 
-      <!-- KARTEIKARTEN ─────────────────────────── -->
-      <div class="screen" id="screen-cards">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-          <div style="font-size:18px;font-weight:800">Karteikarten</div>
-          <div style="display:flex;gap:6px;align-items:center">
-            <label style="font-size:10px;color:var(--muted);display:flex;align-items:center;gap:5px;cursor:pointer">
-              <input type="checkbox" id="skip-known" onchange="initCards()"> Bekannte überspringen
-            </label>
-          </div>
-        </div>
-        <div class="fc-progress"><div class="fc-progress-fill" id="fc-prog" style="width:0%"></div></div>
-        <div class="fc-counter" id="fc-counter">0 / 0</div>
-        <div class="fc-wrap" onclick="flipCard()">
-          <div class="fc" id="fc">
-            <div class="fc-face fc-front">
-              <div class="fc-word" id="fc-front-word">–</div>
-              <div class="fc-hint">Tippe um umzudrehen</div>
-            </div>
-            <div class="fc-face fc-back">
-              <div class="fc-word" id="fc-back-word">–</div>
-              <div class="fc-hint" id="fc-cat-hint"></div>
-            </div>
-          </div>
-        </div>
-        <div class="fc-actions" id="fc-btns" style="display:none">
-          <button class="btn btn-danger btn-sm" onclick="setKnown(false)">✗ Nicht gekonnt</button>
-          <button class="btn btn-ok btn-sm" onclick="setKnown(true)">✓ Gekonnt</button>
-        </div>
-        <div class="fc-nav">
-          <button class="btn btn-sm" onclick="navCard(-1)">← Zurück</button>
-          <button class="btn btn-sm" onclick="flipCard()">↩ Umdrehen</button>
-          <button class="btn btn-sm" onclick="navCard(1)">Weiter →</button>
-        </div>
-        <div style="text-align:center;margin-top:14px;font-size:10px;color:var(--muted)">Kein XP für Karteikarten — nutze Quiz oder Tippen für XP</div>
-      </div>
-
-      <!-- QUIZ ─────────────────────────────────── -->
-      <div class="screen" id="screen-quiz">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-          <div style="font-size:18px;font-weight:800">Quiz</div>
-          <div style="display:flex;gap:6px;align-items:center">
-            <label style="font-size:10px;color:var(--muted);display:flex;align-items:center;gap:5px;cursor:pointer">
-              <input type="checkbox" id="quiz-d2e"> Übersetzungsrichtung ↔
-            </label>
-          </div>
-        </div>
-        <div id="quiz-area"></div>
-      </div>
-
-      <!-- TIPPEN ──────────────────────────────── -->
-      <div class="screen" id="screen-typing">
-        <div style="font-size:18px;font-weight:800;margin-bottom:14px">Tippen</div>
-        <div id="typing-area"></div>
-      </div>
-
-      <!-- ZUORDNEN ────────────────────────────── -->
-      <div class="screen" id="screen-matching">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-          <div style="font-size:18px;font-weight:800">Zuordnen</div>
-          <div style="font-size:11px;color:var(--muted)">Gefunden: <span id="mc-cnt">0</span> / <span id="mc-tot">0</span></div>
-        </div>
-        <div id="matching-area"></div>
-      </div>
-
-      <!-- ÜBERSICHT ────────────────────────────── -->
+      <!-- ÃœBERSICHT ------------------------------ -->
       <div class="screen" id="screen-overview">
         <div class="app-page-head">
           <div><div class="app-page-title">Meine Pools</div><div class="app-page-sub">Verwalte deine Vokabel-Pools.</div></div>
           <div style="display:flex;gap:6px">
             <button class="btn btn-sm btn-lime" onclick="openNewPoolModal()">+ Neuer Pool</button>
-            <button class="btn btn-sm" onclick="openModal('photo-modal')">Foto-Import</button>
-            <button class="btn btn-sm" onclick="goTo('courses')">← Zurück</button>
+            <button class="btn btn-sm" onclick="goTo('courses')">? Zurück</button>
           </div>
         </div>
         <div id="overview-content"></div>
       </div>
 
-      <!-- STATISTIKEN ─────────────────────────── -->
+      <!-- STATISTIKEN --------------------------- -->
       <div class="screen" id="screen-stats">
         <div style="font-size:18px;font-weight:800;margin-bottom:14px">Statistiken</div>
         <div id="stats-content"></div>
       </div>
 
-      <!-- KI-LÜCKENTEXT ───────────────────────── -->
+      <!-- KI-LÃœCKENTEXT ------------------------- -->
       <div class="screen" id="screen-gap">
         <div style="font-size:18px;font-weight:800;margin-bottom:6px">KI-Lückentext</div>
         <div style="font-size:11px;color:var(--muted);margin-bottom:14px">KI generiert einen Text passend zu deinem Pool — füll die Lücken aus</div>
         <div id="gap-content"></div>
       </div>
 
-      <!-- KI-ASSISTENT ────────────────────────── -->
+      <!-- KI-ASSISTENT -------------------------- -->
       <div class="screen" id="screen-aibot">
-        <div class="app-page-head">
-          <div>
-            <div class="app-page-title">KI-Assistent</div>
-            <div class="app-page-sub">Stelle Fragen oder lass dir Lerntipps geben.</div>
-          </div>
-          <button class="btn btn-lime btn-sm" onclick="openChatModal()">Chats</button>
-        </div>
         <div class="aibot-wrap" id="aibot-wrap"></div>
       </div>
 
-      <!-- PROFIL ──────────────────────────────── -->
+      <!-- PROFIL -------------------------------- -->
       <div class="screen" id="screen-profile">
-        <div class="app-page-head"><div><div class="app-page-title">Mein Profil</div><div class="app-page-sub">Deine Statistiken, Avatar und Account-Einstellungen.</div></div></div>
         <div id="profile-content"></div>
       </div>
 
-      <!-- SHOP ────────────────────────────────── -->
+      <!-- SHOP ---------------------------------- -->
       <div class="screen" id="screen-shop">
-        <div class="app-page-head"><div><div class="app-page-title">Belohnungen</div><div class="app-page-sub">Ein Shop für Items, Badges und kosmetische Belohnungen.</div></div></div>
         <div id="shop-content"></div>
       </div>
 
-      <!-- PASS ────────────────────────────────── -->
+      <!-- PASS ---------------------------------- -->
       <div class="screen" id="screen-pass">
-        <div class="app-page-head"><div><div class="app-page-title">Lern-Pass</div><div class="app-page-sub">Schalte Avatar-Items frei, indem du Level aufsteigst.</div></div></div>
         <div id="pass-content"></div>
       </div>
 
@@ -335,9 +260,8 @@
 <nav class="bottom-nav" id="bottom-nav">
   <button class="bn-item active" data-s="home" onclick="goTo('home')"><span class="bn-icon"><svg viewBox="0 0 24 24"><path d="M3 12 12 3l9 9"></path><path d="M5 10v10h14V10"></path><path d="M10 20v-6h4v6"></path></svg></span>Dashboard</button>
   <button class="bn-item" data-s="courses" onclick="goTo('courses')"><span class="bn-icon"><svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2V5z"></path><path d="M8 7h8M8 11h8M8 15h5"></path></svg></span>Fächer</button>
+  <button class="bn-item" data-s="shop" onclick="goTo('shop')"><span class="bn-icon"><svg class="um-ico" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg></span>Shop</button>
   <button class="bn-item" data-s="aibot" onclick="goTo('aibot')"><span class="bn-icon"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H8l-4 4V5z"></path><circle cx="9" cy="10.5" r="1.1" fill="#2A1810" stroke="none"></circle><circle cx="15" cy="10.5" r="1.1" fill="#2A1810" stroke="none"></circle></svg></span>KI-Assistent</button>
-  <button class="bn-item" data-s="community" onclick="goTo('community')"><span class="bn-icon"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"></circle><circle cx="17" cy="9.5" r="2.4"></circle><path d="M3 19c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"></path><path d="M15 19c0-2.3 1.6-4 3.5-4s2.5 1.3 2.5 3"></path></svg></span>Community</button>
-  <button class="bn-item" data-s="profile" onclick="goTo('profile')"><span class="bn-icon" id="profile-nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"></path></svg></span>Profil</button>
 </nav>
 
 <!-- TOAST -->
@@ -346,7 +270,7 @@
 <!-- CONFIRM DIALOG -->
 <div class="confirm-overlay" id="confirm-overlay">
   <div class="confirm-box">
-    <div class="confirm-title" id="confirm-title">Bestätigen</div>
+    <div class="confirm-title" id="confirm-title">BestÃ¤tigen</div>
     <div class="confirm-msg" id="confirm-msg"></div>
     <div style="display:flex;gap:8px">
       <button class="btn btn-sm" onclick="document.getElementById('confirm-overlay').classList.remove('open')">Abbrechen</button>
@@ -358,7 +282,7 @@
 <!-- AUTH MODAL -->
 <div class="modal-overlay" id="auth-modal" onclick="if(event.target===this)closeModal('auth-modal')">
   <div class="modal auth-modal">
-    <button class="auth-close" onclick="closeModal('auth-modal')" aria-label="Schließen">✕</button>
+    <button class="auth-close" onclick="closeModal('auth-modal')" aria-label="SchlieÃŸen">?</button>
     <div class="auth-split" id="auth-split">
       <!-- AVATAR SIDE -->
       <div class="auth-side">
@@ -435,7 +359,7 @@
             </span>
           </div>
           <div class="af-input">
-            <input id="reg-pw2" type="password" placeholder="Passwort bestätigen" autocomplete="new-password">
+            <input id="reg-pw2" type="password" placeholder="Passwort bestÃ¤tigen" autocomplete="new-password">
             <span class="af-icon btn" onclick="authTogglePw('reg-pw2',this)">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"></path><circle cx="12" cy="12" r="3"></circle></svg>
             </span>
@@ -445,14 +369,14 @@
         </div>
         <!-- FORGOT -->
         <div id="auth-forgot-form" style="display: none;">
-          <h1>Passwort zurücksetzen</h1>
+          <h1>Passwort zurÃ¼cksetzen</h1>
           <div class="af-sub">Wir senden dir einen Link</div>
           <div class="af-input">
             <input id="forgot-email" type="email" placeholder="E-Mail">
             <span class="af-icon"><svg viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg></span>
           </div>
           <button class="af-primary" onclick="doForgotPw()">Reset-Link senden</button>
-          <div class="af-foot"><a onclick="authShowLogin()">← Zurück zum Login</a></div>
+          <div class="af-foot"><a onclick="authShowLogin()">? ZurÃ¼ck zum Login</a></div>
         </div>
         <div class="af-msg err" id="auth-msg">Fehler: can't access property "split", k is null</div>
       </div>
@@ -463,7 +387,7 @@
 <!-- POOL MODAL -->
 <div class="modal-overlay" id="pool-modal" onclick="if(event.target===this)closeModal('pool-modal')">
   <div class="modal">
-    <div class="modal-head"><div class="modal-title">Pool wählen / erstellen</div><button class="modal-close" onclick="closeModal('pool-modal')">✕</button></div>
+    <div class="modal-head"><div class="modal-title">Pool wÃ¤hlen / erstellen</div><button class="modal-close" onclick="closeModal('pool-modal')">?</button></div>
     <div id="pool-modal-content"></div>
   </div>
 </div>
@@ -471,27 +395,8 @@
 <!-- NEW POOL MODAL -->
 <div class="modal-overlay" id="new-pool-modal" onclick="if(event.target===this)closeModal('new-pool-modal')">
   <div class="modal">
-    <div class="modal-head"><div class="modal-title" id="npm-title">Neuer Pool</div><button class="modal-close" onclick="closeModal('new-pool-modal')">✕</button></div>
+    <div class="modal-head"><div class="modal-title" id="npm-title">Neuer Pool</div><button class="modal-close" onclick="closeModal('new-pool-modal')">?</button></div>
     <div id="new-pool-content"></div>
-  </div>
-</div>
-
-<!-- PHOTO IMPORT MODAL -->
-<div class="modal-overlay" id="photo-modal" onclick="if(event.target===this)closeModal('photo-modal')">
-  <div class="modal">
-    <div class="modal-head"><div class="modal-title">📷 Foto-Import</div><button class="modal-close" onclick="closeModal('photo-modal')">✕</button></div>
-    <div id="photo-content">
-      <div class="drop-zone" id="drop-zone" onclick="document.getElementById('photo-file-inp').click()" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="handlePhotoDrop(event)">
-        <div style="font-size:36px;margin-bottom:10px">📷</div>
-        <div style="font-size:13px;font-weight:600;margin-bottom:6px">Bild hochladen</div>
-        <div style="font-size:10px;color:var(--muted)">Klicke oder ziehe ein Bild hierher</div>
-        <img id="photo-preview" style="display:none">
-      </div>
-      <input type="file" id="photo-file-inp" accept="image/*" style="display:none" onchange="handlePhotoFile(this)">
-      <div class="k-group"><label class="k-label">Pool-Name für Import</label><input class="k-input" id="photo-pool-name" placeholder="z.B. Meine Wörterliste"></div>
-      <button class="btn btn-lime" id="photo-scan-btn" style="width:100%" onclick="doPhotoScan()">🔍 KI scannen</button>
-      <div id="photo-status" style="margin-top:10px;font-size:11px;color:var(--muted)"></div>
-    </div>
   </div>
 </div>
 
@@ -500,7 +405,7 @@
   <div class="modal" style="max-width:560px">
     <div class="modal-head">
       <div class="modal-title">Avatar gestalten</div>
-      <button class="modal-close" onclick="closeModal('avatar-builder-modal')">✕</button>
+      <button class="modal-close" onclick="closeModal('avatar-builder-modal')">?</button>
     </div>
     <div id="ab-content">
       <div class="ab-preview-wrap">
@@ -509,7 +414,7 @@
       </div>
       <div id="ab-controls"></div>
       <div style="display:flex;gap:8px;margin-top:14px">
-        <button class="btn btn-ghost btn-sm" style="flex:1" onclick="abRandomize()">🎲 Zufällig</button>
+        <button class="btn btn-ghost btn-sm" style="flex:1" onclick="abRandomize()">ZufÃ¤llig</button>
         <button class="btn btn-lime" style="flex:2" onclick="saveAvatarBuilder()">Speichern</button>
       </div>
       <div id="ab-msg" style="font-size:10px;color:var(--muted);margin-top:8px;text-align:center"></div>
@@ -521,20 +426,18 @@
 <div class="fp-overlay" id="fp-overlay" onclick="closeFriendPanel()"></div>
 <div class="fp-panel" id="fp-panel">
   <div class="fp-head">
-    <div style="font-size:14px;font-weight:700">🏆 Freunde &amp; Leaderboard</div>
-    <button class="modal-close" onclick="closeFriendPanel()">✕</button>
+    <div style="font-size:14px;font-weight:700">Freunde &amp; Leaderboard</div>
+    <button class="modal-close" onclick="closeFriendPanel()">?</button>
   </div>
   <div class="fp-body">
     <div class="fp-tabs">
-      <button class="fp-tab active" id="fpt-board" onclick="switchFpTab('board')">👥 Freunde</button>
-      <button class="fp-tab" id="fpt-global" onclick="switchFpTab('global')">🌍 Global</button>
-      <button class="fp-tab" id="fpt-social" onclick="switchFpTab('social')">➕ Anfragen <span id="fp-req-badge" style="display:none" class="req-badge">0</span></button>
-      <button class="fp-tab" id="fpt-pools" onclick="switchFpTab('pools')">📤 Pools</button>
+      <button class="fp-tab active" id="fpt-board" onclick="switchFpTab('board')">Freunde</button>
+      <button class="fp-tab" id="fpt-global" onclick="switchFpTab('global')">Global</button>
+      <button class="fp-tab" id="fpt-social" onclick="switchFpTab('social')">? Anfragen <span id="fp-req-badge" style="display:none" class="req-badge">0</span></button>
     </div>
     <div id="fp-board-content"></div>
     <div id="fp-global-content" style="display:none"></div>
     <div id="fp-social-content" style="display:none"></div>
-    <div id="fp-pools-content" style="display:none"></div>
   </div>
 </div>
 
@@ -546,7 +449,7 @@
       <div class="wn-head-title">What's New</div>
       <div class="wn-head-sub">Release-Notizen und Versionsverlauf.</div>
     </div>
-    <button class="modal-close" onclick="closeWhatsNewPanel()">✕</button>
+    <button class="modal-close" onclick="closeWhatsNewPanel()">?</button>
   </div>
   <div class="wn-body">
     <div class="wn-list" id="wn-list"></div>
@@ -554,7 +457,7 @@
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════ SCRIPT ══════ -->
+<!-- ------------------------------------------- SCRIPT ------ -->
 <script src="src/js/services/supabase.js"></script>
 <script src="src/js/utils/storage.js"></script>
 <script src="src/js/core/theme.js"></script>
@@ -564,10 +467,6 @@
 <script src="src/js/services/sync.js"></script>
 <script src="src/js/screens/home.js"></script>
 <script src="src/js/screens/challenges.js"></script>
-<script src="src/js/screens/learn/cards.js"></script>
-<script src="src/js/screens/learn/quiz.js"></script>
-<script src="src/js/screens/learn/typing.js"></script>
-<script src="src/js/screens/learn/matching.js"></script>
 <script src="src/js/screens/courses.js"></script>
 <script src="src/js/screens/community.js"></script>
 <script src="src/js/screens/overview.js"></script>
@@ -581,6 +480,9 @@
 <script src="src/js/core/bootstrap.js"></script>
 
 </body></html>
+
+
+
 
 
 

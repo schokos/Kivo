@@ -437,11 +437,10 @@ function switchFpTab(tab, opts = {}) {
   fpTab=tab;
   document.querySelectorAll('.fp-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('fpt-'+tab)?.classList.add('active');
-  ['board','global','social','pools'].forEach(t=>{
+  ['board','global','social'].forEach(t=>{
     const e=document.getElementById('fp-'+t+'-content'); if(e)e.style.display=t===tab?'':'none';
   });
   if(tab==='global')loadGlobalLb();
-  else if(tab==='pools')loadFpPools();
 }
 
 async function loadFriendPanel() {
@@ -718,5 +717,6 @@ async function viewFriendProfile(uid,username){
     goTo('profile',{keepProfileContent:true});
   }catch(e){toast('Fehler: '+e.message);}
 }
+
 
 

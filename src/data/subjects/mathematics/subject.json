@@ -1,0 +1,17 @@
+﻿{
+  "id": "mathematics",
+  "title": "Mathematik",
+  "description": "Fachstruktur für Mathematik mit verschiedenen Kursen.",
+  "courses": [
+    {
+      "id": "algebra",
+      "title": "Algebra",
+      "path": "src/data/subjects/mathematics/courses/algebra/index.html"
+    },
+    {
+      "id": "geometrie",
+      "title": "Geometrie",
+      "path": "src/data/subjects/mathematics/courses/geometrie/index.html"
+    }
+  ]
+}

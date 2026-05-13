@@ -87,21 +87,17 @@ function renderPass(){
   const userOwnedItems=lsGet('kivo_items','[]');
 
   const headerHtml=`
-    <div class="k-card" style="margin-bottom:16px;background:linear-gradient(135deg,var(--lime-d2),var(--panel))">
-      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-        <div style="color:var(--lime)">${ic('shield',38)}</div>
-        <div style="flex:1;min-width:160px">
-          <div style="font-size:18px;font-weight:900">Lern-Pass</div>
-          <div style="font-size:11px;color:var(--muted)">Level ${lvl} · ${xp.toLocaleString()} / ${nextXp.toLocaleString()} XP</div>
-          <div class="daily-goal-bar" style="margin-top:8px"><div class="daily-goal-fill" style="width:${Math.max(4,lvlPct)}%"></div></div>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+    <div class="k-card" style="margin-bottom:12px;background:linear-gradient(135deg,var(--lime-d2),var(--panel))">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+        <div style="font-size:11px;color:var(--muted)">Level ${lvl} · ${xp.toLocaleString()} / ${nextXp.toLocaleString()} XP</div>
+        <div style="display:flex;align-items:center;gap:8px">
           <div class="currency-pill" style="display:inline-flex;align-items:center;gap:6px">${ic('coin',13)} ${userCurrency}</div>
           ${s.proOwned
             ? `<span class="tag lime" style="display:inline-flex;align-items:center;gap:4px">${ic('crown',11)} Pro aktiv</span>`
             : `<button class="btn btn-sm btn-lime" style="display:inline-flex;align-items:center;gap:6px" onclick="buyProPass()">${ic('crown',12)} Pro Pass · ${PASS_PRO_PRICE} ${ic('coin',11)}</button>`}
         </div>
       </div>
+      <div class="daily-goal-bar" style="margin-top:8px"><div class="daily-goal-fill" style="width:${Math.max(4,lvlPct)}%"></div></div>
     </div>
     <div style="font-size:11px;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:6px">${ic('sparkles',12)} Free Pass: alle 5 Level eine Belohnung. Pro Pass: jedes Level eine extra Belohnung.</div>
   `;

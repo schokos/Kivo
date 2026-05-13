@@ -1,0 +1,17 @@
+﻿{
+  "id": "english",
+  "title": "Englisch",
+  "description": "Fachstruktur für Englisch mit Vokabel- und Grammatik-Kursen.",
+  "courses": [
+    {
+      "id": "vocabulary",
+      "title": "Vokabeln",
+      "path": "src/data/subjects/english/courses/vocabulary/index.html"
+    },
+    {
+      "id": "grammar",
+      "title": "Grammatik",
+      "path": "src/data/subjects/english/courses/grammar/index.html"
+    }
+  ]
+}

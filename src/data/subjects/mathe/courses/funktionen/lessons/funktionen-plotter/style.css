@@ -1,8 +1,0 @@
-﻿body { margin:0; font-family:Inter, "Segoe UI", Arial, sans-serif; background:#121712; color:#E8EBE3; }
-.tool-shell { max-width:900px; margin:0 auto; padding:32px 20px 48px; }
-.back-link { color:#6BB592; text-decoration:none; font-weight:700; }
-h1 { margin:18px 0 8px; }
-p { color:#969E96; }
-.plot-card { margin-top:24px; background:#19201C; border:1px solid #2E3A34; border-radius:20px; padding:24px; display:grid; gap:14px; }
-input { background:#262E2A; color:#E8EBE3; border:1px solid #2E3A34; border-radius:12px; padding:12px 14px; }
-#plot-output { min-height:280px; border:1px dashed #6BB592; border-radius:16px; display:grid; place-items:center; color:#6BB592; font-weight:700; }

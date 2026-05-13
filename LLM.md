@@ -12,6 +12,15 @@ Kivo ist eine browserbasierte Lernplattform mit statischem Frontend (`index.html
 - Inhalte/Faecher: `src/data/subjects/**`
 - Deployment: GitHub Pages (statisch)
 
+### Temporaere Architektur-Notizen (2026-05-13)
+
+- Vokabel-Lernmodi wurden aus den zentralen `src/js/screens/learn/*`-Einstiegen ausgelagert und laufen nun als Subject-Course unter `src/data/subjects/english/courses/vocabulary/`.
+- Kurse werden im Kivo-System eingebettet geladen (Iframe im `courses`-Screen), damit Shell und BOTTOM NAV sichtbar bleiben.
+- Temporaer entfernt bis Neufassung:
+  - Foto-Import (UI-Entry-Points und Modal-Zugang)
+  - Dashboard-Bereiche `Empfohlenes Fach` und `Faecher entdecken`
+  - Community-Bereich `Pool an Freund senden` (Pools-Tab ausgeblendet)
+
 ## 2) Architektur-Kern
 
 Zweck:

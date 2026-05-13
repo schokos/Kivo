@@ -312,7 +312,8 @@ function buildVocab() {
   vocab=flat.map((v,i)=>({...v,id:i,known:knIds.includes(i)}));
   updateHomeStats();
   const {l,p}=spKey(activeKey);
-  document.getElementById('home-pool-name').textContent=p;
+  const homePoolNameEl = document.getElementById('home-pool-name');
+  if(homePoolNameEl) homePoolNameEl.textContent=p;
 }
 
 function saveKnown() { lsSet('kivo_kn_'+activeKey,vocab.filter(v=>v.known).map(v=>v.id)); syncProgress(); }
@@ -367,7 +368,7 @@ function calcStreak() {
 function updateCurrencyDisplay() {
   const el=document.getElementById('currency-pill');
   const val=document.getElementById('currency-val');
-  if(el) el.style.display=currentUser?'flex':'none';
+  if(el) el.style.display='flex';
   if(val) val.textContent=userCurrency;
 }
 async function syncXpToServer() { return flushLocalSync(); }

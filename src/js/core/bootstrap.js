@@ -52,6 +52,7 @@ window.addEventListener("DOMContentLoaded", () => {
   }
   window.KivoTheme?.initTheme?.();
   userCurrency = parseInt(lsGet("kivo_currency", "0")) || 0;
+  updateCurrencyDisplay();
   loadState();
   initAuth();
   checkShareUrl();

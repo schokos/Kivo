@@ -42,16 +42,29 @@ function closeModal(id) {
 }
 
 function toggleUserMenu() {
-  document.getElementById("user-menu").classList.toggle("open");
+  const menu = document.getElementById("user-menu");
+  if (!menu) return;
+  menu.classList.toggle("open");
 }
 
 function closeUserMenu() {
-  document.getElementById("user-menu").classList.remove("open");
+  const menu = document.getElementById("user-menu");
+  if (!menu) return;
+  menu.classList.remove("open");
 }
 
 document.addEventListener("click", (e) => {
   if (!e.target.closest("#avatar-btn") && !e.target.closest("#user-menu")) {
     closeUserMenu();
   }
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  const avatarBtn = document.getElementById("avatar-btn");
+  if (!avatarBtn) return;
+  avatarBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    toggleUserMenu();
+  });
 });
 
