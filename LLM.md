@@ -16,6 +16,9 @@ Kivo ist eine browserbasierte Lernplattform mit statischem Frontend (`index.html
 
 - Vokabel-Lernmodi wurden aus den zentralen `src/js/screens/learn/*`-Einstiegen ausgelagert und laufen nun als Subject-Course unter `src/data/subjects/english/courses/vocabulary/`.
 - Kurse werden im Kivo-System eingebettet geladen (Iframe im `courses`-Screen), damit Shell und BOTTOM NAV sichtbar bleiben.
+- Die Shell-Screens `overview`, `stats` und `gap` nutzen weiterhin gemeinsame Legacy-Lernlogik aus `src/js/screens/learn/` und muessen von `index.html` exakt aus diesem Unterordner geladen werden.
+- Die Spaced-Repetition-Helfer in `src/js/screens/learn/cards.js` werden auch ausserhalb des Kartenmodus verwendet (z. B. in Pool-Verwaltung, Statistik, Quiz, Typing und Matching) und muessen deshalb im globalen Script-Bootstrap vor diesen Abhaengigkeiten geladen werden.
+- Der KI-Chat speichert optionale personalisierte Memory-Hinweise in `profiles.chat_data.memory` und im lokalen Chat-Payload. Nutzung und Speicherung sind nur nach ausdruecklicher Aktivierung ueber die Profileinstellungen erlaubt.
 - Temporaer entfernt bis Neufassung:
   - Foto-Import (UI-Entry-Points und Modal-Zugang)
   - Dashboard-Bereiche `Empfohlenes Fach` und `Faecher entdecken`

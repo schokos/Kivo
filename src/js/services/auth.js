@@ -1,5 +1,6 @@
 ﻿// ── AUTH ──────────────────────────────────────────────────────
 function _authShow(which){
+  _authResetPwFields?.();
   ['login','register','forgot'].forEach(t=>{
     const el=document.getElementById('auth-'+t+'-form'); if(el) el.style.display=t===which?'block':'none';
   });
@@ -29,17 +30,40 @@ function authShowForgot(){ _authShow('forgot'); }
 function authShowLogin(){ _authShow('login'); }
 function authMsg(m,ok){const el=document.getElementById('auth-msg');if(!el)return;el.textContent=m;el.classList.toggle('err',!ok);}
 
+function getPwToggleIcon(showing) {
+  return showing
+    ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a19.77 19.77 0 0 1 4.22-5.36"/><path d="M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a19.86 19.86 0 0 1-3.17 4.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>'
+    : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+}
+
+function _authSyncPwToggle(btn, showing){
+  if(!btn) return;
+  btn.innerHTML = getPwToggleIcon(showing);
+  btn.setAttribute('aria-pressed', String(showing));
+  btn.setAttribute('aria-label', showing ? 'Passwort verbergen' : 'Passwort anzeigen');
+  btn.title = showing ? 'Passwort verbergen' : 'Passwort anzeigen';
+}
+
+function _authAnyPasswordVisible(){
+  return ['login-pw','reg-pw','reg-pw2','sett-pw'].some(id => document.getElementById(id)?.type === 'text');
+}
+
+function _authResetPwFields(){
+  ['login-pw','reg-pw','reg-pw2'].forEach(id => {
+    const input = document.getElementById(id);
+    if(input) input.type = 'password';
+  });
+  document.querySelectorAll('.af-icon.btn').forEach(btn => _authSyncPwToggle(btn, false));
+  _authHands(false);
+}
+
 // Password show/hide + hands-over-eyes
 function authTogglePw(id,btn){
   const inp=document.getElementById(id); if(!inp)return;
   const showing=inp.type==='text';
   inp.type=showing?'password':'text';
-  _authHands(!showing);
-  if(btn){
-    btn.innerHTML = showing
-      ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>'
-      : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a19.77 19.77 0 0 1 4.22-5.36"/><path d="M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a19.86 19.86 0 0 1-3.17 4.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
-  }
+  _authSyncPwToggle(btn, !showing);
+  _authHands(_authAnyPasswordVisible());
 }
 function _authHands(up){
   const h=document.getElementById('av-hands'); if(!h)return;
@@ -75,7 +99,12 @@ function _authBindEyes(){
 const _origOpenModal_auth=window.openModal;
 window.openModal=function(id){
   if(typeof _origOpenModal_auth==='function') _origOpenModal_auth(id);
-  if(id==='auth-modal'){ _authShow('login'); _authHands(false); requestAnimationFrame(_authBindEyes); }
+  if(id==='auth-modal'){ _authShow('login'); _authResetPwFields(); requestAnimationFrame(_authBindEyes); }
+};
+const _origCloseModal_auth=window.closeModal;
+window.closeModal=function(id){
+  if(typeof _origCloseModal_auth==='function') _origCloseModal_auth(id);
+  if(id==='auth-modal') _authResetPwFields();
 };
 
 async function doLogin(){
@@ -115,12 +144,28 @@ async function doForgotPw(){
   if(!email){authMsg('E-Mail eingeben');return;}
   try{await sb.auth.resetPasswordForEmail(email,{redirectTo:location.href});authMsg('✓ Reset-Link gesendet!',true);}catch(e){authMsg('Fehler: '+e.message);}
 }
+
+function clearUserLocalState() {
+  const keep = new Set(['kivo_theme_mode']);
+  const removablePrefixes = ['kivo_', 'kivo_kn_', 'kivo_sr_'];
+  const keys = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (!key || keep.has(key)) continue;
+    if (removablePrefixes.some((prefix) => key.startsWith(prefix))) keys.push(key);
+  }
+  for (const key of keys) localStorage.removeItem(key);
+}
+
 async function doLogout(){
   await flushLocalSync({force:true});
   await sb.auth.signOut();
+  clearUserLocalState();
   currentUser=null;
   updateUserUi(null);
   loadState();
+  closeUserMenu?.();
+  refreshCurrentScreen?.();
   toast('Abgemeldet');
 }
 function updateUserUi(user){
@@ -161,7 +206,7 @@ async function hydrateSession(session){
     const mergedPass = mergePassState(serverPass, localPass);
     lsSet('kivo_pass', mergedPass);
 
-    const mergedUsername = lsGet('kivo_username','""') || prof?.username || session.user.user_metadata?.username || session.user.email?.split('@')[0] || 'User';
+    const mergedUsername = prof?.username || session.user.user_metadata?.username || session.user.email?.split('@')[0] || lsGet('kivo_username','""') || 'User';
     lsSet('kivo_username', mergedUsername);
 
     const serverThemeMode = window.KivoTheme?.normalizeMode?.(prof?.chat_data?.settings?.theme_mode || 'system') || 'system';
@@ -214,6 +259,7 @@ async function hydrateSession(session){
     const mergedChatData = {
       ...serverChats,
       ...mergedChats,
+      memory: mergeAiMemoryState(serverChats.memory, localChats.memory),
       settings: {
         ...(serverChats?.settings && typeof serverChats.settings === 'object' ? serverChats.settings : {}),
         theme_mode: mergedThemeMode,
@@ -238,12 +284,14 @@ async function hydrateSession(session){
     loadState();
     updateUserUi(currentUser);
     checkPendingFriendReqs();
+    refreshCurrentScreen?.();
   } else {
     currentUser=null;
     const fallbackMode = window.KivoTheme?.normalizeMode?.(lsGet('kivo_theme_mode','"system"') || 'system') || 'system';
     window.KivoTheme?.setThemeMode?.(fallbackMode, {persist:true});
     updateUserUi(null);
     loadState();
+    refreshCurrentScreen?.();
   }
 }
 

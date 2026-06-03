@@ -69,6 +69,10 @@ function universalForward() {
   if (navCursor < navMaxCursor) window.history.forward();
 }
 
+function refreshCurrentScreen(opts = {}) {
+  goTo(getCurrentScreenName(), { fromHistory: true, ...opts });
+}
+
 function goTo(name, opts = {}) {
   ensureNavInitialized(getCurrentScreenName());
 

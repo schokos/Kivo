@@ -300,6 +300,15 @@ function renderProfile(targetUser=null) {
             style="flex:1"
           >
           <button
+            class="af-icon btn"
+            type="button"
+            onclick="authTogglePw('sett-pw',this)"
+            aria-label="Passwort anzeigen"
+            aria-pressed="false"
+            title="Passwort anzeigen"
+            style="position:static;transform:none;width:40px;height:40px;border:1px solid var(--line);border-radius:10px;background:var(--panel-2);flex:0 0 auto"
+          >${typeof getPwToggleIcon === 'function' ? getPwToggleIcon(false) : ''}</button>
+          <button
             class="btn btn-ok btn-sm"
             onclick="changePw()"
             aria-label="Passwort speichern"
@@ -312,12 +321,13 @@ function renderProfile(targetUser=null) {
           <option value="system" ${window.KivoTheme?.getThemeMode?.()!=='light'&&window.KivoTheme?.getThemeMode?.()!=='dark'&&window.KivoTheme?.getThemeMode?.()!=='auto'?'selected':''}>System</option>
           <option value="auto" ${window.KivoTheme?.getThemeMode?.()==='auto'?'selected':''}>Auto (Sonnenauf/-untergang)</option>
         </select>
+        ${typeof renderAiMemorySettings === 'function' ? renderAiMemorySettings() : ''}
       </div>
       <button
         class="btn btn-danger btn-sm"
         onclick="doLogout()"
         aria-label="Abmelden"
-      >? Abmelden</button>
+      >Abmelden</button>
     </div>
 
     <div style="height:12px;"></div>

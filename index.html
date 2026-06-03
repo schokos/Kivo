@@ -51,7 +51,7 @@
     <div class="rail-top">
       <button class="brand-btn" onclick="goTo('home')" title="Kivo" aria-label="Kivo"></button>
       <button class="rail-btn active" id="rb-home" data-s="home" onclick="goTo('home')" title="Dashboard"><span class="rail-ico"><svg viewBox="0 0 24 24"><path d="M3 12 12 3l9 9"></path><path d="M5 10v10h14V10"></path><path d="M10 20v-6h4v6"></path></svg></span><span class="rail-lbl">Dashboard</span></button>
-      <button class="rail-btn" id="rb-courses" data-s="courses" onclick="goTo('courses')" title="FÃ¤cher"><span class="rail-ico"><svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2V5z"></path><path d="M8 7h8M8 11h8M8 15h5"></path></svg></span><span class="rail-lbl">Fächer</span></button>
+      <button class="rail-btn" id="rb-courses" data-s="courses" onclick="goTo('courses')" title="Fächer"><span class="rail-ico"><svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2V5z"></path><path d="M8 7h8M8 11h8M8 15h5"></path></svg></span><span class="rail-lbl">Fächer</span></button>
       <button class="rail-btn" id="rb-challenges" data-s="challenges" onclick="goTo('challenges')" title="Challenges"><span class="rail-ico"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span><span class="rail-lbl">Challenges</span></button>
       <button class="rail-btn" id="rb-pass" data-s="pass" onclick="goTo('pass')" title="Lern-Pass"><span class="rail-ico"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8.5-8 9-4.5-.5-8-4-8-9V6l8-3z"></path><path d="m9 12 2 2 4-4"></path></svg></span><span class="rail-lbl">Lern-Pass</span></button>
       <button class="rail-btn" id="rb-shop" data-s="shop" onclick="goTo('shop')" title="Shop"><span class="rail-ico"><svg viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6L5 8z"></path><path d="M9 8V6a3 3 0 0 1 6 0v2"></path><path d="M9 12v2M15 12v2"></path></svg></span><span class="rail-lbl">Shop</span></button>
@@ -60,7 +60,7 @@
       <button class="rail-btn" id="rb-github" data-s="github"
       onclick="(async()=>{ 
         const ok = await confirm2(
-          'URL fnen?',
+          'URL öffnen?',
           'Möchten Sie https://github.com/schokos/Kivo/issues wirklich öffnen?'
         );
         if(ok){
@@ -96,7 +96,7 @@
     </div>
     <div class="topbar">
       <div class="tb-left">
-        <button class="tb-back-btn" id="courses-topbar-back" onclick="coursesTopbarBack()" title="ZurÃ¼ck" aria-label="ZurÃ¼ck">
+        <button class="tb-back-btn" id="courses-topbar-back" onclick="coursesTopbarBack()" title="Zurück" aria-label="Zurück">
           <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"></path></svg>
         </button>
         <div class="tb-title" id="tb-title">Dashboard</div>
@@ -142,7 +142,7 @@
               <path d="M12 3l2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.8 6.4 20.2l1.1-6.2L3 9.6l6.2-.9L12 3z"></path>
             </svg>
           </span>
-          <span id="hm-xp">0</span>
+          <span id="topbar-xp">0</span>
         </div>
 
       </div>
@@ -165,7 +165,7 @@
           <div class="k-card dash-card progress-card">
             <div style="font-size:17px;font-weight:850">Fortschrittsübersicht</div>
             <div class="progress-ring-wrap">
-              <div><div style="font-size:13px;margin-bottom:8px;color:var(--muted)">Level</div><div class="level-num" id="hm-level">1</div><div style="font-size:13px;margin-top:8px;color:var(--muted)"><span id="hm-xp">0</span> / <span id="hm-next-xp">500</span> XP</div></div>
+              <div><div style="font-size:13px;margin-bottom:8px;color:var(--muted)">Level</div><div class="level-num" id="hm-level">1</div><div style="font-size:13px;margin-top:8px;color:var(--muted)"><span id="home-xp">0</span> / <span id="hm-next-xp">500</span> XP</div></div>
               <div class="ring" id="hm-ring"></div>
             </div>
           </div>
@@ -188,7 +188,7 @@
 
       </div>
 
-      <!-- FÃ¤cher ----------------------------------- -->
+      <!-- Fächer ----------------------------------- -->
       <div class="screen" id="screen-courses">
         <div id="courses-content"></div>
       </div>
@@ -207,7 +207,7 @@
         <div id="community-content"></div>
       </div>
 
-      <!-- ÃœBERSICHT ------------------------------ -->
+      <!-- ÜBERSICHT ------------------------------ -->
       <div class="screen" id="screen-overview">
         <div class="app-page-head">
           <div><div class="app-page-title">Meine Pools</div><div class="app-page-sub">Verwalte deine Vokabel-Pools.</div></div>
@@ -225,7 +225,7 @@
         <div id="stats-content"></div>
       </div>
 
-      <!-- KI-LÃœCKENTEXT ------------------------- -->
+      <!-- KI-LÜCKENTEXT ------------------------- -->
       <div class="screen" id="screen-gap">
         <div style="font-size:18px;font-weight:800;margin-bottom:6px">KI-Lückentext</div>
         <div style="font-size:11px;color:var(--muted);margin-bottom:14px">KI generiert einen Text passend zu deinem Pool — füll die Lücken aus</div>
@@ -270,10 +270,10 @@
 <!-- CONFIRM DIALOG -->
 <div class="confirm-overlay" id="confirm-overlay">
   <div class="confirm-box">
-    <div class="confirm-title" id="confirm-title">BestÃ¤tigen</div>
+    <div class="confirm-title" id="confirm-title">Bestätigen</div>
     <div class="confirm-msg" id="confirm-msg"></div>
     <div style="display:flex;gap:8px">
-      <button class="btn btn-sm" onclick="document.getElementById('confirm-overlay').classList.remove('open')">Abbrechen</button>
+      <button class="btn btn-sm" id="confirm-cancel">Abbrechen</button>
       <button class="btn btn-danger btn-sm" id="confirm-ok">OK</button>
     </div>
   </div>
@@ -282,7 +282,7 @@
 <!-- AUTH MODAL -->
 <div class="modal-overlay" id="auth-modal" onclick="if(event.target===this)closeModal('auth-modal')">
   <div class="modal auth-modal">
-    <button class="auth-close" onclick="closeModal('auth-modal')" aria-label="SchlieÃŸen">?</button>
+    <button class="auth-close" onclick="closeModal('auth-modal')" aria-label="Schließen">×</button>
     <div class="auth-split" id="auth-split">
       <!-- AVATAR SIDE -->
       <div class="auth-side">
@@ -334,7 +334,7 @@
           </div>
           <div class="af-input">
             <input id="login-pw" type="password" placeholder="Passwort" autocomplete="current-password">
-            <span class="af-icon btn" id="login-pw-toggle" onclick="authTogglePw('login-pw',this)" title="Anzeigen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"></path><circle cx="12" cy="12" r="3"></circle></svg></span>
+            <button class="af-icon btn" id="login-pw-toggle" type="button" onclick="authTogglePw('login-pw',this)" title="Passwort anzeigen" aria-label="Passwort anzeigen" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
           </div>
           <button class="af-forgot" onclick="authShowForgot()">Passwort vergessen?</button>
           <button class="af-primary" onclick="doLogin()">Einloggen</button>
@@ -354,31 +354,31 @@
           </div>
           <div class="af-input">
             <input id="reg-pw" type="password" placeholder="Passwort" autocomplete="new-password">
-            <span class="af-icon btn" onclick="authTogglePw('reg-pw',this)">
+            <button class="af-icon btn" type="button" onclick="authTogglePw('reg-pw',this)" title="Passwort anzeigen" aria-label="Passwort anzeigen" aria-pressed="false">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-            </span>
+            </button>
           </div>
           <div class="af-input">
-            <input id="reg-pw2" type="password" placeholder="Passwort bestÃ¤tigen" autocomplete="new-password">
-            <span class="af-icon btn" onclick="authTogglePw('reg-pw2',this)">
+            <input id="reg-pw2" type="password" placeholder="Passwort bestätigen" autocomplete="new-password">
+            <button class="af-icon btn" type="button" onclick="authTogglePw('reg-pw2',this)" title="Passwort anzeigen" aria-label="Passwort anzeigen" aria-pressed="false">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-            </span>
+            </button>
           </div>
           <button class="af-primary" onclick="doRegister()">Konto erstellen</button>
           <div class="af-foot">Schon registriert? <a onclick="authSwitchMode()">Anmelden</a></div>
         </div>
         <!-- FORGOT -->
         <div id="auth-forgot-form" style="display: none;">
-          <h1>Passwort zurÃ¼cksetzen</h1>
+          <h1>Passwort zurücksetzen</h1>
           <div class="af-sub">Wir senden dir einen Link</div>
           <div class="af-input">
             <input id="forgot-email" type="email" placeholder="E-Mail">
             <span class="af-icon"><svg viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg></span>
           </div>
           <button class="af-primary" onclick="doForgotPw()">Reset-Link senden</button>
-          <div class="af-foot"><a onclick="authShowLogin()">? ZurÃ¼ck zum Login</a></div>
+          <div class="af-foot"><a onclick="authShowLogin()">← Zurück zum Login</a></div>
         </div>
-        <div class="af-msg err" id="auth-msg">Fehler: can't access property "split", k is null</div>
+        <div class="af-msg" id="auth-msg"></div>
       </div>
     </div>
   </div>
@@ -387,7 +387,7 @@
 <!-- POOL MODAL -->
 <div class="modal-overlay" id="pool-modal" onclick="if(event.target===this)closeModal('pool-modal')">
   <div class="modal">
-    <div class="modal-head"><div class="modal-title">Pool wÃ¤hlen / erstellen</div><button class="modal-close" onclick="closeModal('pool-modal')">?</button></div>
+    <div class="modal-head"><div class="modal-title">Pool wählen / erstellen</div><button class="modal-close" onclick="closeModal('pool-modal')" aria-label="Schließen">×</button></div>
     <div id="pool-modal-content"></div>
   </div>
 </div>
@@ -395,7 +395,7 @@
 <!-- NEW POOL MODAL -->
 <div class="modal-overlay" id="new-pool-modal" onclick="if(event.target===this)closeModal('new-pool-modal')">
   <div class="modal">
-    <div class="modal-head"><div class="modal-title" id="npm-title">Neuer Pool</div><button class="modal-close" onclick="closeModal('new-pool-modal')">?</button></div>
+    <div class="modal-head"><div class="modal-title" id="npm-title">Neuer Pool</div><button class="modal-close" onclick="closeModal('new-pool-modal')" aria-label="Schließen">×</button></div>
     <div id="new-pool-content"></div>
   </div>
 </div>
@@ -405,7 +405,7 @@
   <div class="modal" style="max-width:560px">
     <div class="modal-head">
       <div class="modal-title">Avatar gestalten</div>
-      <button class="modal-close" onclick="closeModal('avatar-builder-modal')">?</button>
+      <button class="modal-close" onclick="closeModal('avatar-builder-modal')" aria-label="Schließen">×</button>
     </div>
     <div id="ab-content">
       <div class="ab-preview-wrap">
@@ -414,7 +414,7 @@
       </div>
       <div id="ab-controls"></div>
       <div style="display:flex;gap:8px;margin-top:14px">
-        <button class="btn btn-ghost btn-sm" style="flex:1" onclick="abRandomize()">ZufÃ¤llig</button>
+        <button class="btn btn-ghost btn-sm" style="flex:1" onclick="abRandomize()">Zufällig</button>
         <button class="btn btn-lime" style="flex:2" onclick="saveAvatarBuilder()">Speichern</button>
       </div>
       <div id="ab-msg" style="font-size:10px;color:var(--muted);margin-top:8px;text-align:center"></div>
@@ -427,7 +427,7 @@
 <div class="fp-panel" id="fp-panel">
   <div class="fp-head">
     <div style="font-size:14px;font-weight:700">Freunde &amp; Leaderboard</div>
-    <button class="modal-close" onclick="closeFriendPanel()">?</button>
+    <button class="modal-close" onclick="closeFriendPanel()" aria-label="Schließen">×</button>
   </div>
   <div class="fp-body">
     <div class="fp-tabs">
@@ -449,7 +449,7 @@
       <div class="wn-head-title">What's New</div>
       <div class="wn-head-sub">Release-Notizen und Versionsverlauf.</div>
     </div>
-    <button class="modal-close" onclick="closeWhatsNewPanel()">?</button>
+    <button class="modal-close" onclick="closeWhatsNewPanel()" aria-label="Schließen">×</button>
   </div>
   <div class="wn-body">
     <div class="wn-list" id="wn-list"></div>
@@ -469,9 +469,13 @@
 <script src="src/js/screens/challenges.js"></script>
 <script src="src/js/screens/courses.js"></script>
 <script src="src/js/screens/community.js"></script>
-<script src="src/js/screens/overview.js"></script>
-<script src="src/js/screens/stats.js"></script>
-<script src="src/js/screens/gap.js"></script>
+<script src="src/js/screens/learn/cards.js"></script>
+<script src="src/js/screens/learn/quiz.js"></script>
+<script src="src/js/screens/learn/typing.js"></script>
+<script src="src/js/screens/learn/matching.js"></script>
+<script src="src/js/screens/learn/overview.js"></script>
+<script src="src/js/screens/learn/stats.js"></script>
+<script src="src/js/screens/learn/gap.js"></script>
 <script src="src/js/screens/aibot.js"></script>
 <script src="src/js/screens/profile.js"></script>
 <script src="src/js/screens/pass.js"></script>

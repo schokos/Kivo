@@ -1,8 +1,15 @@
-﻿// ── AI CHATBOT ───────────────────────────────────────────────
+// ── AI CHATBOT ───────────────────────────────────────────────
 let aiBotHistory = [];
 
-const AI_SYS = `Du bist der Kivo-Assistent — ein freundlicher Sprachlern-Helfer.
-Du hilfst beim Vokabellernen und beantwortest Fragen. Dein Benutzer ist ${currentUser?.username}.
+const AI_MEMORY_MAX_ENTRIES = 20;
+let aiMemoryState = { ...AI_MEMORY_DEFAULT_STATE };
+const AI_TIPS = ['📚 20 Vokabeln zum Thema Essen', '🎨 Farben auf Spanisch', '✈️ Reise-Vokabeln', '💼 Business-Englisch Basics', '🏠 Zimmer & Möbel'];
+
+function buildAiSystemPrompt() {
+  const memoryContext = aiBuildMemoryContext();
+  const memoryPolicy = aiBuildMemoryPolicyPrompt();
+  return `Du bist der Kivo-Assistent — ein freundlicher Sprachlern-Helfer.
+Du hilfst beim Vokabellernen und beantwortest Fragen. Dein Benutzer ist ${currentUser?.username || 'Gast'}.
 
 Wenn der Benutzer eine Vokabelliste anfordert, beginne deine Antwort mit einer freundlichen, kurzen Bestätigung, gefolgt von einem Block, der die Vokabeln im JSON-Format enthält.
 Das JSON-Format muss immer am Ende sein und muss folgendermaßen formatiert sein: <vocab_list>{"lang":"Englisch","name":"Listenname","length":0,"pairs":[{"de":"Wort","en":"Translation"}]}</vocab_list>.
@@ -12,8 +19,8 @@ Tabellen müssen nicht automatisch in Vokabellisten umgewandelt werden es kommt 
 
 Bei Mathefragen erkläre die Konzepte so einfach wie möglich und verwende LaTeX, um Formeln darzustellen. Alle Erklärungen sollten kurz und auf den Punkt gebracht sein.
 
-Bei allen anderen Fragen antwirst du auf Deutsch, kurz und freundlich.`;
-const AI_TIPS = ['📚 20 Vokabeln zum Thema Essen', '🎨 Farben auf Spanisch', '✈️ Reise-Vokabeln', '💼 Business-Englisch Basics', '🏠 Zimmer & Möbel'];
+Bei allen anderen Fragen antwirst du auf Deutsch, kurz und freundlich.${memoryPolicy}${memoryContext}`;
+}
 
 function escapeHtml(str = '') {
   return String(str)
@@ -157,12 +164,178 @@ function aiEnsureSession() {
   return session;
 }
 
+function aiBuildMemoryContext() {
+  const memory = normalizeAiMemoryState(aiMemoryState);
+  if (!memory.enabled || !memory.consentAccepted || !memory.entries.length) return '';
+  const lines = memory.entries
+    .slice(0, 6)
+    .map((entry, idx) => `${idx + 1}. ${entry.content}`);
+  return `\n\nNutze die folgenden freiwillig gespeicherten Memory-Hinweise nur, wenn sie zur Antwort passen:\n${lines.join('\n')}`;
+}
+
+function aiBuildMemoryPolicyPrompt() {
+  const memory = normalizeAiMemoryState(aiMemoryState);
+  if (memory.enabled && memory.consentAccepted) {
+    return `\n\nDie optionale Memory-Funktion ist aktuell aktiviert. Wenn der Benutzer dich ausdrücklich bittet, etwas zu merken, zu speichern oder in deine Memories zu schreiben, bestätige kurz und klar, dass Kivo diesen freiwillig freigegebenen Hinweis speichern kann. Behaupte in diesem Fall nicht, dass du grundsätzlich keine neuen Memories speichern kannst.`;
+  }
+  return `\n\nDie optionale Memory-Funktion ist aktuell deaktiviert. Wenn der Benutzer dich bittet, etwas zu merken oder in deine Memories zu schreiben, sage kurz, dass die Memory-Funktion derzeit aus ist und in den Einstellungen aktiviert werden kann. Behaupte nicht, dass du vorhandene Memories aktiv nutzt, solange die Funktion deaktiviert ist.`;
+}
+
+function aiUpdateMemoryState(nextState) {
+  aiMemoryState = normalizeAiMemoryState({
+    ...nextState,
+    updatedAt: Date.now(),
+  });
+  aiSaveChatSessions();
+}
+
+function aiIsExplicitMemoryRequest(text = '') {
+  const normalized = String(text || '').toLowerCase();
+  if (!normalized) return false;
+  return /(merk(?:e|en)?\s+(?:es\s+)?(?:dir|dich)|kannst\s+du\s+dir\s+merk(?:en|en,)?|speicher(?:e|n)?|erinner(?:e|n)?\s+dich|in\s+deine\s+memories|in\s+dein\s+memory|schreib(?:e|en)?\s+.*memory|ich\s+bin|mein\s+name\s+ist|ich\s+heiße|ich\s+heisse|ich\s+möchte\s+dass\s+du\s+dich|ich\s+will\s+dass\s+du|wichtig\s+für\s+mich|merke\s+dich|gmbh|我叫|je\s+m'appelle)/i.test(normalized);
+}
+
+function aiAssistantConfirmedMemory(text = '') {
+  const normalized = String(text || '').toLowerCase();
+  if (!normalized) return false;
+  return /(ich\s+)?(merke|speichere)\s+(mir\s+)?(das|es|mir|deinen?\s+hinweis|den\s+hinweis)|habe\s+(es|das)\s+(mir\s+)?gemerkt|ist\s+(gespeichert|vermerkt)|wird\s+gespeichert/.test(normalized);
+}
+
+function aiRememberExplicitUserFact(userText, assistantText = '') {
+  const memory = normalizeAiMemoryState(aiMemoryState);
+  if (!memory.enabled || !memory.consentAccepted) return false;
+  const user = String(userText || '').replace(/\s+/g, ' ').trim();
+  if (!user) return false;
+  
+  // Extrahiere nur den relevanten Inhalt aus dem User-Text (entferne Trigger-Phrasen)
+  const cleanUserText = user
+    .replace(/^(merk(e)?\s+dir|speicher(e)?|erinner(e)?\s+dich|in\s+deine\s+memories|in\s+dein\s+memory|schreib(e)?\s+.*memory|wichtig\s+für\s+mich|merke\s+dich)[:\s]*/gi, '')
+    .replace(/^(ich\s+bin|mein\s+name\s+ist|ich\s+heiße|ich\s+heisse|ich\s+möchte\s+dass\s+du\s+dich|ich\s+will\s+dass\s+du|je\s+m'appelle|我叫)[:\s]*/gi, '')
+    .trim();
+  
+  if (!cleanUserText) return false;
+  
+  const cleanedAssistantText = String(assistantText || '')
+    .replace(/\s+/g, ' ')
+    .replace(/^(klar|okay|ok|verstanden|alles klar)[,!.\s]*/i, '')
+    .replace(/^(ich\s+)?(merke|speichere)\s+(mir\s+)?/i, '')
+    .replace(/^dass\s+/i, '')
+    .trim();
+  const assistantIsGeneric = !cleanedAssistantText
+    || /explizit\s+vom\s+nutzer\s+zum\s+merken\s+freigegeben/i.test(cleanedAssistantText);
+  const content = (assistantIsGeneric ? cleanUserText : cleanedAssistantText).slice(0, 320);
+  if (!content) return false;
+
+  const nextEntries = [
+    {
+      id: aiUid('mem'),
+      createdAt: aiNow(),
+      content,
+    },
+    ...memory.entries.filter((entry) => entry.content !== content),
+  ].slice(0, AI_MEMORY_MAX_ENTRIES);
+  aiUpdateMemoryState({ ...memory, entries: nextEntries });
+  refreshCurrentScreen?.({ keepProfileContent: false });
+  return true;
+}
+
+function aiRememberConversation(userText, assistantText) {
+  const memory = normalizeAiMemoryState(aiMemoryState);
+  if (!memory.enabled || !memory.consentAccepted) return;
+  const user = String(userText || '').replace(/\s+/g, ' ').trim();
+  const assistant = String(assistantText || '').replace(/\s+/g, ' ').trim();
+  const content = (assistant || user).slice(0, 320);
+  if (!content) return;
+  const nextEntries = [
+    {
+      id: aiUid('mem'),
+      createdAt: aiNow(),
+      content,
+    },
+    ...memory.entries.filter((entry) => entry.content !== content),
+  ].slice(0, AI_MEMORY_MAX_ENTRIES);
+  aiUpdateMemoryState({ ...memory, entries: nextEntries });
+}
+
+function renderAiMemorySettings() {
+  const memory = normalizeAiMemoryState(aiMemoryState);
+  const statusText = memory.enabled
+    ? 'Aktiviert: Kivo darf freiwillig freigegebene Hinweise speichern und für personalisierte Antworten nutzen.'
+    : 'Deaktiviert: Es werden keine Memory-Hinweise für personalisierte Antworten verwendet.';
+  const entriesHtml = memory.entries.length
+    ? memory.entries.map((entry) => `
+        <div class="k-card-sm" style="margin-top:8px;padding:10px 12px">
+          <div style="font-size:9px;color:var(--muted);margin-bottom:6px">${new Date(entry.createdAt).toLocaleString('de-DE')}</div>
+          <div style="font-size:11px;margin-bottom:8px"><strong>Gespeichert:</strong> ${escapeHtml(entry.content || '') || '&mdash;'}</div>
+          <button class="btn btn-sm btn-danger" onclick="aiDeleteMemoryEntry('${entry.id}')">Eintrag löschen</button>
+        </div>
+      `).join('')
+    : `<div style="font-size:11px;color:var(--muted);margin-top:8px">Noch keine gespeicherten Memory-Einträge.</div>`;
+  return `
+    <div class="k-group" style="margin-top:14px">
+      <label class="k-label">Memory-Funktion (optional)</label>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:8px">
+        ${statusText}
+      </div>
+      <div style="font-size:10px;color:var(--muted);line-height:1.6;margin-bottom:10px">
+        Die Funktion ist freiwillig. Gespeichert werden nur Hinweise, die du ausdrücklich zum Merken freigibst.
+      </div>
+      <div class="btn-row" style="margin-top:0">
+        <button class="btn btn-sm ${memory.enabled ? 'btn-danger' : 'btn-blue'}" onclick="toggleAiMemory()">
+          ${memory.enabled ? 'Memory deaktivieren' : 'Memory aktivieren'}
+        </button>
+        <button class="btn btn-sm" onclick="confirmClearAiMemory()" ${memory.entries.length ? '' : 'disabled'}>
+          Memory löschen
+        </button>
+      </div>
+      ${entriesHtml}
+    </div>
+  `;
+}
+
+async function toggleAiMemory() {
+  const memory = normalizeAiMemoryState(aiMemoryState);
+  if (memory.enabled) {
+    aiUpdateMemoryState({ ...memory, enabled: false });
+    refreshCurrentScreen?.({ keepProfileContent: false });
+    toast('Memory deaktiviert');
+    return;
+  }
+  const ok = await confirm2(
+    'Memory aktivieren?',
+    'Kivo speichert dann nur Hinweise, die du ausdrücklich zum Merken freigibst, zeigt sie dir in den Einstellungen an und nutzt sie für persönlichere Antworten.'
+  );
+  if (!ok) return;
+  aiUpdateMemoryState({ ...memory, consentAccepted: true, enabled: true });
+  refreshCurrentScreen?.({ keepProfileContent: false });
+  toast('Memory aktiviert');
+}
+
+function aiDeleteMemoryEntry(id) {
+  const memory = normalizeAiMemoryState(aiMemoryState);
+  aiUpdateMemoryState({ ...memory, entries: memory.entries.filter((entry) => entry.id !== id) });
+  refreshCurrentScreen?.({ keepProfileContent: false });
+  toast('Memory-Eintrag gelöscht');
+}
+
+async function confirmClearAiMemory() {
+  const ok = await confirm2(
+    'Memory löschen?',
+    'Alle gespeicherten Memory-Hinweise werden dauerhaft entfernt.'
+  );
+  if (!ok) return;
+  aiUpdateMemoryState({ ...normalizeAiMemoryState(aiMemoryState), entries: [] });
+  refreshCurrentScreen?.({ keepProfileContent: false });
+  toast('Memory gelöscht');
+}
+
 function aiSaveChatSessions() {
   try {
     const payload = {
       activeId: aiActiveChatId,
       order: aiChatOrder,
-      sessions: aiChatSessions
+      sessions: aiChatSessions,
+      memory: normalizeAiMemoryState(aiMemoryState),
     };
     lsSet(AI_CHAT_STORAGE_KEY, payload);
     lsSet(AI_CHAT_ACTIVE_KEY, aiActiveChatId || '');
@@ -178,6 +351,7 @@ function aiLoadChatSessions() {
     if (raw) {
       const parsed = raw;
       aiChatSessions = parsed.sessions && typeof parsed.sessions === 'object' ? parsed.sessions : {};
+      aiMemoryState = normalizeAiMemoryState(parsed.memory);
       aiChatOrder = Array.isArray(parsed.order)
         ? parsed.order.filter(id => aiChatSessions[id])
         : Object.keys(aiChatSessions);
@@ -186,6 +360,8 @@ function aiLoadChatSessions() {
       aiActiveChatId = storedActive && aiChatSessions[storedActive]
         ? storedActive
         : (aiChatOrder[0] || null);
+    } else {
+      aiMemoryState = { ...AI_MEMORY_DEFAULT_STATE };
     }
 
     if (!aiActiveChatId) {
@@ -198,6 +374,7 @@ function aiLoadChatSessions() {
     console.warn('[AI] Sessions konnten nicht geladen werden:', e);
     aiChatSessions = {};
     aiChatOrder = [];
+    aiMemoryState = { ...AI_MEMORY_DEFAULT_STATE };
     const s = aiCreateChatSession('Neuer Chat', true);
     aiActiveChatId = s.id;
     return s;
@@ -781,7 +958,9 @@ function aiBotSend(preset) {
   const assistantMsg = {
     role: 'assistant',
     content: '',
-    streaming: true
+    streaming: true,
+    skipAutoMemory: false,
+    isMemoryRequest: aiIsExplicitMemoryRequest(msg)
   };
   aiBotHistory.push(assistantMsg);
   session.messages.push(assistantMsg);
@@ -1133,7 +1312,7 @@ async function fetchAiReply(loadingDiv) {
         headers: await edgeHeaders(),
         body: JSON.stringify({
           mode: 'chat',
-          system: AI_SYS,
+          system: buildAiSystemPrompt(),
           messages: aiBotHistory
         })
       }
@@ -1164,6 +1343,7 @@ async function fetchAiReply(loadingDiv) {
 
     // Stream finalisieren
     const active = aiGetActiveSession();
+    const responseText = aiCurrentStream?.raw || '';
 
     if (active && aiCurrentStream) {
       const idx = aiCurrentStream.assistantIndex;
@@ -1175,6 +1355,16 @@ async function fetchAiReply(loadingDiv) {
 
       if (aiBotHistory[idx]) {
         aiBotHistory[idx].content = aiCurrentStream.raw;
+      }
+
+      const shouldSaveMemory = active.messages[idx]?.isMemoryRequest
+        || aiAssistantConfirmedMemory(aiCurrentStream.raw);
+
+      // Speichere Memory-Eintrag, wenn der Nutzer explizit etwas merken lassen wollte
+      // oder das Modell die Speicherung bestaetigt hat.
+      if (shouldSaveMemory) {
+        const userMsg = active.messages[idx - 1]?.content || '';
+        aiRememberExplicitUserFact(userMsg, aiCurrentStream.raw);
       }
 
       active.streaming = {
@@ -1324,19 +1514,21 @@ async function importAiList(encOrRaw) {
       await syncPoolToServer(lang, name);
     }
     loadState();
+    if (typeof renderCourses === 'function') renderCourses();
     toast(`✓ "${name}" mit ${pairs.length} Wörtern importiert!`);
-    confirm2(
+    const shouldSwitch = await confirm2(
       'Pool wechseln?',
-      `Zu "${name}" wechseln und lernen?`,
-      () => {
-        setActivePool(mkKey(lang, name));
-        goTo('courses');
-      }
+      `Zu "${name}" wechseln und lernen?`
     );
+    if (shouldSwitch) {
+      setActivePool(mkKey(lang, name));
+      goTo('courses');
+    }
   } catch (e) {
     toast('Fehler: ' + e.message);
   }
 }
+
 
 
 

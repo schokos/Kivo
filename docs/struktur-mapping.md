@@ -8,14 +8,18 @@ Dieses Dokument beschreibt die aktuelle technische Zuordnung von Verantwortlichk
 - Globales Styling: `src/styles/main.css`
 - Core/Shell/Navigation: `src/js/core/*`
 - Screen-Logik je Bereich: `src/js/screens/*`
+- Gemeinsame Legacy-Lernscreen-Logik fuer Poolverwaltung, Statistik, KI-Lueckentext und Spaced-Repetition-Helfer: `src/js/screens/learn/*`
 - Services fuer Supabase/Auth/Sync: `src/js/services/*`
 - State/Utilities: `src/js/state/*`, `src/js/utils/*`
 - Fach-/Content-Daten: `src/data/subjects/*`
 - Fachkatalog-Einstieg: `src/data/subjects/subjects.json`
+- Optionale KI-Personalisierung/Memory: UI in `src/js/screens/profile.js` und `src/js/screens/aibot.js`, Persistenz-/Merge-Logik in `src/js/services/auth.js` und `src/js/services/sync.js`
 
 ## Soll-Zustand (stabile Zielstruktur)
 - Shell-/App-Rahmen bleibt in `index.html` + `src/js/core/*`.
 - Fachliche UI-Logik bleibt in `src/js/screens/*`.
+- Wiederverwendete Lernfunktionen duerfen unter `src/js/screens/learn/*` verbleiben, solange Shell und eingebettete Kurse dieselben Helfer teilen.
+- Wenn Shell-Screens oder Lernmodi Funktionen aus `src/js/screens/learn/*` indirekt mitbenutzen, muessen die Script-Dateien im `index.html` in Abhaengigkeitsreihenfolge global eingebunden bleiben.
 - Backend-nahe Logik bleibt in `src/js/services/*`.
 - Content bleibt strikt unter `src/data/subjects/*`.
 

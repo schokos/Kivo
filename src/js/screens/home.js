@@ -122,35 +122,17 @@ function updateHomeStats() {
   const topbarStreak = document.getElementById('topbar-streak');
   if (topbarStreak) topbarStreak.textContent = s;
 
-  const hmXp = document.getElementById('hm-xp');
+  const topbarXp = document.getElementById('topbar-xp');
+  const homeXp = document.getElementById('home-xp');
   const hmLevel = document.getElementById('hm-level');
   const hmNextXp = document.getElementById('hm-next-xp');
   const hmRing = document.getElementById('hm-ring');
-  const homeUserName = document.getElementById('home-user-name');
 
-  if (hmXp) hmXp.textContent = xpTotal.toLocaleString();
+  if (topbarXp) topbarXp.textContent = xpTotal.toLocaleString();
+  if (homeXp) homeXp.textContent = xpTotal.toLocaleString();
   if (hmLevel) hmLevel.textContent = level;
   if (hmNextXp) hmNextXp.textContent = next.toLocaleString();
   if (hmRing) hmRing.style.setProperty('--ring-pct', Math.max(4, levelPct) + '%');
-  if (homeUserName) homeUserName.textContent = currentUser?.username || 'Lerner';
-
-  const today = new Date().toISOString().slice(0, 10);
-  const xpData = lsGet('kivo_xp', '{}');
-  const todayXp = xpData[today] || 0;
-  const lbl = document.getElementById('hm-goal-lbl');
-  if (lbl) lbl.textContent = todayXp + ' XP heute';
-
-  const poolPct = t > 0 ? Math.round(k / t * 100) : 0;
-  const poolBar = document.getElementById('daily-goal-fill');
-  if (poolBar) poolBar.style.width = poolPct + '%';
-
-  const rec = sessions.slice(-5);
-  const hmSessions = document.getElementById('hm-sessions');
-  if (hmSessions) {
-    hmSessions.innerHTML = rec.length
-      ? rec.map(ses => `<span style="margin-right:6px">${ses.pct}% (${ses.ok}✓)</span>`).join('')
-      : 'Noch keine Sessions';
-  }
 
   renderHomeAggregatedTasks();
 }

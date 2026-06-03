@@ -23,6 +23,7 @@ Kivo/
 |  |- js/
 |  |  |- core/
 |  |  |- screens/
+|  |  |  |- learn/
 |  |  |- services/
 |  |  |- state/
 |  |  |- utils/
@@ -37,6 +38,7 @@ Kivo/
 - Der Kurskatalog MUSS aus `src/data/subjects/subjects.json` gelesen werden.
 - Jede Lesson MUSS einen eigenen Ordner unter `lessons/<lektion>/` haben.
 - Deployment-relevante Einstiegspfade MUESSEN statisch aufloesbar sein.
+- Wenn `index.html` Lernscreen-Helfer laedt, MUESSEN die Script-Pfade den realen Dateien unter `src/js/screens/learn/` entsprechen.
 - Bei Strukturregel-Aenderungen MUESSEN `LLM.md` und `docs/struktur-mapping.md` im selben PR aktualisiert werden.
 
 ## SHOULD-Regeln

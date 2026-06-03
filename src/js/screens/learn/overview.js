@@ -62,7 +62,7 @@ function saveNewPool() {
   saveCustom();
   if(currentUser) syncPoolToServer(lang,name);
   closeModal('new-pool-modal'); renderOverview(); setActivePool(mkKey(lang,name));
-  if(document.getElementById('screen-courses')?.classList.contains('active')) renderCourses();
+  if(typeof renderCourses === 'function') renderCourses();
   toast('✓ Pool "'+name+'" erstellt!');
 }
 
@@ -77,7 +77,7 @@ async function saveEditedPool(oldKey) {
   if(!POOLS[lang])POOLS[lang]={};
   if((old.l!==lang||old.p!==name)&&POOLS[old.l]?.[old.p]){delete POOLS[old.l][old.p];if(!Object.keys(POOLS[old.l]).length)delete POOLS[old.l];}
   POOLS[lang][name]={subcats:{[name]:pairs}}; saveCustom(); await syncPoolToServer(lang,name);
-  activeKey=mkKey(lang,name); lsSet('kivo_ak',activeKey); closeModal('new-pool-modal'); loadState(); renderOverview(); if(document.getElementById('screen-courses')?.classList.contains('active')) renderCourses(); toast('✓ Pool gespeichert');
+  activeKey=mkKey(lang,name); lsSet('kivo_ak',activeKey); closeModal('new-pool-modal'); loadState(); renderOverview(); if(typeof renderCourses === 'function') renderCourses(); toast('✓ Pool gespeichert');
 }
 
 async function syncPoolToServer(lang,name) {

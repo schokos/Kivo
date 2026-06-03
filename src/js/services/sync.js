@@ -78,6 +78,43 @@ function mergePassState(serverPass = {}, localPass = {}) {
   };
 }
 
+const AI_MEMORY_DEFAULT_STATE = Object.freeze({
+  consentAccepted: false,
+  enabled: false,
+  entries: [],
+  updatedAt: 0,
+});
+
+function normalizeAiMemoryState(raw = {}) {
+  const source = raw && typeof raw === 'object' ? raw : {};
+  const entries = Array.isArray(source.entries)
+    ? source.entries
+        .filter((entry) => entry && typeof entry === 'object')
+        .map((entry) => ({
+          id: String(entry.id || `mem_${entry.createdAt || Date.now()}`),
+          createdAt: Number(entry.createdAt || Date.now()),
+          content: String(entry.content || entry.assistant || entry.user || '').trim(),
+        }))
+        .filter((entry) => entry.content)
+        .sort((a, b) => b.createdAt - a.createdAt)
+        .slice(0, 20)
+    : [];
+
+  return {
+    consentAccepted: !!source.consentAccepted,
+    enabled: !!source.enabled && !!source.consentAccepted,
+    entries,
+    updatedAt: Number(source.updatedAt || 0),
+  };
+}
+
+function mergeAiMemoryState(serverMemory = {}, localMemory = {}) {
+  const server = normalizeAiMemoryState(serverMemory);
+  const local = normalizeAiMemoryState(localMemory);
+  const chosen = local.updatedAt >= server.updatedAt ? local : server;
+  return normalizeAiMemoryState(chosen);
+}
+
 function _mergeChatPayload(serverPayload={}, localPayload={}) {
   const serverSessions = serverPayload.sessions && typeof serverPayload.sessions === 'object' ? serverPayload.sessions : {};
   const localSessions = localPayload.sessions && typeof localPayload.sessions === 'object' ? localPayload.sessions : {};
@@ -120,8 +157,12 @@ async function _syncProfileToServer(){
     const { data:profileRow, error:profileErr } = await sb.from('profiles').select('chat_data').eq('id', currentUser.id).maybeSingle();
     if(profileErr) throw profileErr;
     const baseChatData = profileRow?.chat_data && typeof profileRow.chat_data === 'object' ? profileRow.chat_data : {};
+    const localChatData = lsGet(AI_CHAT_STORAGE_KEY,'{}') || {};
+    const mergedChats = _mergeChatPayload(baseChatData, localChatData);
     const chatDataWithTheme = {
       ...baseChatData,
+      ...mergedChats,
+      memory: mergeAiMemoryState(baseChatData.memory, localChatData.memory),
       settings: {
         ...(baseChatData.settings && typeof baseChatData.settings === 'object' ? baseChatData.settings : {}),
         theme_mode: themeMode,
@@ -143,6 +184,8 @@ async function _syncProfileToServer(){
     };
     const { error } = await sb.from('profiles').update(payload).eq('id', currentUser.id);
     if(error) throw error;
+    lsSet(AI_CHAT_STORAGE_KEY, chatDataWithTheme);
+    lsSet(AI_CHAT_ACTIVE_KEY, chatDataWithTheme.activeId || '');
     currentUser.avatar_data = avatarData || currentUser.avatar_data || null;
     currentUser.avatar_url = avatarUrl || currentUser.avatar_url || null;
     currentUser.theme_mode = themeMode;
@@ -230,6 +273,7 @@ async function _syncChatsToServer(){
     const nextChatData = {
       ...serverPayload,
       ...merged,
+      memory: mergeAiMemoryState(serverPayload.memory, localPayload.memory),
       settings: {
         ...(serverPayload?.settings && typeof serverPayload.settings === 'object' ? serverPayload.settings : {}),
         theme_mode: themeMode,
@@ -311,9 +355,6 @@ function buildVocab() {
   const flat=flattenPool(pool);
   vocab=flat.map((v,i)=>({...v,id:i,known:knIds.includes(i)}));
   updateHomeStats();
-  const {l,p}=spKey(activeKey);
-  const homePoolNameEl = document.getElementById('home-pool-name');
-  if(homePoolNameEl) homePoolNameEl.textContent=p;
 }
 
 function saveKnown() { lsSet('kivo_kn_'+activeKey,vocab.filter(v=>v.known).map(v=>v.id)); syncProgress(); }

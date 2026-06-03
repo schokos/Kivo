@@ -7,14 +7,16 @@
   setTimeout(() => el.remove(), 2800);
 }
 
-function confirm2(title, msg) {
+function confirm2(title, msg, onConfirm) {
   return new Promise((resolve) => {
     const overlay = document.getElementById("confirm-overlay");
     const okBtn = document.getElementById("confirm-ok");
     const cancelBtn = document.getElementById("confirm-cancel");
+    const finalTitle = msg === undefined ? "Bestätigen" : title;
+    const finalMsg = msg === undefined ? title : msg;
 
-    document.getElementById("confirm-title").textContent = title;
-    document.getElementById("confirm-msg").textContent = msg;
+    document.getElementById("confirm-title").textContent = finalTitle;
+    document.getElementById("confirm-msg").textContent = finalMsg;
     overlay.classList.add("open");
 
     const close = (result) => {
@@ -25,7 +27,16 @@ function confirm2(title, msg) {
       resolve(result);
     };
 
-    okBtn.onclick = () => close(true);
+    okBtn.onclick = async () => {
+      if (typeof onConfirm === "function") {
+        try {
+          await onConfirm();
+        } catch (error) {
+          console.error(error);
+        }
+      }
+      close(true);
+    };
     if (cancelBtn) cancelBtn.onclick = () => close(false);
     overlay.onclick = (e) => {
       if (e.target === overlay) close(false);
