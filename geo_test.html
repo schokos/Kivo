@@ -1,0 +1,1695 @@
+<!DOCTYPE html>
+<!--
+  ============================================================
+  FILE:    geogebra-api-demo.html
+  PURPOSE: Interactive demo of the full GeoGebra Apps API 6.0.
+           Designed for embedding on non-profit educational sites.
+  AUDIENCE (primary): AI assistants reading/modifying this file.
+  AUDIENCE (secondary): Developers and educators.
+
+  LOGIN / ACCOUNT:
+    All account and login UI is intentionally disabled via applet
+    parameters. See APPLET_CONFIG → NON_PROFIT_FLAGS.
+    This is permitted for free, non-commercial, non-profit use.
+    License: https://www.geogebra.org/license (Non-Commercial)
+
+  AI-READABILITY CONVENTIONS:
+    - Every logical block is wrapped in a SECTION comment.
+    - Functions are JSDoc-annotated with @param, @returns, @sideeffect.
+    - Mutable global state lives in a single `STATE` object.
+    - Constants are ALL_CAPS at the top of their section.
+    - DOM IDs used in JS are prefixed with `js-` to distinguish
+      them from purely styling hooks.
+    - Each API demo entry is a plain data object (API_CATALOG array)
+      so new demos can be added without touching rendering logic.
+  ============================================================
+-->
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GeoGebra API · Demo</title>
+
+  <!-- ── FONTS ── -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=Fira+Code:wght@300;400;500&family=Libre+Baskerville:ital@0;1&display=swap" rel="stylesheet">
+
+  <style>
+    /* ============================================================
+       SECTION: CSS CUSTOM PROPERTIES (Design Tokens)
+       All colours, sizes and font stacks in one place.
+    ============================================================ */
+    :root {
+      /* Palette */
+      --bg:           #0d0f14;
+      --surface:      #161920;
+      --surface-2:    #1e2230;
+      --border:       #2a2f3d;
+      --border-light: #333a4d;
+      --text:         #e8eaf0;
+      --muted:        #6b7394;
+      --accent:       #5b8af5;
+      --accent-dim:   #1f2d52;
+      --accent-hover: #7aa0ff;
+      --green:        #3ecf8e;
+      --yellow:       #f5c842;
+      --red:          #f56565;
+      --orange:       #f59e42;
+
+      /* Typography */
+      --font-ui:    'Syne', sans-serif;
+      --font-code:  'Fira Code', monospace;
+      --font-serif: 'Libre Baskerville', serif;
+
+      /* Spacing scale */
+      --sp-xs: 4px;
+      --sp-sm: 8px;
+      --sp-md: 16px;
+      --sp-lg: 24px;
+      --sp-xl: 40px;
+
+      /* Radii */
+      --r-sm: 6px;
+      --r-md: 10px;
+      --r-lg: 16px;
+    }
+
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ============================================================
+       SECTION: BASE LAYOUT
+    ============================================================ */
+    body {
+      font-family: var(--font-ui);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: 52px 1fr 200px 36px;
+      grid-template-areas:
+        "header"
+        "workspace"
+        "console"
+        "footer";
+    }
+
+    /* ── Header ── */
+    header {
+      grid-area: header;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 var(--sp-lg);
+      gap: var(--sp-lg);
+    }
+
+    .logo {
+      font-family: var(--font-code);
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--accent);
+      letter-spacing: 0.02em;
+      display: flex;
+      align-items: center;
+      gap: var(--sp-sm);
+    }
+    .logo::before {
+      content: "◈";
+      font-size: 1rem;
+      animation: pulse 3s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.4; }
+    }
+
+    .header-badge {
+      font-family: var(--font-code);
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      background: var(--accent-dim);
+      color: var(--accent);
+      border: 1px solid var(--accent-dim);
+      padding: 2px 8px;
+      border-radius: 3px;
+    }
+
+    .header-nav {
+      margin-left: auto;
+      display: flex;
+      gap: var(--sp-sm);
+    }
+
+    .btn {
+      font-family: var(--font-code);
+      font-size: 0.72rem;
+      padding: 5px 12px;
+      border-radius: var(--r-sm);
+      border: 1px solid var(--border-light);
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn:hover         { border-color: var(--accent); color: var(--accent); }
+    .btn.btn-accent    { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .btn.btn-accent:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+    .btn.btn-danger    { color: var(--red); border-color: #3d1e1e; }
+    .btn.btn-danger:hover { background: #3d1e1e; }
+
+    /* ── Workspace (middle row) ── */
+    .workspace {
+      grid-area: workspace;
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      overflow: hidden;
+    }
+
+    /* ── GeoGebra panel (left) ── */
+    .ggb-panel {
+      position: relative;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+    }
+
+    .ggb-topbar {
+      height: 40px;
+      background: var(--surface-2);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 var(--sp-md);
+      gap: var(--sp-sm);
+    }
+
+    .view-pill {
+      font-family: var(--font-code);
+      font-size: 0.65rem;
+      padding: 3px 10px;
+      border-radius: 20px;
+      border: 1px solid var(--border-light);
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .view-pill.active  { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .view-pill:hover:not(.active) { border-color: var(--accent); color: var(--accent); }
+
+    #js-ggb-loading {
+      position: absolute;
+      inset: 40px 0 0 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      background: var(--surface);
+      z-index: 10;
+      font-family: var(--font-code);
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .spinner {
+      width: 28px; height: 28px;
+      border: 2px solid var(--border-light);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #js-ggb-container { width: 100%; height: calc(100% - 40px); }
+
+    /* ── API Explorer panel (right) ── */
+    .api-panel {
+      display: grid;
+      grid-template-rows: auto 1fr;
+      overflow: hidden;
+      background: var(--surface);
+    }
+
+    /* Tab navigation */
+    .tab-nav {
+      display: flex;
+      overflow-x: auto;
+      background: var(--surface-2);
+      border-bottom: 1px solid var(--border);
+      scrollbar-width: none;
+    }
+    .tab-nav::-webkit-scrollbar { display: none; }
+
+    .tab-btn {
+      font-family: var(--font-code);
+      font-size: 0.62rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      padding: 10px 14px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+    }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab-btn:hover:not(.active) { color: var(--text); }
+
+    /* Tab content */
+    .tab-content {
+      overflow-y: auto;
+      padding: var(--sp-md);
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-sm);
+    }
+
+    .tab-pane { display: none; }
+    .tab-pane.active { display: contents; }
+
+    /* API Function card */
+    .api-card {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      overflow: hidden;
+      transition: border-color 0.15s;
+    }
+    .api-card:hover { border-color: var(--border-light); }
+
+    .api-card-header {
+      padding: var(--sp-sm) var(--sp-md);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: var(--sp-sm);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .api-card-title {
+      font-family: var(--font-code);
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--accent);
+    }
+
+    .api-card-desc {
+      font-size: 0.7rem;
+      color: var(--muted);
+      margin-top: 2px;
+      line-height: 1.4;
+      font-family: var(--font-code);
+    }
+
+    .api-card-expand {
+      font-size: 0.6rem;
+      color: var(--muted);
+      flex-shrink: 0;
+      transition: transform 0.2s;
+    }
+    .api-card.open .api-card-expand { transform: rotate(90deg); }
+
+    .api-card-body {
+      display: none;
+      padding: var(--sp-sm) var(--sp-md) var(--sp-md);
+      border-top: 1px solid var(--border);
+      gap: var(--sp-sm);
+      flex-direction: column;
+    }
+    .api-card.open .api-card-body { display: flex; }
+
+    /* Inputs inside API cards */
+    .param-row {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-sm);
+    }
+    .param-label {
+      font-family: var(--font-code);
+      font-size: 0.65rem;
+      color: var(--muted);
+      min-width: 70px;
+    }
+    .param-input {
+      flex: 1;
+      font-family: var(--font-code);
+      font-size: 0.72rem;
+      padding: 5px 8px;
+      background: var(--bg);
+      border: 1px solid var(--border-light);
+      border-radius: var(--r-sm);
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .param-input:focus { border-color: var(--accent); }
+
+    .param-select {
+      flex: 1;
+      font-family: var(--font-code);
+      font-size: 0.72rem;
+      padding: 5px 8px;
+      background: var(--bg);
+      border: 1px solid var(--border-light);
+      border-radius: var(--r-sm);
+      color: var(--text);
+      outline: none;
+    }
+
+    .api-run-btn {
+      align-self: flex-end;
+      font-family: var(--font-code);
+      font-size: 0.68rem;
+      padding: 5px 14px;
+      border-radius: var(--r-sm);
+      border: 1px solid var(--accent-dim);
+      background: var(--accent-dim);
+      color: var(--accent);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .api-run-btn:hover { background: var(--accent); color: #fff; }
+
+    .api-result {
+      font-family: var(--font-code);
+      font-size: 0.68rem;
+      color: var(--green);
+      background: #0a1f14;
+      border: 1px solid #1a3d28;
+      border-radius: var(--r-sm);
+      padding: var(--sp-sm);
+      min-height: 28px;
+      word-break: break-all;
+      white-space: pre-wrap;
+    }
+    .api-result.empty { color: var(--muted); }
+    .api-result.error { color: var(--red); background: #1f0a0a; border-color: #3d1a1a; }
+
+    /* ============================================================
+       SECTION: CONSOLE (bottom row)
+    ============================================================ */
+    .console {
+      grid-area: console;
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      display: grid;
+      grid-template-rows: 32px 1fr;
+      overflow: hidden;
+    }
+
+    .console-bar {
+      background: var(--surface-2);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 var(--sp-md);
+      gap: var(--sp-md);
+    }
+
+    .console-label {
+      font-family: var(--font-code);
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .console-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: blink 2s ease-in-out infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.2; }
+    }
+
+    #js-console-log {
+      overflow-y: auto;
+      padding: var(--sp-sm) var(--sp-md);
+      font-family: var(--font-code);
+      font-size: 0.7rem;
+      line-height: 1.8;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .log-entry {
+      display: flex;
+      gap: var(--sp-md);
+      align-items: baseline;
+    }
+    .log-time  { color: var(--muted); min-width: 56px; }
+    .log-type  { min-width: 60px; font-weight: 500; }
+    .log-type.cmd    { color: var(--accent); }
+    .log-type.result { color: var(--green);  }
+    .log-type.event  { color: var(--yellow); }
+    .log-type.error  { color: var(--red);    }
+    .log-type.info   { color: var(--muted);  }
+    .log-msg   { color: var(--text); }
+
+    /* ── Footer ── */
+    footer {
+      grid-area: footer;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 var(--sp-lg);
+      gap: var(--sp-lg);
+    }
+    .footer-item {
+      font-family: var(--font-code);
+      font-size: 0.62rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    #js-coord-display { margin-left: auto; }
+
+    /* ── Scrollbar global ── */
+    ::-webkit-scrollbar      { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track{ background: transparent; }
+    ::-webkit-scrollbar-thumb{ background: var(--border-light); border-radius: 10px; }
+
+    @media (max-width: 900px) {
+      .workspace { grid-template-columns: 1fr; }
+      .api-panel { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ============================================================
+     SECTION: HEADER
+============================================================ -->
+<header>
+  <div class="logo">GeoGebra API Demo</div>
+  <span class="header-badge">v6.0 · Non-Profit</span>
+  <nav class="header-nav">
+    <button class="btn btn-danger" onclick="App.reset()">Neu</button>
+    <button class="btn"           onclick="App.undo()">↩ Undo</button>
+    <button class="btn"           onclick="App.redo()">↪ Redo</button>
+    <button class="btn"           onclick="App.exportGGB()">Exportieren</button>
+    <button class="btn btn-accent" onclick="window.open('https://wiki.geogebra.org/de/','_blank')">Dokumentation ↗</button>
+  </nav>
+</header>
+
+<!-- ============================================================
+     SECTION: WORKSPACE
+============================================================ -->
+<div class="workspace">
+
+  <!-- LEFT: GeoGebra applet -->
+  <div class="ggb-panel">
+    <div id="js-ggb-loading">
+      <div class="spinner"></div>
+      <span>Lade GeoGebra …</span>
+    </div>
+    <div id="js-ggb-container"></div>
+  </div>
+
+  <!-- RIGHT: API Explorer -->
+  <div class="api-panel">
+    <nav class="tab-nav" id="js-tab-nav">
+      <!-- tabs injected by JS from API_CATALOG -->
+    </nav>
+    <div class="tab-content" id="js-tab-content">
+      <!-- cards injected by JS from API_CATALOG -->
+    </div>
+  </div>
+
+</div>
+
+<!-- ============================================================
+     SECTION: EVENT CONSOLE
+============================================================ -->
+<div class="console">
+  <div class="console-bar">
+    <div class="console-dot"></div>
+    <span class="console-label">Event &amp; API Log</span>
+    <button class="btn" style="margin-left:auto;font-size:0.6rem;padding:2px 8px;" onclick="App.clearLog()">Leeren</button>
+  </div>
+  <div id="js-console-log"></div>
+</div>
+
+<!-- ============================================================
+     SECTION: STATUS BAR
+============================================================ -->
+<footer>
+  <div class="footer-item">
+    <span style="width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block;"></span>
+    GeoGebra API 6.0
+  </div>
+  <div class="footer-item">Non-Commercial · Kein Login</div>
+  <div class="footer-item" id="js-coord-display"></div>
+</footer>
+
+
+<!-- ============================================================
+     SECTION: JAVASCRIPT
+     Sub-sections:
+       1. APPLET_CONFIG   — GeoGebra init params (including login-disable flags)
+       2. API_CATALOG     — Declarative list of all API demo entries
+       3. App namespace   — All imperative logic
+       4. DOM bootstrap   — Calls App.init() after GeoGebra loads
+============================================================ -->
+<script>
+"use strict";
+
+/* ── 1. APPLET_CONFIG ─────────────────────────────────────────
+   Parameters passed to GGBApplet().
+   LOGIN / ACCOUNT UI is suppressed via the NON_PROFIT_FLAGS block.
+   Reference: https://wiki.geogebra.org/en/Reference:GeoGebra_Apps_Embedding
+──────────────────────────────────────────────────────────────── */
+
+/** @typedef {Object} AppletConfig */
+
+/** @type {Object.<string, AppletConfig>} View presets */
+const VIEW_PRESETS = {
+  classic: {
+    appName: "classic",
+    showToolBar:       true,
+    showAlgebraInput:  true,
+    showMenuBar:       false,   // NON_PROFIT_FLAG: removes File/Edit/About menus → no login option visible
+    enableLabelDrags:  true,
+    enable3d:          false,
+  },
+  graphing: {
+    appName: "graphing",
+    showToolBar:       true,
+    showAlgebraInput:  true,
+    showMenuBar:       false,   // NON_PROFIT_FLAG
+    enableLabelDrags:  true,
+  },
+  geometry: {
+    appName: "geometry",
+    showToolBar:       true,
+    showAlgebraInput:  false,
+    showMenuBar:       false,   // NON_PROFIT_FLAG
+    enableLabelDrags:  true,
+  },
+  "3d": {
+    appName: "3d",
+    showToolBar:       true,
+    showAlgebraInput:  true,
+    showMenuBar:       false,   // NON_PROFIT_FLAG
+    enableLabelDrags:  true,
+    enable3d:          true,
+  },
+};
+
+/**
+ * NON_PROFIT_FLAGS — applied to every view preset.
+ * These collectively remove login, account, and data-sharing UI.
+ * - showMenuBar: false          → hides the top menu (File / Edit / Sign In …)
+ * - enableRightClick: false     → removes right-click context menu (contains "Sign In")
+ * - showResetIcon: false        → removes the reset corner icon (links to geogebra.org)
+ * - preventFocus: false         → keep keyboard focus; unrelated to login but listed for completeness
+ *
+ * Note: GeoGebra does NOT set cookies or call home when showMenuBar is false
+ * and the applet is loaded from the CDN in read-only embedding mode.
+ */
+const NON_PROFIT_FLAGS = {
+  showMenuBar:       false,
+  enableRightClick:  true,
+  showResetIcon:     false,
+  showFullscreenButton: false,
+  useBrowserForJS:   false,
+};
+
+/**
+ * Builds the full GGBApplet parameter object for a given view key.
+ * @param {string} viewKey - Key into VIEW_PRESETS
+ * @returns {AppletConfig}
+ */
+function buildAppletParams(viewKey) {
+  const wrapper = document.getElementById("js-ggb-panel") ||
+                  document.querySelector(".ggb-panel");
+  const w = (wrapper?.clientWidth  || 800);
+  const h = (wrapper?.clientHeight || 600) - 40; // subtract topbar height
+
+  return Object.assign(
+    {
+      // Identity
+      id:     "ggbApp",
+      width:  w,
+      height: h,
+      // Callback
+      appletOnLoad() {
+        document.getElementById("js-ggb-loading").style.display = "none";
+        App.onAppletReady();
+      },
+    },
+    VIEW_PRESETS[viewKey] ?? VIEW_PRESETS.classic,
+    NON_PROFIT_FLAGS,  // always override with non-profit flags last
+  );
+}
+
+
+/* ── 2. API_CATALOG ───────────────────────────────────────────
+   Declarative description of every API function to be demoed.
+   Structure:
+     category: string           → becomes a tab
+     entries:  ApiEntry[]
+   
+   ApiEntry:
+     id:      string            → unique, used for DOM IDs
+     fn:      string            → the ggbApp method name (for display)
+     desc:    string            → human description
+     params:  ParamDef[]        → input fields shown in the card
+     run:     function(inputs)  → called when "Ausführen" is clicked;
+                                  `inputs` is {[paramId]: value}.
+                                  Must return a result string or throw.
+     default: string?           → optional quickfill preset
+──────────────────────────────────────────────────────────────── */
+
+/** @type {Array<{category: string, entries: Array}>} */
+const API_CATALOG = [
+
+  /* ── CATEGORY: Objekte ──────────────────────────────────── */
+  {
+    category: "Objekte",
+    entries: [
+      {
+        id: "evalCmd",
+        fn: "evalCommand(cmd)",
+        desc: "Führt einen GeoGebra-Befehl aus (Funktionen, Punkte, Formen, CAS…).",
+        params: [
+          { id: "cmd", label: "Befehl", type: "text", placeholder: "f(x) = sin(x)" },
+        ],
+        run({ cmd }) {
+          if (!cmd) throw new Error("Befehl darf nicht leer sein.");
+          const ok = ggbApp.evalCommand(cmd);
+          return ok ? `✓ Befehl ausgeführt` : `⚠ Befehl fehlgeschlagen`;
+        },
+      },
+      {
+        id: "evalCmdLabels",
+        fn: "evalCommandGetLabels(cmd)",
+        desc: "Führt einen Befehl aus und gibt die erzeugten Objektnamen zurück.",
+        params: [
+          { id: "cmd", label: "Befehl", type: "text", placeholder: "Segment((0,0),(3,4))" },
+        ],
+        run({ cmd }) {
+          if (!cmd) throw new Error("Befehl erforderlich.");
+          const labels = ggbApp.evalCommandGetLabels(cmd);
+          return labels || "(keine Labels zurückgegeben)";
+        },
+      },
+      {
+        id: "allObjectNames",
+        fn: "getAllObjectNames(type?)",
+        desc: "Listet alle Objekte im aktuellen Konstruktion. Optionaler Typ-Filter: point, line, conic, function …",
+        params: [
+          { id: "type", label: "Typ (opt.)", type: "text", placeholder: "point" },
+        ],
+        run({ type }) {
+          const names = type
+            ? ggbApp.getAllObjectNames(type)
+            : ggbApp.getAllObjectNames();
+          return names.length > 0 ? names.join(", ") : "(keine Objekte)";
+        },
+      },
+      {
+        id: "exists",
+        fn: "exists(name)",
+        desc: "Prüft, ob ein Objekt mit dem angegebenen Namen existiert.",
+        params: [
+          { id: "name", label: "Name", type: "text", placeholder: "A" },
+        ],
+        run({ name }) {
+          if (!name) throw new Error("Name erforderlich.");
+          return ggbApp.exists(name) ? "true (Objekt vorhanden)" : "false (nicht vorhanden)";
+        },
+      },
+      {
+        id: "isDefined",
+        fn: "isDefined(name)",
+        desc: "Prüft, ob das Objekt einen definierten Wert hat (nicht undefiniert/ausgeblendet).",
+        params: [
+          { id: "name", label: "Name", type: "text", placeholder: "f" },
+        ],
+        run({ name }) {
+          if (!name) throw new Error("Name erforderlich.");
+          return ggbApp.isDefined(name) ? "true (definiert)" : "false (undefiniert)";
+        },
+      },
+      {
+        id: "getObjectType",
+        fn: "getObjectType(name)",
+        desc: "Gibt den Typ eines Objekts zurück (point, line, conic, numeric, function …).",
+        params: [
+          { id: "name", label: "Name", type: "text", placeholder: "A" },
+        ],
+        run({ name }) {
+          if (!name) throw new Error("Name erforderlich.");
+          const t = ggbApp.getObjectType(name);
+          return t || "(kein Typ / Objekt nicht gefunden)";
+        },
+      },
+      {
+        id: "renameObject",
+        fn: "renameObject(old, new)",
+        desc: "Benennt ein Objekt um.",
+        params: [
+          { id: "oldName", label: "Alter Name", type: "text", placeholder: "A"  },
+          { id: "newName", label: "Neuer Name", type: "text", placeholder: "P1" },
+        ],
+        run({ oldName, newName }) {
+          if (!oldName || !newName) throw new Error("Beide Namen erforderlich.");
+          const ok = ggbApp.renameObject(oldName, newName);
+          return ok ? `✓ Umbenannt: ${oldName} → ${newName}` : `⚠ Umbenennnung fehlgeschlagen`;
+        },
+      },
+      {
+        id: "deleteObject",
+        fn: "deleteObject(name)",
+        desc: "Löscht ein Objekt aus der Konstruktion.",
+        params: [
+          { id: "name", label: "Name", type: "text", placeholder: "A" },
+        ],
+        run({ name }) {
+          if (!name) throw new Error("Name erforderlich.");
+          ggbApp.deleteObject(name);
+          return `✓ Objekt "${name}" gelöscht (falls vorhanden)`;
+        },
+      },
+    ],
+  },
+
+  /* ── CATEGORY: Werte ────────────────────────────────────── */
+  {
+    category: "Werte",
+    entries: [
+      {
+        id: "getValue",
+        fn: "getValue(name)",
+        desc: "Gibt den numerischen Wert eines Objekts zurück (Schieberegler, Punkte, etc.).",
+        params: [
+          { id: "name", label: "Name", type: "text", placeholder: "a" },
+        ],
+        run({ name }) {
+          if (!name) throw new Error("Name erforderlich.");
+          return String(ggbApp.getValue(name));
+        },
+      },
+      {
+        id: "setValue",
+        fn: "setValue(name, value)",
+        desc: "Setzt den numerischen Wert eines freien Objekts (z. B. Schieberegler).",
+        params: [
+          { id: "name",  label: "Name",  type: "text",   placeholder: "a"   },
+          { id: "value", label: "Wert",  type: "number", placeholder: "3.5" },
+        ],
+        run({ name, value }) {
+          if (!name) throw new Error("Name erforderlich.");
+          ggbApp.setValue(name, parseFloat(value));
+          return `✓ ${name} = ${value}`;
+        },
+      },
+      {
+        id: "getXcoord",
+        fn: "getXcoord(name) / getYcoord(name)",
+        desc: "Gibt die X- bzw. Y-Koordinate eines Punktes zurück.",
+        params: [
+          { id: "name", label: "Punkt", type: "text", placeholder: "A" },
+        ],
+        run({ name }) {
+          if (!name) throw new Error("Name erforderlich.");
+          const x = ggbApp.getXcoord(name);
+          const y = ggbApp.getYcoord(name);
+          return `X = ${x},  Y = ${y}`;
+        },
+      },
+      {
+        id: "setCoords",
+        fn: "setCoords(name, x, y)",
+        desc: "Setzt die Koordinaten eines freien Punktes.",
+        params: [
+          { id: "name", label: "Punkt", type: "text",   placeholder: "A" },
+          { id: "x",    label: "x",     type: "number", placeholder: "2" },
+          { id: "y",    label: "y",     type: "number", placeholder: "3" },
+        ],
+        run({ name, x, y }) {
+          if (!name) throw new Error("Name erforderlich.");
+          ggbApp.setCoords(name, parseFloat(x), parseFloat(y));
+          return `✓ ${name} → (${x}, ${y})`;
+        },
+      },
+      {
+        id: "getValueString",
+        fn: "getValueString(name)",
+        desc: "Gibt den Wert als lesbaren String zurück (z. B. 'A = (1, 2)').",
+        params: [
+          { id: "name", label: "Name", type: "text", placeholder: "A" },
+        ],
+        run({ name }) {
+          if (!name) throw new Error("Name erforderlich.");
+          return ggbApp.getValueString(name) || "(leer)";
+        },
+      },
+      {
+        id: "getDefinitionString",
+        fn: "getDefinitionString(name)",
+        desc: "Gibt die Definition des Objekts zurück (z. B. 'f(x) = sin(x)').",
+        params: [
+          { id: "name", label: "Name", type: "text", placeholder: "f" },
+        ],
+        run({ name }) {
+          if (!name) throw new Error("Name erforderlich.");
+          return ggbApp.getDefinitionString(name) || "(keine Definition)";
+        },
+      },
+      {
+        id: "getCommandString",
+        fn: "getCommandString(name)",
+        desc: "Gibt den GeoGebra-Befehl zurück, mit dem das Objekt erzeugt wurde.",
+        params: [
+          { id: "name", label: "Name", type: "text", placeholder: "f" },
+        ],
+        run({ name }) {
+          if (!name) throw new Error("Name erforderlich.");
+          return ggbApp.getCommandString(name) || "(kein Befehl)";
+        },
+      },
+      {
+        id: "getLaTeXString",
+        fn: "getLaTeXString(name)",
+        desc: "Gibt den LaTeX-Ausdruck des Objekts zurück.",
+        params: [
+          { id: "name", label: "Name", type: "text", placeholder: "f" },
+        ],
+        run({ name }) {
+          if (!name) throw new Error("Name erforderlich.");
+          return ggbApp.getLaTeXString(name) || "(kein LaTeX)";
+        },
+      },
+    ],
+  },
+
+  /* ── CATEGORY: Darstellung ──────────────────────────────── */
+  {
+    category: "Darstellung",
+    entries: [
+      {
+        id: "setColor",
+        fn: "setColor(name, r, g, b)",
+        desc: "Ändert die Farbe eines Objekts (RGB 0–255).",
+        params: [
+          { id: "name", label: "Name", type: "text",   placeholder: "f"   },
+          { id: "r",    label: "R",    type: "number", placeholder: "255" },
+          { id: "g",    label: "G",    type: "number", placeholder: "100" },
+          { id: "b",    label: "B",    type: "number", placeholder: "0"   },
+        ],
+        run({ name, r, g, b }) {
+          if (!name) throw new Error("Name erforderlich.");
+          ggbApp.setColor(name, parseInt(r), parseInt(g), parseInt(b));
+          return `✓ Farbe gesetzt: ${name} → rgb(${r},${g},${b})`;
+        },
+      },
+      {
+        id: "setVisible",
+        fn: "setVisible(name, bool)",
+        desc: "Zeigt oder versteckt ein Objekt in der Zeichenfläche.",
+        params: [
+          { id: "name",    label: "Name",    type: "text",   placeholder: "f"   },
+          { id: "visible", label: "Sichtbar",type: "select", options: ["true","false"] },
+        ],
+        run({ name, visible }) {
+          if (!name) throw new Error("Name erforderlich.");
+          ggbApp.setVisible(name, visible === "true");
+          return `✓ ${name} sichtbar: ${visible}`;
+        },
+      },
+      {
+        id: "setLabelVisible",
+        fn: "setLabelVisible(name, bool)",
+        desc: "Zeigt oder versteckt das Label eines Objekts.",
+        params: [
+          { id: "name",    label: "Name",    type: "text",   placeholder: "A"    },
+          { id: "visible", label: "Sichtbar",type: "select", options: ["true","false"] },
+        ],
+        run({ name, visible }) {
+          if (!name) throw new Error("Name erforderlich.");
+          ggbApp.setLabelVisible(name, visible === "true");
+          return `✓ Label von ${name}: ${visible}`;
+        },
+      },
+      {
+        id: "setFixed",
+        fn: "setFixed(name, bool, selectable)",
+        desc: "Fixiert oder löst ein Objekt (nicht verschiebbar) und steuert Selektierbarkeit.",
+        params: [
+          { id: "name",  label: "Name",     type: "text",   placeholder: "A"   },
+          { id: "fixed", label: "Fixiert",  type: "select", options: ["true","false"] },
+          { id: "sel",   label: "Selekt.",  type: "select", options: ["true","false"] },
+        ],
+        run({ name, fixed, sel }) {
+          if (!name) throw new Error("Name erforderlich.");
+          ggbApp.setFixed(name, fixed === "true", sel === "true");
+          return `✓ ${name}: fixiert=${fixed}, selektierbar=${sel}`;
+        },
+      },
+      {
+        id: "setPointSize",
+        fn: "setPointSize(name, size)",
+        desc: "Setzt die Punktgröße (1–9).",
+        params: [
+          { id: "name", label: "Name", type: "text",   placeholder: "A" },
+          { id: "size", label: "Größe",type: "number", placeholder: "5" },
+        ],
+        run({ name, size }) {
+          if (!name) throw new Error("Name erforderlich.");
+          ggbApp.setPointSize(name, parseInt(size));
+          return `✓ Punktgröße von ${name}: ${size}`;
+        },
+      },
+      {
+        id: "setLineThickness",
+        fn: "setLineThickness(name, thickness)",
+        desc: "Setzt die Linienbreite (1–13).",
+        params: [
+          { id: "name",  label: "Name",  type: "text",   placeholder: "f" },
+          { id: "thick", label: "Breite",type: "number", placeholder: "3" },
+        ],
+        run({ name, thick }) {
+          if (!name) throw new Error("Name erforderlich.");
+          ggbApp.setLineThickness(name, parseInt(thick));
+          return `✓ Linienbreite von ${name}: ${thick}`;
+        },
+      },
+      {
+        id: "setLineStyle",
+        fn: "setLineStyle(name, style)",
+        desc: "Setzt den Linienstil (0=Voll, 1=Gestrichelt, 2=Gepunktet, 3=Strichlinie, 4=Punkt-Strich).",
+        params: [
+          { id: "name",  label: "Name",  type: "text",   placeholder: "f" },
+          { id: "style", label: "Stil",  type: "select", options: ["0","1","2","3","4"] },
+        ],
+        run({ name, style }) {
+          if (!name) throw new Error("Name erforderlich.");
+          ggbApp.setLineStyle(name, parseInt(style));
+          return `✓ Linienstil von ${name}: ${style}`;
+        },
+      },
+      {
+        id: "setFilling",
+        fn: "setFilling(name, opacity)",
+        desc: "Setzt die Füll-Deckkraft eines Polygons / Kegelschnitts (0.0–1.0).",
+        params: [
+          { id: "name",    label: "Name",  type: "text",   placeholder: "poly1" },
+          { id: "opacity", label: "Deckkraft",type: "number", placeholder: "0.4"  },
+        ],
+        run({ name, opacity }) {
+          if (!name) throw new Error("Name erforderlich.");
+          ggbApp.setFilling(name, parseFloat(opacity));
+          return `✓ Füllung von ${name}: ${opacity}`;
+        },
+      },
+      {
+        id: "setCaption",
+        fn: "setCaption(name, caption)",
+        desc: "Setzt den Beschriftungstext eines Objekts (Caption).",
+        params: [
+          { id: "name",    label: "Name",       type: "text", placeholder: "A"         },
+          { id: "caption", label: "Beschrift.", type: "text", placeholder: "Mein Punkt" },
+        ],
+        run({ name, caption }) {
+          if (!name) throw new Error("Name erforderlich.");
+          ggbApp.setCaption(name, caption);
+          return `✓ Caption von ${name}: "${caption}"`;
+        },
+      },
+    ],
+  },
+
+  /* ── CATEGORY: Ansicht ──────────────────────────────────── */
+  {
+    category: "Ansicht",
+    entries: [
+      {
+        id: "setAxesVisible",
+        fn: "setAxesVisible(xAxis, yAxis)",
+        desc: "Zeigt oder blendet die Koordinatenachsen aus.",
+        params: [
+          { id: "xAxis", label: "X-Achse", type: "select", options: ["true","false"] },
+          { id: "yAxis", label: "Y-Achse", type: "select", options: ["true","false"] },
+        ],
+        run({ xAxis, yAxis }) {
+          ggbApp.setAxesVisible(xAxis === "true", yAxis === "true");
+          return `✓ Achsen: x=${xAxis}, y=${yAxis}`;
+        },
+      },
+      {
+        id: "setGridVisible",
+        fn: "setGridVisible(bool)",
+        desc: "Zeigt oder versteckt das Koordinatengitter.",
+        params: [
+          { id: "visible", label: "Sichtbar", type: "select", options: ["true","false"] },
+        ],
+        run({ visible }) {
+          ggbApp.setGridVisible(visible === "true");
+          return `✓ Gitter: ${visible}`;
+        },
+      },
+      {
+        id: "setCoordSystem",
+        fn: "setCartesianCoordSystem(xmin,xmax,ymin,ymax)",
+        desc: "Setzt den sichtbaren Koordinatenbereich.",
+        params: [
+          { id: "xmin", label: "xMin", type: "number", placeholder: "-10" },
+          { id: "xmax", label: "xMax", type: "number", placeholder: "10"  },
+          { id: "ymin", label: "yMin", type: "number", placeholder: "-6"  },
+          { id: "ymax", label: "yMax", type: "number", placeholder: "6"   },
+        ],
+        run({ xmin, xmax, ymin, ymax }) {
+          ggbApp.setCartesianCoordSystem(
+            parseFloat(xmin), parseFloat(xmax),
+            parseFloat(ymin), parseFloat(ymax)
+          );
+          return `✓ Fenster: x=[${xmin},${xmax}], y=[${ymin},${ymax}]`;
+        },
+      },
+      {
+        id: "setPerspective",
+        fn: "setPerspective(code)",
+        desc: "Wechselt die Perspektive: 'G'=Grafik, 'A'=Algebra, 'S'=CAS, 'T'=Tabelle, '3'=3D.",
+        params: [
+          { id: "code", label: "Code", type: "select", options: ["G","A","GA","S","T","3"] },
+        ],
+        run({ code }) {
+          ggbApp.setPerspective(code);
+          return `✓ Perspektive: ${code}`;
+        },
+      },
+      {
+        id: "refreshViews",
+        fn: "refreshViews()",
+        desc: "Erzwingt ein Neuzeichnen aller Ansichten (nützlich nach programmatischen Änderungen).",
+        params: [],
+        run() {
+          ggbApp.refreshViews();
+          return "✓ Alle Ansichten neu gezeichnet";
+        },
+      },
+      {
+        id: "setRepaintingActive",
+        fn: "setRepaintingActive(bool)",
+        desc: "Aktiviert/deaktiviert automatisches Neuzeichnen (false = Performance-Modus bei Batch-Änderungen).",
+        params: [
+          { id: "active", label: "Aktiv", type: "select", options: ["true","false"] },
+        ],
+        run({ active }) {
+          ggbApp.setRepaintingActive(active === "true");
+          return `✓ Auto-Repaint: ${active}`;
+        },
+      },
+    ],
+  },
+
+  /* ── CATEGORY: Animation ────────────────────────────────── */
+  {
+    category: "Animation",
+    entries: [
+      {
+        id: "setAnimating",
+        fn: "setAnimating(name, bool)",
+        desc: "Aktiviert / deaktiviert die Animation für einen Schieberegler.",
+        params: [
+          { id: "name",   label: "Schieberegler", type: "text",   placeholder: "a" },
+          { id: "anim",   label: "Animieren",     type: "select", options: ["true","false"] },
+        ],
+        run({ name, anim }) {
+          if (!name) throw new Error("Name erforderlich.");
+          ggbApp.setAnimating(name, anim === "true");
+          return `✓ Animation von ${name}: ${anim}`;
+        },
+      },
+      {
+        id: "setAnimationSpeed",
+        fn: "setAnimationSpeed(name, speed)",
+        desc: "Setzt die Animationsgeschwindigkeit eines Schiebereglers.",
+        params: [
+          { id: "name",  label: "Name",          type: "text",   placeholder: "a"   },
+          { id: "speed", label: "Geschwindigkeit",type: "number", placeholder: "1.5" },
+        ],
+        run({ name, speed }) {
+          if (!name) throw new Error("Name erforderlich.");
+          ggbApp.setAnimationSpeed(name, parseFloat(speed));
+          return `✓ Animationsgeschwindigkeit von ${name}: ${speed}`;
+        },
+      },
+      {
+        id: "startAnimation",
+        fn: "startAnimation()",
+        desc: "Startet alle laufenden Animationen in der Konstruktion.",
+        params: [],
+        run() {
+          ggbApp.startAnimation();
+          return "✓ Animation gestartet";
+        },
+      },
+      {
+        id: "stopAnimation",
+        fn: "stopAnimation()",
+        desc: "Stoppt alle laufenden Animationen.",
+        params: [],
+        run() {
+          ggbApp.stopAnimation();
+          return "✓ Animation gestoppt";
+        },
+      },
+      {
+        id: "isAnimationRunning",
+        fn: "isAnimationRunning()",
+        desc: "Gibt true zurück, wenn gerade eine Animation läuft.",
+        params: [],
+        run() {
+          return String(ggbApp.isAnimationRunning());
+        },
+      },
+    ],
+  },
+
+  /* ── CATEGORY: Listener ─────────────────────────────────── */
+  {
+    category: "Listener",
+    entries: [
+      {
+        id: "registerUpdateListener",
+        fn: "registerUpdateListener(fn)",
+        desc: "Registriert eine globale Callback-Funktion, die bei JEDER Änderung aufgerufen wird. Demo loggt in den Event-Log.",
+        params: [],
+        run() {
+          ggbApp.registerUpdateListener("App.onGlobalUpdate");
+          STATE.listenerActive.update = true;
+          return "✓ Update-Listener registriert → prüfe Event-Log";
+        },
+      },
+      {
+        id: "unregisterUpdateListener",
+        fn: "unregisterUpdateListener(fn)",
+        desc: "Deregistriert den globalen Update-Listener.",
+        params: [],
+        run() {
+          ggbApp.unregisterUpdateListener("App.onGlobalUpdate");
+          STATE.listenerActive.update = false;
+          return "✓ Update-Listener entfernt";
+        },
+      },
+      {
+        id: "registerAddListener",
+        fn: "registerAddListener(fn)",
+        desc: "Callback wenn ein Objekt zur Konstruktion hinzugefügt wird.",
+        params: [],
+        run() {
+          ggbApp.registerAddListener("App.onObjectAdded");
+          STATE.listenerActive.add = true;
+          return "✓ Add-Listener registriert → prüfe Event-Log";
+        },
+      },
+      {
+        id: "registerRemoveListener",
+        fn: "registerRemoveListener(fn)",
+        desc: "Callback wenn ein Objekt aus der Konstruktion entfernt wird.",
+        params: [],
+        run() {
+          ggbApp.registerRemoveListener("App.onObjectRemoved");
+          STATE.listenerActive.remove = true;
+          return "✓ Remove-Listener registriert → prüfe Event-Log";
+        },
+      },
+      {
+        id: "registerObjectUpdateListener",
+        fn: "registerObjectUpdateListener(name, fn)",
+        desc: "Callback für Änderungen an einem einzelnen Objekt.",
+        params: [
+          { id: "name", label: "Objekt", type: "text", placeholder: "A" },
+        ],
+        run({ name }) {
+          if (!name) throw new Error("Name erforderlich.");
+          ggbApp.registerObjectUpdateListener(name, "App.onObjectUpdate");
+          return `✓ Object-Update-Listener für "${name}" registriert`;
+        },
+      },
+      {
+        id: "registerObjectClickListener",
+        fn: "registerObjectClickListener(name, fn)",
+        desc: "Callback wenn ein spezifisches Objekt angeklickt wird.",
+        params: [
+          { id: "name", label: "Objekt", type: "text", placeholder: "A" },
+        ],
+        run({ name }) {
+          if (!name) throw new Error("Name erforderlich.");
+          ggbApp.registerObjectClickListener(name, "App.onObjectClick");
+          return `✓ Click-Listener für "${name}" registriert`;
+        },
+      },
+    ],
+  },
+
+  /* ── CATEGORY: Export / Import ──────────────────────────── */
+  {
+    category: "Export",
+    entries: [
+      {
+        id: "getXML",
+        fn: "getXML()",
+        desc: "Gibt die gesamte Konstruktion als GeoGebra-XML zurück.",
+        params: [],
+        run() {
+          const xml = ggbApp.getXML();
+          App.log("result", xml.substring(0, 200) + " …");
+          return `(${xml.length} Zeichen) → vollständig im Log`;
+        },
+      },
+      {
+        id: "getObjectXML",
+        fn: "getObjectXML(name)",
+        desc: "Gibt das XML-Fragment für ein einzelnes Objekt zurück.",
+        params: [
+          { id: "name", label: "Name", type: "text", placeholder: "f" },
+        ],
+        run({ name }) {
+          if (!name) throw new Error("Name erforderlich.");
+          const xml = ggbApp.getObjectXML(name);
+          return xml || "(kein XML)";
+        },
+      },
+      {
+        id: "getBase64",
+        fn: "getBase64()",
+        desc: "Exportiert die Konstruktion als Base64-kodierten .ggb-String (ZIP).",
+        params: [],
+        run() {
+          const b64 = ggbApp.getBase64();
+          return `(${b64.length} Zeichen Base64)`;
+        },
+      },
+      {
+        id: "getVersion",
+        fn: "getVersion()",
+        desc: "Gibt die GeoGebra-Versionsnummer zurück.",
+        params: [],
+        run() {
+          return ggbApp.getVersion?.() ?? "Methode nicht verfügbar in dieser Ansicht";
+        },
+      },
+      {
+        id: "getObjectNumber",
+        fn: "getObjectNumber()",
+        desc: "Gibt die Anzahl der Objekte in der aktuellen Konstruktion zurück.",
+        params: [],
+        run() {
+          return String(ggbApp.getObjectNumber());
+        },
+      },
+    ],
+  },
+
+  /* ── CATEGORY: Steuerung ────────────────────────────────── */
+  {
+    category: "Steuerung",
+    entries: [
+      {
+        id: "undo",
+        fn: "undo()",
+        desc: "Macht den letzten Schritt rückgängig.",
+        params: [],
+        run() { ggbApp.undo(); return "✓ Undo"; },
+      },
+      {
+        id: "redo",
+        fn: "redo()",
+        desc: "Stellt den letzten rückgängig gemachten Schritt wieder her.",
+        params: [],
+        run() { ggbApp.redo(); return "✓ Redo"; },
+      },
+      {
+        id: "newConstruction",
+        fn: "newConstruction()",
+        desc: "Löscht die gesamte Konstruktion (neues leeres Blatt).",
+        params: [],
+        run() { ggbApp.newConstruction(); return "✓ Neue Konstruktion gestartet"; },
+      },
+      {
+        id: "reset",
+        fn: "reset()",
+        desc: "Setzt auf den zuletzt gespeicherten Stand zurück (falls gespeichert).",
+        params: [],
+        run() { ggbApp.reset?.(); return "✓ Reset ausgeführt"; },
+      },
+      {
+        id: "setUndoPoint",
+        fn: "setUndoPoint()",
+        desc: "Setzt manuell einen Undo-Punkt (nützlich bei programmatischen Batch-Änderungen).",
+        params: [],
+        run() { ggbApp.setUndoPoint?.(); return "✓ Undo-Punkt gesetzt"; },
+      },
+      {
+        id: "hideCursorWhenDragging",
+        fn: "hideCursorWhenDragging(bool)",
+        desc: "Versteckt den Mauszeiger beim Ziehen (nützlich für saubere Screenshots/Videos).",
+        params: [
+          { id: "hide", label: "Verstecken", type: "select", options: ["true","false"] },
+        ],
+        run({ hide }) {
+          ggbApp.hideCursorWhenDragging?.(hide === "true");
+          return `✓ Cursor beim Ziehen verstecken: ${hide}`;
+        },
+      },
+    ],
+  },
+];
+
+
+/* ── 3. App NAMESPACE ─────────────────────────────────────────
+   All imperative application logic.
+   No code runs at parse time; everything is called from DOM
+   events or from onAppletReady().
+──────────────────────────────────────────────────────────────── */
+
+/** @type {Object} Mutable global state — everything in one place */
+const STATE = {
+  currentView:   "classic",
+  appletReady:   false,
+  listenerActive: { update: false, add: false, remove: false },
+};
+
+/** @namespace App */
+const App = {
+
+  /* ── APPLET LIFECYCLE ──────────────────────────────────── */
+
+  /**
+   * Launches (or re-launches) the GeoGebra applet for a given view.
+   * Clears the old container first to avoid duplicate applets.
+   * @param {string} viewKey - Key into VIEW_PRESETS
+   */
+  launchApplet(viewKey) {
+    document.getElementById("js-ggb-loading").style.display = "flex";
+    document.getElementById("js-ggb-container").innerHTML  = "";
+    STATE.appletReady  = false;
+    STATE.currentView  = viewKey;
+
+    const params = buildAppletParams(viewKey);
+    const applet = new GGBApplet(params, "6.0");
+    applet.inject("js-ggb-container");
+
+    App.log("info", `Applet lädt: ${viewKey}`);
+  },
+
+  /**
+   * Called by GeoGebra once the applet is fully loaded.
+   * Registers the mouse-move listener for the coordinate display.
+   * @sideeffect Sets STATE.appletReady = true
+   */
+  onAppletReady() {
+    STATE.appletReady = true;
+    App.log("info", `✓ GeoGebra bereit (${STATE.currentView})`);
+
+    // Register mouse listener for coordinate display in footer
+    ggbApp.registerClientListener(function(event) {
+      if (event[0] === "mouseMoved") {
+        const x = parseFloat(event[1]).toFixed(2);
+        const y = parseFloat(event[2]).toFixed(2);
+        document.getElementById("js-coord-display").textContent = `x = ${x}, y = ${y}`;
+      }
+    });
+  },
+
+  /**
+   * Switches the active view preset.
+   * @param {HTMLElement} btnEl - The clicked .view-pill button
+   */
+  setView(btnEl) {
+    document.querySelectorAll(".view-pill").forEach(b => b.classList.remove("active"));
+    btnEl.classList.add("active");
+    App.launchApplet(btnEl.dataset.view);
+  },
+
+
+  /* ── LISTENER CALLBACKS (global scope, called by GeoGebra) ── */
+
+  /** @param {string} label - Object label that was updated */
+  onGlobalUpdate(label)   { App.log("event", `update: ${label}`); },
+
+  /** @param {string} label - Label of the newly added object */
+  onObjectAdded(label)    { App.log("event", `add: ${label}`); },
+
+  /** @param {string} label - Label of the removed object */
+  onObjectRemoved(label)  { App.log("event", `remove: ${label}`); },
+
+  /** @param {string} label - Label of the object that was updated */
+  onObjectUpdate(label)   { App.log("event", `obj-update: ${label}`); },
+
+  /** @param {string} label - Label of the object that was clicked */
+  onObjectClick(label)    { App.log("event", `click: ${label}`); },
+
+
+  /* ── HEADER ACTIONS ────────────────────────────────────── */
+
+  /** Clears the construction (new empty sheet). */
+  reset() {
+    if (!STATE.appletReady) return;
+    ggbApp.newConstruction();
+    App.log("cmd", "newConstruction()");
+  },
+
+  /** Undoes the last step. */
+  undo() {
+    if (!STATE.appletReady) return;
+    ggbApp.undo();
+    App.log("cmd", "undo()");
+  },
+
+  /** Redoes the last undone step. */
+  redo() {
+    if (!STATE.appletReady) return;
+    ggbApp.redo();
+    App.log("cmd", "redo()");
+  },
+
+  /** Downloads the current construction as a .ggb file. */
+  exportGGB() {
+    if (!STATE.appletReady) return;
+    const b64 = ggbApp.getBase64();
+    const a   = document.createElement("a");
+    a.href     = `data:application/vnd.geogebra.file;base64,${b64}`;
+    a.download = "konstruktion.ggb";
+    a.click();
+    App.log("cmd", "getBase64() → download");
+  },
+
+
+  /* ── EVENT LOG ─────────────────────────────────────────── */
+
+  /**
+   * Appends a styled line to the event log.
+   * @param {'cmd'|'result'|'event'|'error'|'info'} type
+   * @param {string} message
+   */
+  log(type, message) {
+    const el  = document.getElementById("js-console-log");
+    const now = new Date();
+    const ts  = `${String(now.getHours()).padStart(2,"0")}:${String(now.getMinutes()).padStart(2,"0")}:${String(now.getSeconds()).padStart(2,"0")}`;
+
+    const entry = document.createElement("div");
+    entry.className = "log-entry";
+    entry.innerHTML = `
+      <span class="log-time">${ts}</span>
+      <span class="log-type ${type}">${type}</span>
+      <span class="log-msg">${String(message).substring(0, 300)}</span>
+    `;
+    el.appendChild(entry);
+    el.scrollTop = el.scrollHeight;
+
+    // Keep log bounded at 200 entries
+    while (el.children.length > 200) el.removeChild(el.firstChild);
+  },
+
+  /** Clears all log entries. */
+  clearLog() {
+    document.getElementById("js-console-log").innerHTML = "";
+  },
+
+
+  /* ── DOM BUILDER ───────────────────────────────────────── */
+
+  /**
+   * Builds the tab navigation and API cards from API_CATALOG.
+   * Idempotent — safe to call multiple times (clears first).
+   */
+  buildUI() {
+    const tabNav     = document.getElementById("js-tab-nav");
+    const tabContent = document.getElementById("js-tab-content");
+    tabNav.innerHTML     = "";
+    tabContent.innerHTML = "";
+
+    API_CATALOG.forEach((group, groupIdx) => {
+      /* ── Tab button ── */
+      const tabBtn = document.createElement("button");
+      tabBtn.className   = `tab-btn ${groupIdx === 0 ? "active" : ""}`;
+      tabBtn.textContent = group.category;
+      tabBtn.dataset.group = groupIdx;
+      tabBtn.addEventListener("click", () => {
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+        document.querySelectorAll(".tab-pane").forEach(p => p.classList.remove("active"));
+        tabBtn.classList.add("active");
+        document.getElementById(`js-pane-${groupIdx}`).classList.add("active");
+      });
+      tabNav.appendChild(tabBtn);
+
+      /* ── Pane ── */
+      const pane = document.createElement("div");
+      pane.className = `tab-pane ${groupIdx === 0 ? "active" : ""}`;
+      pane.id        = `js-pane-${groupIdx}`;
+
+      group.entries.forEach(entry => {
+        pane.appendChild(App.buildApiCard(entry));
+      });
+
+      tabContent.appendChild(pane);
+    });
+  },
+
+  /**
+   * Builds a single API demo card from an entry definition.
+   * @param {Object} entry - One entry from API_CATALOG
+   * @returns {HTMLElement}
+   */
+  buildApiCard(entry) {
+    const card = document.createElement("div");
+    card.className = "api-card";
+
+    // ── Header (clickable to expand) ──
+    const header = document.createElement("div");
+    header.className = "api-card-header";
+    header.innerHTML = `
+      <div>
+        <div class="api-card-title">${entry.fn}</div>
+        <div class="api-card-desc">${entry.desc}</div>
+      </div>
+      <span class="api-card-expand">▶</span>
+    `;
+    header.addEventListener("click", () => {
+      card.classList.toggle("open");
+    });
+    card.appendChild(header);
+
+    // ── Body ──
+    const body = document.createElement("div");
+    body.className = "api-card-body";
+
+    const inputs = {};
+
+    // Render param fields
+    entry.params.forEach(param => {
+      const row = document.createElement("div");
+      row.className = "param-row";
+
+      const label = document.createElement("span");
+      label.className   = "param-label";
+      label.textContent = param.label;
+      row.appendChild(label);
+
+      let inputEl;
+      if (param.type === "select") {
+        inputEl = document.createElement("select");
+        inputEl.className = "param-select";
+        param.options.forEach(opt => {
+          const o = document.createElement("option");
+          o.value = o.textContent = opt;
+          inputEl.appendChild(o);
+        });
+      } else {
+        inputEl = document.createElement("input");
+        inputEl.className   = "param-input";
+        inputEl.type        = param.type === "number" ? "text" : "text";
+        inputEl.placeholder = param.placeholder ?? "";
+      }
+      inputEl.id = `js-input-${entry.id}-${param.id}`;
+      inputs[param.id] = inputEl;
+      row.appendChild(inputEl);
+      body.appendChild(row);
+    });
+
+    // Result display
+    const result = document.createElement("div");
+    result.className   = "api-result empty";
+    result.id          = `js-result-${entry.id}`;
+    result.textContent = "— noch nicht ausgeführt —";
+
+    // Run button
+    const runBtn = document.createElement("button");
+    runBtn.className   = "api-run-btn";
+    runBtn.textContent = "Ausführen";
+    runBtn.addEventListener("click", () => {
+      if (!STATE.appletReady) {
+        result.className   = "api-result error";
+        result.textContent = "⚠ Applet noch nicht geladen.";
+        return;
+      }
+      // Collect input values
+      const values = {};
+      entry.params.forEach(p => { values[p.id] = inputs[p.id].value.trim(); });
+
+      try {
+        const output = entry.run(values);
+        result.className   = "api-result";
+        result.textContent = output;
+        App.log("cmd",    `${entry.fn} (${Object.values(values).join(", ")})`);
+        App.log("result", output);
+      } catch (err) {
+        result.className   = "api-result error";
+        result.textContent = `Fehler: ${err.message}`;
+        App.log("error",  err.message);
+      }
+    });
+
+    body.appendChild(result);
+    body.appendChild(runBtn);
+    card.appendChild(body);
+
+    return card;
+  },
+
+
+  /* ── INIT ──────────────────────────────────────────────── */
+
+  /**
+   * Application entry point.
+   * Called once after the GeoGebra CDN script loads.
+   */
+  init() {
+    App.buildUI();
+    App.launchApplet("classic");
+    App.log("info", "GeoGebra API Demo bereit.");
+  },
+};
+
+// Expose listener callbacks to global scope (GeoGebra calls them by name)
+window.App = App;
+
+</script>
+
+<!-- ── GeoGebra CDN ──────────────────────────────────────── -->
+<script
+  src="https://cdn.geogebra.org/apps/deployggb.js"
+  onload="App.init()"
+  onerror="document.getElementById('js-ggb-loading').innerHTML='<span style=color:var(--red)>Fehler: GeoGebra konnte nicht geladen werden. Internetverbindung prüfen.</span>'"
+></script>
+
+</body>
+</html>
