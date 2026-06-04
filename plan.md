@@ -329,16 +329,21 @@ graph TD
 | Phase       | Zeitraum   | Fokus                                                                 |
 |-------------|------------|-----------------------------------------------------------------------|
 | **1. MVP**  | 2–3 Monate | Lerntyp-Test, KI-Dialog, GeoGebra-Integration, Level-System.          |
-| **2. Beta** | 1 Monat    | Mustererkennung, Transfertests, Untis-Integration.                     |
-| **3. Release** | 2 Monate | Weitere Fächer, Kollaboration, Gamification-Features.                 |
+| **2. Beta** | 1 Monat    | Mustererkennung, Transfertests, Untis-Integration, Kollaboration.    |
+| **3. Release** | 2 Monate | Gamification-Features, weitere Fächer, Feature-Vervollständigung.      |
 
 ### **B. Offene Fragen**
 1. **KI-Aufgaben**:
    - Soll die KI **komplett neue Aufgaben** generieren oder **Vorlagen anpassen**?
+   - Welche Tools benötigt die KI für die Erstellung neuer Aufgaben (z.B. GeoGebra-API, CAS, MathML-Generator)?
+   
+2. **Rechtliche Fragen**:
+   - Lizenzen klären (GeoGebra Non-Commercial License, eigene Inhalte)
+   - Impressum und Datenschutz implementieren
 
 ### **C. Nächste Schritte für die Entwicklung**
 1. **Lerntyp-Test implementieren** (Multiple Choice, 5–10 Fragen).
-2. **GeoGebra-Integration testen** (API oder Fork).
+2. **GeoGebra-Integration finalisieren** - API! Siehe [geo_test.html](geo_test.html) für Demo.
 3. **KI-Dialog-System aufsetzen** (NLP-Modell für emotionale Führung).
 4. **Mustererkennungstraining umsetzen** (Aufgabenbank mit adaptiven Mustern).
 5. **Verständnischecks entwickeln** (Selbsterklärung, Transferaufgaben).
@@ -400,7 +405,7 @@ def handle_user_input(user_input, user_profile):
     return generate_encouraging_response(user_profile)
 ```
 
-### **C. Beispiel: GeoGebra-Aufgabe (HTML/JS)
+### **C. Beispiel: GeoGebra-Aufgabe (HTML/JS)**
 ```html
 <!-- Einbettung eines GeoGebra-Applets -->
 <iframe
@@ -461,7 +466,3 @@ A: Ja! Die KI **zerlegt komplexe Themen** in kleinere Schritte und nutzt **GeoGe
 
 ### **F: Wie wird die Mustererkennung trainiert?**
 A: Durch **adaptive Aufgaben** (z. B. Folgen, Symmetrien, Ableitungsregeln) und **Transfertests** (Anwendung auf neue Probleme).
-
----
-**📌 Letzte Aktualisierung**: 17. Mai 2026
-**🔗 Projekt**: KI-gestützte Lernplattform für die Sekundarstufe II
